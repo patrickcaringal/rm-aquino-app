@@ -221,7 +221,7 @@ const ResponsiveAppBar = () => {
             {/* <Breadcrumbs separator="›" aria-label="breadcrumb">
               <Typography color="common.white">LOGIN</Typography>
             </Breadcrumbs> */}
-            {/* {isLoggedIn && (
+            {isLoggedIn && (
               <>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar sx={{ bgcolor: "primary.main" }}>
@@ -272,7 +272,7 @@ const ResponsiveAppBar = () => {
                   </MenuItem>
                 </Menu>
               </>
-            )} */}
+            )}
           </Container>
         </Toolbar>
       </AppBar>

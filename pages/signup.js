@@ -19,7 +19,7 @@ const defaultValue = {
   birthdate: "",
   gender: "",
   address: "",
-  contactNo: "",
+  email: "",
   password: "",
 };
 
@@ -35,9 +35,10 @@ export default function SignUpPage() {
     validationSchema: SignupSchema,
     validateOnChange: false,
     onSubmit: async (values) => {
+      alert("In Progress");
       // // Check Account Duplicate
       // const { error: checkAccDupliError } = await checkAccountDuplicate(
-      //   values.contactNo
+      //   values.email
       // );
       // if (checkAccDupliError) return openErrorDialog(checkAccDupliError);
       // // Move to contact no verification

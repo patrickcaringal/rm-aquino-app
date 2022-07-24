@@ -133,13 +133,13 @@ const Form = ({
         {/* CREDENTIAL */}
         <Grid item xs={12}>
           <Input
-            value={values.contactNo}
+            value={values.email}
             required
             label="Email"
-            name="contactNo"
+            name="email"
             onChange={handleChange}
             onBlur={handleBlur}
-            error={touched.contactNo && errors.contactNo}
+            error={touched.email && errors.email}
           />
         </Grid>
         <Grid item xs={12}>
@@ -173,7 +173,7 @@ const Form = ({
               router.push("/signin");
             }}
           >
-            Already have an account? Sign in
+            Already have an account? Login
           </Link>
         </Grid>
       </Grid>

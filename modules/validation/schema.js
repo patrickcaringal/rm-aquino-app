@@ -8,9 +8,7 @@ export const SignupSchema = Yup.object().shape({
   birthdate: Yup.string().nullable().required("Required"),
   gender: Yup.string().required("Required"),
   address: Yup.string().required("Required"),
-  contactNo: Yup.string()
-    .matches(/^(09)\d{9}$/, "Invalid Contact Number")
-    .required("Required"),
+  email: Yup.string().email().required("Required"),
   password: Yup.string()
     .min(8, "Password must be 8 characters long")
     .required("Required"),
@@ -24,9 +22,7 @@ export const VerificationCodeSchema = Yup.object().shape({
 });
 
 export const SigninSchema = Yup.object().shape({
-  contactNo: Yup.string()
-    .matches(/^(09)\d{9}$/, "Invalid Contact Number")
-    .required("Required"),
+  email: Yup.string().email().required("Required"),
   password: Yup.string()
     .min(8, "Password must be 8 characters long")
     .required("Required"),
