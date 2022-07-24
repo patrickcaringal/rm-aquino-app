@@ -24,7 +24,7 @@ import {
 import { SigninSchema } from "../modules/validation";
 
 const defaultValue = {
-  contactNo: "",
+  email: "",
   password: "",
 };
 
@@ -45,11 +45,12 @@ export default function SignInPage() {
     validationSchema: SigninSchema,
     validateOnChange: false,
     onSubmit: async (values) => {
-      // const { contactNo, password } = values;
+      alert("In Progress");
+      // const { email, password } = values;
       // // Authenticate
       // const { data: userInfo, error: authError } = await checkAccountCredential(
       //   {
-      //     contactNo,
+      //     email,
       //     password,
       //   }
       // );

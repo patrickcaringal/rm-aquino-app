@@ -22,15 +22,13 @@ const Form = ({
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Input
-            value={values.contactNo}
+            value={values.email}
             required
             label="Email"
-            name="contactNo"
-            onChange={(e) =>
-              setFieldValue("contactNo", e.target.value.toUpperCase())
-            }
+            name="email"
+            onChange={handleChange}
             onBlur={handleBlur}
-            error={touched.contactNo && errors.contactNo}
+            error={touched.email && errors.email}
           />
         </Grid>
         <Grid item xs={12}>
