@@ -17,6 +17,7 @@ import {
 } from "./auth";
 import { addBranchReq, getBranchesReq } from "./branches";
 import { auth, db } from "./config";
+import { createPatientAccountReq } from "./patient";
 import { addServiceReq, getServicesReq } from "./services";
 import { addStaffReq, getStaffsReq, signInStaffReq } from "./staff";
 import { deleteImageReq, uploadImageReq } from "./storage";
@@ -52,4 +53,6 @@ export {
   // storage
   uploadImageReq,
   deleteImageReq,
+  // patient
+  createPatientAccountReq,
 };

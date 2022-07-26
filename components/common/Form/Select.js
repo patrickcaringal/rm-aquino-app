@@ -29,8 +29,6 @@ const SelectComponent = ({
     >
       <InputLabel>{label}</InputLabel>
       <Select value={value} label={label} onChange={onChange} onBlur={onBlur}>
-        {/* <MenuItem value="male">Male</MenuItem>
-        <MenuItem value="female">Female</MenuItem> */}
         {children}
       </Select>
       {error && <FormHelperText>{error}</FormHelperText>}

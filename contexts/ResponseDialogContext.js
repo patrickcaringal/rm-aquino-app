@@ -43,7 +43,7 @@ export const ResponseDialogProvider = ({ children }) => {
     if (autoClose) {
       setTimeout(() => {
         setOpen(false);
-      }, 2000);
+      }, 4000);
     }
   };
 
@@ -51,6 +51,10 @@ export const ResponseDialogProvider = ({ children }) => {
     setType("ERROR");
     setContent(content);
     setOpen(true);
+
+    setTimeout(() => {
+      setOpen(false);
+    }, 4000);
   };
 
   const value = { openErrorDialog, openResponseDialog };

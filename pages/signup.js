@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useFormik } from "formik";
 import Image from "next/image";
-import { useRouter } from "next/router";
 
 import { Form } from "../components/pages/patient/SignUp";
+import { useBackdropLoader } from "../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../contexts/ResponseDialogContext";
 import useRequest from "../hooks/useRequest";
-import { checkAccountDuplicateReq } from "../modules/firebase";
+import { createPatientAccountReq } from "../modules/firebase";
 import { SignupSchema } from "../modules/validation";
 
 const defaultValue = false
@@ -35,39 +35,40 @@ const defaultValue = false
       password: "12345678",
     };
 
-// {
-//   firstName: "",
-//   middleName: "",
-//   lastName: "",
-//   suffix: "",
-//   birthdate: "",
-//   gender: "",
-//   address: "",
-//   email: "",
-//   password: "",
-// }
-
 export default function SignUpPage() {
   // const router = useRouter();
-  // const { openErrorDialog } = useResponseDialog();
-  // const [checkAccountDuplicate, checkAccountDuplicateLoading] = useRequest(
-  //   checkAccountDuplicateReq
-  // );
+  const { setBackdropLoader } = useBackdropLoader();
+
+  const { openResponseDialog, openErrorDialog } = useResponseDialog();
+  const [createPatientAccount] = useRequest(
+    createPatientAccountReq,
+    setBackdropLoader
+  );
 
   const formik = useFormik({
     initialValues: defaultValue,
     validationSchema: SignupSchema,
     validateOnChange: false,
-    onSubmit: async (values) => {
+    onSubmit: async (values, { resetForm }) => {
       // alert("In Progress");
-      console.log(JSON.stringify(values, null, 4));
-      // // Check Account Duplicate
-      // const { error: checkAccDupliError } = await checkAccountDuplicate(
-      //   values.email
-      // );
-      // if (checkAccDupliError) return openErrorDialog(checkAccDupliError);
-      // // Move to contact no verification
-      // setStep(STEPS.VERIFICATION);
+      const { error: createAccountError } = await createPatientAccount(values);
+      if (createAccountError) return openErrorDialog(createAccountError);
+
+      // Success
+      openResponseDialog({
+        autoClose: true,
+        content: (
+          <>
+            <Typography variant="body1">
+              Patient account registration successful.
+            </Typography>
+            <Typography variant="body2">For Admin approval.</Typography>
+          </>
+        ),
+        closeCb() {
+          resetForm();
+        },
+      });
     },
   });
 
