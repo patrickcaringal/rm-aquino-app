@@ -11,17 +11,41 @@ import useRequest from "../hooks/useRequest";
 import { checkAccountDuplicateReq } from "../modules/firebase";
 import { SignupSchema } from "../modules/validation";
 
-const defaultValue = {
-  firstName: "",
-  middleName: "",
-  lastName: "",
-  suffix: "",
-  birthdate: "",
-  gender: "",
-  address: "",
-  email: "",
-  password: "",
-};
+const defaultValue = false
+  ? {
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      suffix: "",
+      birthdate: "",
+      gender: "",
+      address: "",
+      email: "",
+      password: "",
+    }
+  : {
+      firstName: "THOMAS",
+      middleName: "MICHAEL",
+      lastName: "SHELBY",
+      suffix: "",
+      birthdate: "2022-07-05",
+      gender: "male",
+      address: "TEST",
+      email: "test@gmail.com",
+      password: "12345678",
+    };
+
+// {
+//   firstName: "",
+//   middleName: "",
+//   lastName: "",
+//   suffix: "",
+//   birthdate: "",
+//   gender: "",
+//   address: "",
+//   email: "",
+//   password: "",
+// }
 
 export default function SignUpPage() {
   // const router = useRouter();
@@ -35,7 +59,8 @@ export default function SignUpPage() {
     validationSchema: SignupSchema,
     validateOnChange: false,
     onSubmit: async (values) => {
-      alert("In Progress");
+      // alert("In Progress");
+      console.log(JSON.stringify(values, null, 4));
       // // Check Account Duplicate
       // const { error: checkAccDupliError } = await checkAccountDuplicate(
       //   values.email

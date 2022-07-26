@@ -1,14 +1,14 @@
 import React from "react";
 
 import { LoadingButton } from "@mui/lab";
-import { Box, FormHelperText, Grid, Link } from "@mui/material";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import { Box, Grid, Link, MenuItem } from "@mui/material";
+// import FormControl from "@mui/material/FormControl";
+// import InputLabel from "@mui/material/InputLabel";
+// import Select from "@mui/material/Select";
 import { useRouter } from "next/router";
 
-import { DatePicker, Input } from "../../../common/Form";
+import { formatTimeStamp } from "../../../../modules/helper";
+import { DatePicker, Input, Select } from "../../../common/Form";
 
 const Form = ({
   handleSubmit,
@@ -79,7 +79,7 @@ const Form = ({
             label="Date of Birth"
             value={values.birthdate}
             onChange={(value) => {
-              setFieldValue("birthdate", value, false);
+              setFieldValue("birthdate", formatTimeStamp(value), false);
             }}
             onBlur={handleBlur}
             required
@@ -89,30 +89,19 @@ const Form = ({
         </Grid>
 
         <Grid item xs={12}>
-          <FormControl
-            variant="filled"
-            focused
-            fullWidth
-            size="small"
+          <Select
             required
+            label="Gender"
+            onChange={(e) => {
+              setFieldValue("gender", e.target.value, false);
+            }}
+            value={values.gender}
             error={touched.gender && errors.gender}
+            onBlur={handleBlur}
           >
-            <InputLabel>Gender</InputLabel>
-            <Select
-              value={values.gender}
-              label="Gender"
-              onChange={(e) => {
-                setFieldValue("gender", e.target.value, false);
-              }}
-              onBlur={handleBlur}
-            >
-              <MenuItem value="male">Male</MenuItem>
-              <MenuItem value="female">Female</MenuItem>
-            </Select>
-            {touched.gender && errors.gender && (
-              <FormHelperText>{errors.gender}</FormHelperText>
-            )}
-          </FormControl>
+            <MenuItem value="male">Male</MenuItem>
+            <MenuItem value="female">Female</MenuItem>
+          </Select>
         </Grid>
         <Grid item xs={12}>
           <Input

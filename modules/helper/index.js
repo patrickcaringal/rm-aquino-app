@@ -5,12 +5,17 @@ export const formatDate = (date, dateformat = "yyyy-MM-dd") => {
 };
 
 export const formatTimeStamp = (timestamp, dateformat = "yyyy-MM-dd") => {
-  if (!timestamp) return "";
+  if (typeof timestamp === "string")
+    return format(new Date(timestamp), dateformat);
 
-  return format(
-    new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000),
-    dateformat
-  );
+  if ("seconds" in timestamp && "nanoseconds" in timestamp) {
+    return format(
+      new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000),
+      dateformat
+    );
+  } else {
+    return format(new Date(timestamp), dateformat);
+  }
 };
 
 export const getInitials = (str = "") => {

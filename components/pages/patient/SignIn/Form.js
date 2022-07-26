@@ -67,7 +67,7 @@ const Form = ({
               router.push("/signup");
             }}
           >
-            {"Don't have an account? Register"}
+            Register for Account
           </Link>
         </Grid>
       </Grid>
