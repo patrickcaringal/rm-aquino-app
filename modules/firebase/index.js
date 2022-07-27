@@ -7,6 +7,7 @@ import {
   getMemberForApprovalReq,
   updateFamilyMembersReq,
 } from "./account";
+import { signInAdminReq } from "./admin";
 import {
   monitorAuthState,
   signInAnonymouslyReq,
@@ -55,4 +56,6 @@ export {
   deleteImageReq,
   // patient
   createPatientAccountReq,
+  // admin
+  signInAdminReq,
 };

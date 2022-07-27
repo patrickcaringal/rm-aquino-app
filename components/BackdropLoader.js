@@ -13,7 +13,9 @@ const BackdropLoader = ({ open }) => (
         thickness={8}
         sx={{ mb: 3 }}
       />
-      <Typography color="common.white">Loading</Typography>
+      <Typography variant="h6" color="common.white">
+        Loading ...
+      </Typography>
     </Box>
   </Backdrop>
 );

@@ -11,15 +11,15 @@ const LoggedInInaccessibleRoute = ({ children }) => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      if (router.pathname.includes("/doctor")) {
-        router.push("/doctor/dashboard");
+      if (router.pathname.includes("/admin")) {
+        router.push("/admin/dashboard");
         return;
       }
 
-      if (router.pathname.includes("/staff")) {
-        router.push("/staff/dashboard");
-        return;
-      }
+      // if (router.pathname.includes("/staff")) {
+      //   router.push("/staff/dashboard");
+      //   return;
+      // }
 
       router.push("/dashboard");
     }
