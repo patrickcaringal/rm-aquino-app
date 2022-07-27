@@ -6,8 +6,8 @@ import { useRouter } from "next/router";
 import { PATHS, getRoleRoutes } from "../components/common/Routes";
 import { useAuth } from "../contexts/AuthContext";
 
-const doctorRoutes = getRoleRoutes("DOCTOR");
-const staffRoutes = getRoleRoutes("STAFF");
+const adminRoutes = getRoleRoutes("ADMIN");
+// const staffRoutes = getRoleRoutes("STAFF");
 const patientRoutes = getRoleRoutes("PATIENT");
 
 const ProtectedRoute = ({ children }) => {
@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children }) => {
 
   const isRouteNotAllowed = useMemo(
     () => ({
-      admin: isAdmin && isLoggedIn && !doctorRoutes.includes(router.pathname),
+      admin: isAdmin && isLoggedIn && !adminRoutes.includes(router.pathname),
       // staff: isStaff && isLoggedIn && !staffRoutes.includes(router.pathname),
       patient:
         isPatient && isLoggedIn && !patientRoutes.includes(router.pathname),

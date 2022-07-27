@@ -9,6 +9,7 @@ export const PATHS = {
   // },
   ADMIN: {
     DASHBOARD: "/admin/dashboard",
+    STAFF_MANAGEMENT: "/admin/staffs",
   },
   // STAFF: {
   //   DASHBOARD: "/staff/dashboard",

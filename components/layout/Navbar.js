@@ -103,7 +103,8 @@ const ResponsiveAppBar = () => {
           //   "0px 2px 4px -1px rgb(0, 0, 0, 0.05), 0px 4px 5px 0px rgb(0, 0, 0, 0.05), 0px 1px 10px 0px rgb(0, 0, 0, 0.05)",
         }}
       >
-        <Container maxWidth={isAdminPanel ? "none" : "lg"}>
+        {/* maxWidth={isAdminPanel ? "none" : "lg"} */}
+        <Container maxWidth="lg">
           <Toolbar
             disableGutters
             sx={{ height: "80px !important", minHeight: "80px !important" }}

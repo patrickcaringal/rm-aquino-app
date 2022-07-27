@@ -89,95 +89,77 @@ const DashboardPage = () => {
   return (
     <Box
       sx={{
-        height: "calc(100vh - 64px)",
-        mx: 4,
+        // height: "calc(100vh - 64px)",
+        bgColor: "secondary",
       }}
     >
-      <Toolbar
-        onRootClick={() => router.push("/doctor/dashboard")}
-        paths={[{ text: "Staffs" }]}
-      >
-        <Button
-          variant="contained"
-          size="small"
-          onClick={handleStaffModalOpen}
-          startIcon={<GroupAddIcon />}
-        >
-          add staff
-        </Button>
-      </Toolbar>
       <Box>
-        <Paper
-          elevation={2}
-          sx={{ height: "calc(100vh - 64px - 64px - 16px)" }}
-        >
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Branch</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
-                </TableRow>
-              </TableHead>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Branch</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
+              </TableRow>
+            </TableHead>
 
-              <TableBody>
-                {staffs.map((i) => {
-                  const {
-                    id,
-                    firstName,
-                    suffix,
-                    lastName,
-                    middleName,
-                    email,
-                    branch,
-                    address,
-                  } = i;
+            <TableBody>
+              {staffs.map((i) => {
+                const {
+                  id,
+                  firstName,
+                  suffix,
+                  lastName,
+                  middleName,
+                  email,
+                  branch,
+                  address,
+                } = i;
 
-                  return (
-                    <TableRow key={id}>
-                      <TableCell>
-                        {getFullName({
-                          firstName,
-                          suffix,
-                          lastName,
-                          middleName,
-                        })}
-                      </TableCell>
-                      <TableCell>{email}</TableCell>
-                      <TableCell sx={{ maxWidth: 200 }}>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            display: "-webkit-box",
-                            WebkitBoxOrient: "vertical",
-                            WebkitLineClamp: "2",
-                            overflow: "hidden",
-                          }}
-                          component="div"
-                        >
-                          {address}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>{branch}</TableCell>
-                      <TableCell>
-                        {/* <IconButton
+                return (
+                  <TableRow key={id}>
+                    <TableCell>
+                      {getFullName({
+                        firstName,
+                        suffix,
+                        lastName,
+                        middleName,
+                      })}
+                    </TableCell>
+                    <TableCell>{email}</TableCell>
+                    <TableCell sx={{ maxWidth: 200 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "-webkit-box",
+                          WebkitBoxOrient: "vertical",
+                          WebkitLineClamp: "2",
+                          overflow: "hidden",
+                        }}
+                        component="div"
+                      >
+                        {address}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{branch}</TableCell>
+                    <TableCell>
+                      {/* <IconButton
                             color="primary"
                             component="span"
                             onClick={handleSendEmail}
                           >
                             <MailIcon />
                           </IconButton> */}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
 
       <ManageStaffModal
