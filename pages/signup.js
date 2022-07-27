@@ -38,7 +38,6 @@ const defaultValue = false
 export default function SignUpPage() {
   // const router = useRouter();
   const { setBackdropLoader } = useBackdropLoader();
-
   const { openResponseDialog, openErrorDialog } = useResponseDialog();
   const [createPatientAccount] = useRequest(
     createPatientAccountReq,

@@ -32,8 +32,8 @@ export const getRoleRoutes = (role) => {
 };
 
 export const PROTECTED_ROUTES = [
-  ...getRoleRoutes("DOCTOR"),
-  ...getRoleRoutes("STAFF"),
+  ...getRoleRoutes("ADMIN"),
+  // ...getRoleRoutes("STAFF"),
   ...getRoleRoutes("PATIENT"),
 ];
 

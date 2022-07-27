@@ -76,7 +76,7 @@ const ResponsiveAppBar = () => {
 
   const handleLogout = async () => {
     // Sign Out Doctor, Staff
-    if (isAdmin || isStaff) {
+    if (isAdmin) {
       const { error: signOutError } = await signOutReq();
       if (signOutError) return openErrorDialog(signOutError);
       manualSetUser(null);
@@ -84,11 +84,11 @@ const ResponsiveAppBar = () => {
       return;
     }
 
-    // Sign Out Patient
-    const { error: signOutError } = await signOutAnonymously(userSession);
-    if (signOutError) return openErrorDialog(signOutError);
-    manualSetUser(null);
-    setAnchorElUser(null);
+    // // Sign Out Patient
+    // const { error: signOutError } = await signOutAnonymously(userSession);
+    // if (signOutError) return openErrorDialog(signOutError);
+    // manualSetUser(null);
+    // setAnchorElUser(null);
   };
 
   return (
@@ -151,6 +151,59 @@ const ResponsiveAppBar = () => {
             >
               JP Rizal St, Poblacion Uno, Cabuyao, 4026 Laguna
             </Typography>
+
+            {isLoggedIn && (
+              <>
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar sx={{ bgcolor: "primary.main" }}>
+                    {getInitials(user?.firstName)}
+                  </Avatar>
+                </IconButton>
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  <Box sx={{ width: 260, p: 2 }}>
+                    <Typography variant="body1" textAlign="center">
+                      {getFullName(user).toUpperCase()}
+                    </Typography>
+                    <Typography variant="body2" textAlign="center">
+                      {user?.email}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      textAlign="center"
+                      display="block"
+                    >
+                      {user?.role === "superadmin"
+                        ? "Doctor"
+                        : !user?.role
+                        ? "Patient"
+                        : user?.role}
+                    </Typography>
+                  </Box>
+                  <Divider />
+                  <MenuItem onClick={handleLogout}>
+                    <ListItemIcon>
+                      <LogoutIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Logout</ListItemText>
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
 
             {/* Mobile */}
             {/* <>
@@ -221,58 +274,6 @@ const ResponsiveAppBar = () => {
             {/* <Breadcrumbs separator="›" aria-label="breadcrumb">
               <Typography color="common.white">LOGIN</Typography>
             </Breadcrumbs> */}
-            {isLoggedIn && (
-              <>
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar sx={{ bgcolor: "primary.main" }}>
-                    {getInitials(user?.firstName)}
-                  </Avatar>
-                </IconButton>
-                <Menu
-                  sx={{ mt: "45px" }}
-                  id="menu-appbar"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
-                >
-                  <Box sx={{ width: 260, p: 2 }}>
-                    <Typography variant="body1" textAlign="center">
-                      {getFullName(user).toUpperCase()}
-                    </Typography>
-                    <Typography variant="body2" textAlign="center">
-                      {user?.email}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      textAlign="center"
-                      display="block"
-                    >
-                      {user?.role === "superadmin"
-                        ? "Doctor"
-                        : !user?.role
-                        ? "Patient"
-                        : user?.role}
-                    </Typography>
-                  </Box>
-                  <Divider />
-                  <MenuItem onClick={handleLogout}>
-                    <ListItemIcon>
-                      <LogoutIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Logout</ListItemText>
-                  </MenuItem>
-                </Menu>
-              </>
-            )}
           </Container>
         </Toolbar>
       </AppBar>

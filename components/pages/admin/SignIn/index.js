@@ -13,23 +13,30 @@ import { useFormik } from "formik";
 import Image from "next/image";
 
 import { useAuth } from "../../../../contexts/AuthContext";
+import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import { signInAdminReq } from "../../../../modules/firebase";
 import { DoctorSigninSchema } from "../../../../modules/validation";
 import Form from "./Form";
 
-const defaultValues = {
-  email: "",
-  password: "",
-};
+const defaultValues = false
+  ? {
+      email: "",
+      password: "",
+    }
+  : {
+      email: "rmaquino@gmail.com",
+      password: "12345678",
+    };
 
 const AdminSignInPage = () => {
   const { manualSetUser } = useAuth();
+  const { setBackdropLoader } = useBackdropLoader();
   const { openErrorDialog } = useResponseDialog();
 
   // Requests
-  const [signIn] = useRequest(signInAdminReq);
+  const [signIn] = useRequest(signInAdminReq, setBackdropLoader);
 
   const formik = useFormik({
     initialValues: defaultValues,
