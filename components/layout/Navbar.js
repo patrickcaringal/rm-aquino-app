@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import AdbIcon from "@mui/icons-material/Adb";
+import GroupIcon from "@mui/icons-material/Group";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -28,6 +29,8 @@ import {
 import { useRouter } from "next/router";
 
 import { Logo } from "../../components";
+import NavbarMenu from "../../components/common/Menu/NavbarMenu";
+import { PATHS } from "../../components/common/Routes";
 import { useAuth } from "../../contexts/AuthContext";
 import { useBackdropLoader } from "../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../contexts/ResponseDialogContext";
@@ -58,6 +61,16 @@ const ResponsiveAppBar = () => {
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const menuItems = isAdmin
+    ? [
+        {
+          text: "Staffs",
+          icon: <GroupIcon />,
+          onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
+        },
+      ]
+    : [];
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -267,21 +280,29 @@ const ResponsiveAppBar = () => {
         <Toolbar
           sx={{
             bgcolor: "primary.dark",
-            height: "30px !important",
-            minHeight: "30px !important",
+            height: "40px !important",
+            minHeight: "40px !important",
           }}
         >
-          <Container maxWidth={isAdminPanel ? "none" : "lg"}>
-            {/* <Breadcrumbs separator="›" aria-label="breadcrumb">
-              <Typography color="common.white">LOGIN</Typography>
-            </Breadcrumbs> */}
+          <Container maxWidth="lg">
+            {menuItems.map(({ text, icon, onClick }) => (
+              <Button
+                sx={{ color: "common.white" }}
+                key={text}
+                variant="text"
+                onClick={onClick}
+                startIcon={icon}
+              >
+                {text}
+              </Button>
+            ))}
           </Container>
         </Toolbar>
       </AppBar>
       <Toolbar
         sx={{
-          height: "110px !important",
-          minHeight: "110px !important",
+          height: "120px !important",
+          minHeight: "120px !important",
         }}
       />
     </>
