@@ -64,7 +64,6 @@ export const StaffSchema = Yup.object().shape({
       gender: Yup.string().required("Required"),
       address: Yup.string().required("Required"),
       email: Yup.string().email("Invalid email").required("Required"),
-      branch: Yup.string().required("Required"),
     })
   ),
 });

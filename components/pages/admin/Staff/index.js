@@ -16,12 +16,17 @@ import faker from "faker";
 import { useRouter } from "next/router";
 
 import { Toolbar } from "../../../../components/common";
-import { ManageStaffModal } from "../../../../components/pages/doctor/StaffManagement";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import { addStaffReq, getStaffsReq } from "../../../../modules/firebase";
-import { getFullName, getUniquePersonId } from "../../../../modules/helper";
+import { getFullName, pluralize } from "../../../../modules/helper";
+import ManageStaffModal from "./ManageStaffModal";
+
+const defaultModal = {
+  open: false,
+  data: {},
+};
 
 const DashboardPage = () => {
   const router = useRouter();
@@ -34,68 +39,63 @@ const DashboardPage = () => {
 
   // Local States
   const [staffs, setStaffs] = useState([
-    ...[...Array(2)].map((i) => ({
-      id: faker.random.uuid(),
-      firstName: faker.name.firstName(),
-      suffix: "",
-      lastName: faker.name.lastName(),
-      middleName: faker.name.lastName(),
-      email: faker.internet.email(),
-      branch: faker.lorem.words(),
-      address: faker.lorem.paragraph(),
-    })),
+    // ...[...Array(2)].map((i) => ({
+    //   id: faker.datatype.uuid(),
+    //   firstName: faker.name.firstName(),
+    //   suffix: "",
+    //   lastName: faker.name.lastName(),
+    //   middleName: faker.name.lastName(),
+    //   email: faker.internet.email(),
+    //   address: faker.lorem.paragraph(),
+    //   birthdate: faker.date.past(),
+    //   gender: faker.random.arrayElements(["male", "female"]),
+    // })),
   ]);
-  const [staffModalOpen, setStaffModalOpen] = useState(false);
-
-  //   const staffsUniqueId = staffs.map((i) => {
-  //     const { firstName, middleName, lastName, birthdate } = i;
-  //     const m = getUniquePersonId({ firstName, middleName, lastName, birthdate });
-  //     return m;
-  //   });
+  const [staffModal, setStaffModal] = useState(defaultModal);
 
   useEffect(() => {
     const fetch = async () => {
       // Get Staffs
-      const { data: staffList, error: getStaffsError } = await getStaffs({
-        branch: "LAKESIDE",
-      });
+      const { data: staffList, error: getStaffsError } = await getStaffs();
       if (getStaffsError) return openErrorDialog(getStaffsError);
 
       setStaffs(staffList);
     };
 
-    // fetch();
+    fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleStaffModalOpen = () => {
-    setStaffModalOpen(true);
+    setStaffModal({
+      open: true,
+      data: null,
+    });
   };
-
-  //   const handleCheckDuplicate = (newStaff) => staffsUniqueId.includes(newStaff);
 
   const handleAddStaff = async (newStaff) => {
     // Add Staff
-    const { error: addStaffError } = await addStaff({
+    const { data: addedStaff, error: addStaffError } = await addStaff({
       staffs: newStaff,
     });
     if (addStaffError) return openErrorDialog(addStaffError);
 
     // Successful
-    const allStaffs = [...staffs, ...newStaff];
-    setStaffs(allStaffs);
+    setStaffs((prev) => [...prev, ...addedStaff]);
 
     openResponseDialog({
       autoClose: true,
-      content: "Staff successfuly added.",
+      content: `${pluralize("Staff", addedStaff.length)} successfuly added.`,
       type: "SUCCESS",
       closeCb() {
-        setStaffModalOpen(false);
+        setStaffModal(defaultModal);
       },
     });
   };
 
-  const handleSendEmail = () => {};
+  const handleStaffModalClose = () => {
+    setStaffModal(defaultModal);
+  };
 
   return (
     <Box
@@ -105,6 +105,10 @@ const DashboardPage = () => {
         pt: 2,
       }}
     >
+      <Button variant="contained" size="small" onClick={handleStaffModalOpen}>
+        add staff
+      </Button>
+
       <Box>
         <TableContainer>
           <Table>
@@ -113,7 +117,6 @@ const DashboardPage = () => {
                 <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Branch</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -156,7 +159,6 @@ const DashboardPage = () => {
                         {address}
                       </Typography>
                     </TableCell>
-                    <TableCell>{branch}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                 );
@@ -166,12 +168,12 @@ const DashboardPage = () => {
         </TableContainer>
       </Box>
 
-      {/* <ManageStaffModal
-        open={staffModalOpen}
-        setOpen={setStaffModalOpen}
-        onCheckDuplicate={handleCheckDuplicate}
-        onAddStaff={handleAddStaff}
-      /> */}
+      <ManageStaffModal
+        open={staffModal.open}
+        onClose={handleStaffModalClose}
+        // onCheckDuplicate={handleCheckDuplicate}
+        onSave={handleAddStaff}
+      />
     </Box>
   );
 };

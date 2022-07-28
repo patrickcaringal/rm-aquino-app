@@ -1,3 +1,4 @@
+import Modal from "./Modal";
 import Toolbar from "./Toolbar";
 
-export { Toolbar };
+export { Modal, Toolbar };
