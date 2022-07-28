@@ -41,3 +41,30 @@ a {
 * {
   box-sizing: border-box;
 }
+
+// MUI overrides
+
+.MuiTable-root {
+  $border: 1px solid rgba(34, 36, 38, 0.1);
+  border: $border;
+
+  td.MuiTableCell-root,
+  th.MuiTableCell-root {
+    &:not(:first-child) {
+      border-left: $border;
+    }
+  }
+
+  td.MuiTableCell-root,
+  th.MuiTableCell-root {
+    border-bottom: $border;
+  }
+
+  td {
+    background: #fff;
+  }
+
+  th {
+    background: #eee;
+  }
+}
