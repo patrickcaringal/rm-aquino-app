@@ -12,20 +12,27 @@ const defaultValues = {
   staffs: [],
 };
 
-export default function ManageStaffModal({ open, onClose, onSave }) {
-  const { openResponseDialog } = useResponseDialog();
+export default function ManageStaffModal({
+  open = false,
+  data,
+  onClose,
+  onSave,
+}) {
+  const isCreate = !data;
+  const initialValues = isCreate ? defaultValues : { staffs: [data] };
 
   const formik = useFormik({
-    initialValues: defaultValues,
+    initialValues,
     validationSchema: StaffSchema,
     validateOnChange: false,
+    enableReinitialize: true,
     onSubmit: async (values) => {
       const { staffs } = values;
       onSave(staffs);
     },
   });
 
-  const { values, submitForm, resetForm } = formik;
+  const { values, submitForm, resetForm, dirty } = formik;
 
   const handleClose = () => {
     onClose();
@@ -36,12 +43,12 @@ export default function ManageStaffModal({ open, onClose, onSave }) {
     <Modal
       open={open}
       onClose={handleClose}
-      title="Add Staff"
+      title={`${isCreate ? "Add" : "Edit"} Staff`}
       dialogActions={
         <>
           <Button
             sx={{ mr: 2 }}
-            disabled={values.staffs.length === 0}
+            disabled={values.staffs.length === 0 || !dirty}
             onClick={submitForm}
           >
             save
@@ -53,7 +60,7 @@ export default function ManageStaffModal({ open, onClose, onSave }) {
       }
     >
       <FormikProvider value={formik}>
-        <Form {...formik} />
+        <Form {...formik} isCreate={isCreate} />
       </FormikProvider>
     </Modal>
   );

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -19,8 +21,16 @@ import { Toolbar, successMessage } from "../../../../components/common";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
-import { addStaffReq, getStaffsReq } from "../../../../modules/firebase";
-import { getFullName, pluralize } from "../../../../modules/helper";
+import {
+  addStaffReq,
+  getStaffsReq,
+  updateStaffReq,
+} from "../../../../modules/firebase";
+import {
+  formatTimeStamp,
+  getFullName,
+  pluralize,
+} from "../../../../modules/helper";
 import ManageStaffModal from "./ManageStaffModal";
 
 const defaultModal = {
@@ -36,6 +46,7 @@ const DashboardPage = () => {
   // Requests
   const [getStaffs] = useRequest(getStaffsReq, setBackdropLoader);
   const [addStaff] = useRequest(addStaffReq, setBackdropLoader);
+  const [updateStaff] = useRequest(updateStaffReq, setBackdropLoader);
 
   // Local States
   const [staffs, setStaffs] = useState([]);
@@ -53,13 +64,6 @@ const DashboardPage = () => {
     fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleStaffModalOpen = () => {
-    setStaffModal({
-      open: true,
-      data: null,
-    });
-  };
 
   const handleAddStaff = async (newStaff) => {
     // Add Staff
@@ -84,8 +88,59 @@ const DashboardPage = () => {
     });
   };
 
+  const handleEditStaff = async (updatedDocs) => {
+    const updatedStaff = updatedDocs[0];
+    const staffCopy = [...staffs];
+    const index = staffCopy.findIndex((i) => i.id === updatedStaff.id);
+
+    staffCopy[index] = {
+      ...staffCopy[index],
+      ...updatedStaff,
+    };
+
+    // TODO: change email
+    // const isEmailUpdated = !lodash.isEqual(
+    //   staffs[index].email,
+    //   updatedStaff.email
+    // );
+
+    // Update
+    const { error: updateError } = await updateStaff({
+      staff: updatedStaff,
+    });
+    if (updateError) return openErrorDialog(updateError);
+
+    // Success
+    setStaffs(staffCopy);
+    openResponseDialog({
+      autoClose: true,
+      content: successMessage({
+        noun: "Staff",
+        verb: "updated",
+      }),
+      type: "SUCCESS",
+      closeCb() {
+        setStaffModal(defaultModal);
+      },
+    });
+  };
+
+  const handleAddModalOpen = () => {
+    setStaffModal({
+      open: true,
+      data: null,
+    });
+  };
+
   const handleStaffModalClose = () => {
     setStaffModal(defaultModal);
+  };
+
+  const handleEditModalOpen = (staff) => {
+    setStaffModal({
+      open: true,
+      data: staff,
+    });
   };
 
   return (
@@ -97,20 +152,22 @@ const DashboardPage = () => {
       }}
     >
       <Box sx={{ mb: 2 }}>
-        <Button variant="contained" size="small" onClick={handleStaffModalOpen}>
+        <Button variant="contained" size="small" onClick={handleAddModalOpen}>
           add staff
         </Button>
       </Box>
 
       <Box>
         <TableContainer>
-          <Table>
+          <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }} align="center">
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHead>
 
@@ -123,22 +180,27 @@ const DashboardPage = () => {
                   lastName,
                   middleName,
                   email,
-                  branch,
+                  birthdate,
                   address,
                 } = i;
 
                 return (
                   <TableRow key={id}>
-                    <TableCell>
-                      {getFullName({
-                        firstName,
-                        suffix,
-                        lastName,
-                        middleName,
-                      })}
+                    <TableCell sx={{ width: 260 }}>
+                      <Typography variant="body2">
+                        {getFullName({
+                          firstName,
+                          suffix,
+                          lastName,
+                          middleName,
+                        })}
+                      </Typography>
                     </TableCell>
-                    <TableCell>{email}</TableCell>
-                    <TableCell sx={{ maxWidth: 200 }}>
+                    <TableCell sx={{ width: 260 }}>
+                      <Typography variant="body2">{email}</Typography>
+                    </TableCell>
+                    {/* sx={{ maxWidth: 200 }} */}
+                    <TableCell>
                       <Typography
                         variant="caption"
                         sx={{
@@ -152,7 +214,32 @@ const DashboardPage = () => {
                         {address}
                       </Typography>
                     </TableCell>
-                    <TableCell></TableCell>
+                    <TableCell sx={{ width: 110 }} align="center">
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() =>
+                          handleEditModalOpen({
+                            ...i,
+                            birthdate: formatTimeStamp(birthdate),
+                          })
+                        }
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      {/* <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() =>
+                          handleEditModalOpen({
+                            ...i,
+                            birthdate: formatTimeStamp(birthdate),
+                          })
+                        }
+                      >
+                        <DeleteIcon />
+                      </IconButton> */}
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -161,12 +248,14 @@ const DashboardPage = () => {
         </TableContainer>
       </Box>
 
-      <ManageStaffModal
-        open={staffModal.open}
-        onClose={handleStaffModalClose}
-        // onCheckDuplicate={handleCheckDuplicate}
-        onSave={handleAddStaff}
-      />
+      {staffModal.open && (
+        <ManageStaffModal
+          open={staffModal.open}
+          data={staffModal.data}
+          onClose={handleStaffModalClose}
+          onSave={!staffModal.data ? handleAddStaff : handleEditStaff}
+        />
+      )}
     </Box>
   );
 };

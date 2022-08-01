@@ -36,33 +36,35 @@ const Form = ({
       render={({ push, remove }) => {
         return (
           <>
-            <Fab
-              color="primary"
-              variant="extended"
-              sx={{ position: "absolute", bottom: 8, left: 16 }}
-              onClick={() => {
-                push({
-                  firstName: faker.name.firstName(),
-                  suffix: "",
-                  lastName: faker.name.lastName(),
-                  middleName: faker.name.lastName(),
-                  email: faker.internet.email(),
-                  address: faker.lorem.paragraph(),
-                  birthdate: faker.date.past(),
-                  gender: faker.random.arrayElement(["male", "female"]),
-                });
-              }}
-              size="small"
-            >
-              <AddIcon sx={{ mr: 1 }} />
-              Add staff
-            </Fab>
+            {isCreate && (
+              <Fab
+                color="primary"
+                variant="extended"
+                sx={{ position: "absolute", bottom: 8, left: 16 }}
+                onClick={() => {
+                  push({
+                    firstName: faker.name.firstName(),
+                    suffix: "",
+                    lastName: faker.name.lastName(),
+                    middleName: faker.name.lastName(),
+                    email: faker.internet.email(),
+                    address: faker.lorem.paragraph(),
+                    birthdate: faker.date.past(),
+                    gender: faker.random.arrayElement(["male", "female"]),
+                  });
+                }}
+                size="small"
+              >
+                <AddIcon sx={{ mr: 1 }} />
+                Add staff
+              </Fab>
+            )}
             <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
                 overflow: "overlay",
-                minHeight: 280,
+                minHeight: isCreate ? 280 : 0,
               }}
             >
               {values.staffs.map((s, index) => {
@@ -76,16 +78,18 @@ const Form = ({
 
                 return (
                   <React.Fragment key={index}>
-                    <IconButton
-                      sx={{ alignSelf: "flex-end" }}
-                      size="small"
-                      color="error"
-                      onClick={() => {
-                        remove(index);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                    {isCreate && (
+                      <IconButton
+                        sx={{ alignSelf: "flex-end" }}
+                        size="small"
+                        color="error"
+                        onClick={() => {
+                          remove(index);
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
                     <Grid key={index} container spacing={2}>
                       <Grid item xs={12} sm={4}>
                         <Input
@@ -188,6 +192,7 @@ const Form = ({
                       </Grid>
                       <Grid item xs={12} sm={4}>
                         <Input
+                          disabled={!isCreate}
                           required
                           label="Email"
                           name={getFieldName("email")}

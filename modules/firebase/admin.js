@@ -8,6 +8,7 @@ import {
   doc,
   getDocs,
   query,
+  updateDoc,
   where,
   writeBatch,
 } from "firebase/firestore";
@@ -24,6 +25,12 @@ import { getErrorMsg } from "./auth";
 import { auth, db, secondaryAuth, timestampFields } from "./config";
 
 const collRef = collection(db, "admins");
+
+const transformedFields = (doc) => ({
+  name: getFullName(doc),
+  birthdate: formatFirebasetimeStamp(doc.birthdate),
+  nameBirthdate: getUniquePersonId(doc),
+});
 
 export const signInAdminReq = async ({ email, password }) => {
   try {
@@ -118,9 +125,10 @@ export const addStaffReq = async ({ staffs }) => {
     if (isDuplicate) {
       const duplicates = querySnapshot.docs.map((i) => i.data().name);
       throw new Error(
-        `Duplicate ${pluralize("Staff", duplicates.length)} (${duplicates.join(
-          ", "
-        )})`
+        duplicateMessage({
+          noun: pluralize("Staff", duplicates.length),
+          item: arrayStringify(duplicates),
+        })
       );
     }
 
@@ -129,27 +137,21 @@ export const addStaffReq = async ({ staffs }) => {
 
     for (let index = 0; index < staffs.length; index++) {
       const staffdoc = { ...staffs[index] };
-      const { birthdate: rawBirthdate, email } = staffdoc;
 
       const {
         user: { uid },
       } = await createUserWithEmailAndPassword(
         secondaryAuth,
-        email,
+        staffdoc.email,
         "12345678"
       );
-
-      const fullName = getFullName(staffdoc);
-      const birthdate = formatFirebasetimeStamp(rawBirthdate);
 
       staffdoc = {
         ...staffdoc,
         id: uid,
-        nameBirthdate: getUniquePersonId(staffdoc), // unique identifier
-        name: fullName,
-        birthdate,
         role: "staff",
         deleted: false,
+        ...transformedFields(staffdoc),
         ...timestampFields({ dateCreated: true, dateUpdated: true }),
       };
 
@@ -162,6 +164,40 @@ export const addStaffReq = async ({ staffs }) => {
     await batch.commit();
 
     return { data: staffs, success: true };
+  } catch (error) {
+    const errMsg = getErrorMsg(error.code);
+    return { error: errMsg || error.message };
+  }
+};
+
+export const updateStaffReq = async ({ staff }) => {
+  try {
+    const nameBirthdate = getUniquePersonId(staff);
+
+    // Check fullname, birthdate duplicate
+    const q = query(collRef, where("nameBirthdate", "==", nameBirthdate));
+    const querySnapshot = await getDocs(q);
+
+    const isDuplicate = querySnapshot.docs.length !== 0;
+    if (isDuplicate) {
+      throw new Error(
+        duplicateMessage({
+          noun: "Staff",
+          item: getFullName(staff),
+        })
+      );
+    }
+
+    // Update
+    const docRef = doc(db, "admins", staff.id);
+    const finalDoc = {
+      ...staff,
+      ...transformedFields(staff),
+      ...timestampFields({ dateUpdated: true }),
+    };
+    await updateDoc(docRef, finalDoc);
+
+    return { success: true };
   } catch (error) {
     const errMsg = getErrorMsg(error.code);
     return { error: errMsg || error.message };

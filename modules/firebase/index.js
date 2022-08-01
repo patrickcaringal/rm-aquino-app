@@ -7,7 +7,12 @@ import {
   getMemberForApprovalReq,
   updateFamilyMembersReq,
 } from "./account";
-import { addStaffReq, getStaffsReq, signInAdminReq } from "./admin";
+import {
+  addStaffReq,
+  getStaffsReq,
+  signInAdminReq,
+  updateStaffReq,
+} from "./admin";
 import {
   monitorAuthState,
   signInAnonymouslyReq,
@@ -53,6 +58,7 @@ export {
   createPatientAccountReq,
   // admin
   signInAdminReq,
-  addStaffReq,
   getStaffsReq,
+  addStaffReq,
+  updateStaffReq,
 };
