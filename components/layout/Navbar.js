@@ -2,6 +2,7 @@ import * as React from "react";
 
 import AdbIcon from "@mui/icons-material/Adb";
 import GroupIcon from "@mui/icons-material/Group";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -68,6 +69,11 @@ const ResponsiveAppBar = () => {
           text: "Staffs",
           icon: <GroupIcon />,
           onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
+        },
+        {
+          text: "Patient Approval",
+          icon: <HowToRegIcon />,
+          onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
         },
       ]
     : [];
@@ -287,7 +293,7 @@ const ResponsiveAppBar = () => {
           <Container maxWidth="lg">
             {menuItems.map(({ text, icon, onClick }) => (
               <Button
-                sx={{ color: "common.white" }}
+                sx={{ color: "common.white", mr: 2 }}
                 key={text}
                 variant="text"
                 onClick={onClick}

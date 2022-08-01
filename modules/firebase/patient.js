@@ -62,3 +62,25 @@ export const createPatientAccountReq = async (document) => {
     return { error: error.message };
   }
 };
+
+export const getPatientsAccountApprovalReq = async () => {
+  try {
+    // TODO: adjust when get branch needed
+    const q = query(
+      collRef,
+      where("approved", "==", false),
+      where("deleted", "==", false)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};

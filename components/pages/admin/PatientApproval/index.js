@@ -13,7 +13,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import faker from "faker";
 import { useRouter } from "next/router";
 
 import { Toolbar, successMessage } from "../../../../components/common";
@@ -22,6 +21,7 @@ import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import {
   addStaffReq,
+  getPatientsAccountApprovalReq,
   getStaffsReq,
   updateStaffReq,
 } from "../../../../modules/firebase";
@@ -38,26 +38,28 @@ const defaultModal = {
 };
 
 const DashboardPage = () => {
-  const router = useRouter();
   const { setBackdropLoader } = useBackdropLoader();
   const { openResponseDialog, openErrorDialog } = useResponseDialog();
 
   // Requests
-  const [getStaffs] = useRequest(getStaffsReq, setBackdropLoader);
+  const [getStaffs] = useRequest(
+    getPatientsAccountApprovalReq,
+    setBackdropLoader
+  );
   const [addStaff] = useRequest(addStaffReq, setBackdropLoader);
   const [updateStaff] = useRequest(updateStaffReq, setBackdropLoader);
 
   // Local States
-  const [staffs, setStaffs] = useState([]);
+  const [patients, setPatients] = useState([]);
   const [staffModal, setStaffModal] = useState(defaultModal);
 
   useEffect(() => {
     const fetch = async () => {
       // Get Staffs
-      const { data: staffList, error: getStaffsError } = await getStaffs();
-      if (getStaffsError) return openErrorDialog(getStaffsError);
+      const { data: patientList, error: getPatientError } = await getStaffs();
+      if (getPatientError) return openErrorDialog(getPatientError);
 
-      setStaffs(staffList);
+      setPatients(patientList);
     };
 
     fetch();
@@ -67,12 +69,12 @@ const DashboardPage = () => {
   const handleAddStaff = async (newStaff) => {
     // Add Staff
     const { data: addedStaff, error: addStaffError } = await addStaff({
-      staffs: newStaff,
+      patients: newStaff,
     });
     if (addStaffError) return openErrorDialog(addStaffError);
 
     // Successful
-    setStaffs((prev) => [...prev, ...addedStaff]);
+    setPatients((prev) => [...prev, ...addedStaff]);
 
     openResponseDialog({
       autoClose: true,
@@ -89,7 +91,7 @@ const DashboardPage = () => {
 
   const handleEditStaff = async (updatedDocs) => {
     const updatedStaff = updatedDocs[0];
-    const staffCopy = [...staffs];
+    const staffCopy = [...patients];
     const index = staffCopy.findIndex((i) => i.id === updatedStaff.id);
 
     staffCopy[index] = {
@@ -99,7 +101,7 @@ const DashboardPage = () => {
 
     // TODO: change email
     // const isEmailUpdated = !lodash.isEqual(
-    //   staffs[index].email,
+    //   patients[index].email,
     //   updatedStaff.email
     // );
 
@@ -110,7 +112,7 @@ const DashboardPage = () => {
     if (updateError) return openErrorDialog(updateError);
 
     // Success
-    setStaffs(staffCopy);
+    setPatients(staffCopy);
     openResponseDialog({
       autoClose: true,
       content: successMessage({
@@ -157,6 +159,7 @@ const DashboardPage = () => {
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Gender</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }} align="center">
                   Actions
@@ -165,13 +168,14 @@ const DashboardPage = () => {
             </TableHead>
 
             <TableBody>
-              {staffs.map((i) => {
+              {patients.map((i) => {
                 const {
                   id,
                   firstName,
                   suffix,
                   lastName,
                   middleName,
+                  gender,
                   email,
                   birthdate,
                   address,
@@ -192,6 +196,10 @@ const DashboardPage = () => {
                     <TableCell sx={{ width: 260 }}>
                       <Typography variant="body2">{email}</Typography>
                     </TableCell>
+                    <TableCell sx={{ width: 260 }}>
+                      <Typography variant="body2">{gender}</Typography>
+                    </TableCell>
+
                     {/* sx={{ maxWidth: 200 }} */}
                     <TableCell>
                       <Typography
@@ -208,7 +216,7 @@ const DashboardPage = () => {
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ width: 110 }} align="center">
-                      <IconButton
+                      {/* <IconButton
                         size="small"
                         color="primary"
                         onClick={() =>
@@ -219,18 +227,6 @@ const DashboardPage = () => {
                         }
                       >
                         <EditIcon />
-                      </IconButton>
-                      {/* <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() =>
-                          handleEditModalOpen({
-                            ...i,
-                            birthdate: formatTimeStamp(birthdate),
-                          })
-                        }
-                      >
-                        <DeleteIcon />
                       </IconButton> */}
                     </TableCell>
                   </TableRow>

@@ -23,7 +23,10 @@ import {
 } from "./auth";
 import { addBranchReq, getBranchesReq } from "./branches";
 import { auth, db } from "./config";
-import { createPatientAccountReq } from "./patient";
+import {
+  createPatientAccountReq,
+  getPatientsAccountApprovalReq,
+} from "./patient";
 import { addServiceReq, getServicesReq } from "./services";
 import { deleteImageReq, uploadImageReq } from "./storage";
 
@@ -56,6 +59,7 @@ export {
   deleteImageReq,
   // patient
   createPatientAccountReq,
+  getPatientsAccountApprovalReq,
   // admin
   signInAdminReq,
   getStaffsReq,
