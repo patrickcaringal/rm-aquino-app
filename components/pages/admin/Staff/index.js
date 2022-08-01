@@ -15,7 +15,7 @@ import {
 import faker from "faker";
 import { useRouter } from "next/router";
 
-import { Toolbar } from "../../../../components/common";
+import { Toolbar, successMessage } from "../../../../components/common";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
@@ -38,19 +38,7 @@ const DashboardPage = () => {
   const [addStaff] = useRequest(addStaffReq, setBackdropLoader);
 
   // Local States
-  const [staffs, setStaffs] = useState([
-    // ...[...Array(2)].map((i) => ({
-    //   id: faker.datatype.uuid(),
-    //   firstName: faker.name.firstName(),
-    //   suffix: "",
-    //   lastName: faker.name.lastName(),
-    //   middleName: faker.name.lastName(),
-    //   email: faker.internet.email(),
-    //   address: faker.lorem.paragraph(),
-    //   birthdate: faker.date.past(),
-    //   gender: faker.random.arrayElements(["male", "female"]),
-    // })),
-  ]);
+  const [staffs, setStaffs] = useState([]);
   const [staffModal, setStaffModal] = useState(defaultModal);
 
   useEffect(() => {
@@ -85,7 +73,10 @@ const DashboardPage = () => {
 
     openResponseDialog({
       autoClose: true,
-      content: `${pluralize("Staff", addedStaff.length)} successfuly added.`,
+      content: successMessage({
+        noun: pluralize("Staff", addedStaff.length),
+        verb: "added",
+      }),
       type: "SUCCESS",
       closeCb() {
         setStaffModal(defaultModal);
@@ -105,9 +96,11 @@ const DashboardPage = () => {
         pt: 2,
       }}
     >
-      <Button variant="contained" size="small" onClick={handleStaffModalOpen}>
-        add staff
-      </Button>
+      <Box sx={{ mb: 2 }}>
+        <Button variant="contained" size="small" onClick={handleStaffModalOpen}>
+          add staff
+        </Button>
+      </Box>
 
       <Box>
         <TableContainer>

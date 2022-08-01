@@ -47,3 +47,6 @@ export const getUniquePersonId = ({
 
 export const pluralize = (noun, count, suffix = "s") =>
   `${noun}${count !== 1 ? suffix : ""}`;
+
+export const arrayStringify = (array, separator = ", ") =>
+  array.join(separator);

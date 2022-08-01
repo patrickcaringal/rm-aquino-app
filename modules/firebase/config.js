@@ -3,8 +3,6 @@ import { getAuth } from "firebase/auth";
 import { Timestamp, getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-const TB = process.env.TB;
-
 const firebaseConfig = {
   apiKey: "AIzaSyBtmAtMHRtt1UY89Pkgmk34HcxO5URoGP0",
   authDomain: "rm-aquino-app.firebaseapp.com",

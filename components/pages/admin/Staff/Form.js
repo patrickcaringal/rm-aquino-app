@@ -1,24 +1,8 @@
 import React from "react";
 
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {
-  Avatar,
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
-  Divider,
-  Fab,
-  FormControl,
-  FormHelperText,
-  Grid,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  TextField,
-} from "@mui/material";
+import { Box, Divider, Fab, Grid, IconButton, MenuItem } from "@mui/material";
 import faker from "faker";
 import { FieldArray } from "formik";
 

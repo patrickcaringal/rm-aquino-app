@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 
-import { ResponseDialog } from "../components";
+import { ResponseDialog } from "../components/common";
 
 const ResponseDialogContext = createContext({});
 

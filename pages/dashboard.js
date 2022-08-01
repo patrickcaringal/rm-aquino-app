@@ -31,7 +31,7 @@ const DashboardPage = () => {
         columnGap: 3,
       }}
     >
-      <Card sx={{ width: 296, height: 208 }}>
+      {/* <Card sx={{ width: 296, height: 208 }}>
         <CardActionArea
           sx={{ width: "inherit", height: "inherit" }}
           onClick={() => {
@@ -103,7 +103,7 @@ const DashboardPage = () => {
             </Typography>
           </CardContent>
         </CardActionArea>
-      </Card>
+      </Card> */}
     </Box>
   );
 };

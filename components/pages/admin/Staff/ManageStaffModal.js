@@ -44,7 +44,7 @@ export default function ManageStaffModal({ open, onClose, onSave }) {
             disabled={values.staffs.length === 0}
             onClick={submitForm}
           >
-            saves
+            save
           </Button>
           <Button color="inherit" onClick={handleClose}>
             Cancel

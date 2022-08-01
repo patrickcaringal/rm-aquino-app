@@ -12,7 +12,9 @@ import {
   writeBatch,
 } from "firebase/firestore";
 
+import { duplicateMessage } from "../../components/common";
 import {
+  arrayStringify,
   formatFirebasetimeStamp,
   getFullName,
   getUniquePersonId,
@@ -58,11 +60,15 @@ export const signOutReq = async () => {
 export const getStaffsReq = async () => {
   try {
     // TODO: adjust when get branch needed
-    const q = query(collRef, where("role", "==", "staff"));
+    const q = query(
+      collRef,
+      where("role", "==", "staff"),
+      where("deleted", "==", false)
+    );
     const querySnapshot = await getDocs(q);
 
-    const data = querySnapshot.docs.map((doc, index) => ({
-      index,
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
       ...doc.data(),
     }));
 
@@ -90,10 +96,10 @@ export const addStaffReq = async ({ staffs }) => {
     if (isDuplicate) {
       const duplicates = querySnapshot.docs.map((i) => i.data().email);
       throw new Error(
-        `Duplicate ${pluralize(
-          "Staff email",
-          duplicates.length
-        )} (${duplicates.join(", ")})`
+        duplicateMessage({
+          noun: pluralize("email", duplicates.length),
+          item: arrayStringify(duplicates),
+        })
       );
     }
 
@@ -118,9 +124,9 @@ export const addStaffReq = async ({ staffs }) => {
       );
     }
 
+    // Bulk Create Auth Account
     const batch = writeBatch(db);
 
-    // Bulk Create Auth Account
     for (let index = 0; index < staffs.length; index++) {
       const staffdoc = { ...staffs[index] };
       const { birthdate: rawBirthdate, email } = staffdoc;
@@ -143,6 +149,7 @@ export const addStaffReq = async ({ staffs }) => {
         name: fullName,
         birthdate,
         role: "staff",
+        deleted: false,
         ...timestampFields({ dateCreated: true, dateUpdated: true }),
       };
 
