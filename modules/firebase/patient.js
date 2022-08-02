@@ -4,6 +4,7 @@ import {
 } from "firebase/auth";
 import {
   collection,
+  deleteDoc,
   doc,
   getDocs,
   query,
@@ -121,6 +122,22 @@ export const approvePatientReq = async ({ patient }) => {
       ...timestampFields({ dateUpdated: true }),
     };
     await updateDoc(docRef, finalDoc);
+
+    return { success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const rejectPatientReq = async ({ patient }) => {
+  try {
+    // TODO: add send email
+    // patient.reason
+
+    // Delete
+    const docRef = doc(db, "patients", patient.id);
+    await deleteDoc(docRef);
 
     return { success: true };
   } catch (error) {

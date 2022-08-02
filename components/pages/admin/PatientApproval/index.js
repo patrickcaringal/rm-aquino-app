@@ -19,11 +19,12 @@ import {
   addStaffReq,
   approvePatientReq,
   getPatientsAccountApprovalReq,
+  rejectPatientReq,
   updateStaffReq,
 } from "../../../../modules/firebase";
 import { pluralize } from "../../../../modules/helper";
 import CollapsibleRow from "./CollapsibleRow";
-import ManageStaffModal from "./ManageStaffModal";
+import RejectModal from "./rejectModal";
 
 const defaultModal = {
   open: false,
@@ -39,13 +40,12 @@ const PatientApprovalPage = () => {
     getPatientsAccountApprovalReq,
     setBackdropLoader
   );
-  const [addStaff] = useRequest(addStaffReq, setBackdropLoader);
-  const [updateStaff] = useRequest(updateStaffReq, setBackdropLoader);
   const [approvePatient] = useRequest(approvePatientReq, setBackdropLoader);
+  const [rejectPatient] = useRequest(rejectPatientReq, setBackdropLoader);
 
   // Local States
   const [patients, setPatients] = useState([]);
-  const [staffModal, setStaffModal] = useState(defaultModal);
+  const [rejectModal, setRejectModal] = useState(defaultModal);
 
   useEffect(() => {
     const fetch = async () => {
@@ -78,86 +78,36 @@ const PatientApprovalPage = () => {
     });
   };
 
-  const handleReject = (data) => {
-    console.log(data);
-  };
-
-  const handleAddStaff = async (newStaff) => {
-    // Add Staff
-    const { data: addedStaff, error: addStaffError } = await addStaff({
-      patients: newStaff,
+  const handleReject = async (patient) => {
+    // Reject
+    const { error: rejectError } = await rejectPatient({
+      patient,
     });
-    if (addStaffError) return openErrorDialog(addStaffError);
+    if (rejectError) return openErrorDialog(rejectError);
 
-    // Successful
-    setPatients((prev) => [...prev, ...addedStaff]);
-
+    setPatients((prev) => prev.filter((i) => i.id !== patient.id));
     openResponseDialog({
       autoClose: true,
       content: successMessage({
-        noun: pluralize("Staff", addedStaff.length),
-        verb: "added",
+        noun: "Patient",
+        verb: "rejected",
       }),
       type: "SUCCESS",
       closeCb() {
-        setStaffModal(defaultModal);
+        setRejectModal(defaultModal);
       },
     });
   };
 
-  const handleEditStaff = async (updatedDocs) => {
-    const updatedStaff = updatedDocs[0];
-    const staffCopy = [...patients];
-    const index = staffCopy.findIndex((i) => i.id === updatedStaff.id);
-
-    staffCopy[index] = {
-      ...staffCopy[index],
-      ...updatedStaff,
-    };
-
-    // TODO: change email
-    // const isEmailUpdated = !lodash.isEqual(
-    //   patients[index].email,
-    //   updatedStaff.email
-    // );
-
-    // Update
-    const { error: updateError } = await updateStaff({
-      staff: updatedStaff,
-    });
-    if (updateError) return openErrorDialog(updateError);
-
-    // Success
-    setPatients(staffCopy);
-    openResponseDialog({
-      autoClose: true,
-      content: successMessage({
-        noun: "Staff",
-        verb: "updated",
-      }),
-      type: "SUCCESS",
-      closeCb() {
-        setStaffModal(defaultModal);
-      },
-    });
-  };
-
-  const handleAddModalOpen = () => {
-    setStaffModal({
+  const handleRejectModalOpen = (data) => {
+    setRejectModal({
       open: true,
-      data: null,
+      data,
     });
   };
 
   const handleStaffModalClose = () => {
-    setStaffModal(defaultModal);
-  };
-
-  const handleEditModalOpen = (staff) => {
-    setStaffModal({
-      open: true,
-      data: staff,
-    });
+    setRejectModal(defaultModal);
   };
 
   return (
@@ -192,7 +142,7 @@ const PatientApprovalPage = () => {
                   key={i.id}
                   data={i}
                   onApprove={handleApprove}
-                  onReject={handleReject}
+                  onReject={handleRejectModalOpen}
                 />
               ))}
             </TableBody>
@@ -200,14 +150,14 @@ const PatientApprovalPage = () => {
         </TableContainer>
       </Box>
 
-      {/* {staffModal.open && (
-        <ManageStaffModal
-          open={staffModal.open}
-          data={staffModal.data}
+      {rejectModal.open && (
+        <RejectModal
+          open={rejectModal.open}
+          data={rejectModal.data}
           onClose={handleStaffModalClose}
-          onSave={!staffModal.data ? handleAddStaff : handleEditStaff}
+          onReject={handleReject}
         />
-      )} */}
+      )}
     </Box>
   );
 };
