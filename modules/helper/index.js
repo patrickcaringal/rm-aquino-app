@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { differenceInYears, format } from "date-fns";
 import { Timestamp } from "firebase/firestore";
 
 export const formatDate = (date, dateformat = "yyyy-MM-dd") => {
@@ -21,6 +21,11 @@ export const formatTimeStamp = (timestamp, dateformat = "yyyy-MM-dd") => {
 
 export const formatFirebasetimeStamp = (timestamp) => {
   return Timestamp.fromDate(new Date(timestamp));
+};
+
+export const calculateAge = (birthdate) => {
+  const age = differenceInYears(new Date(), new Date(birthdate));
+  return age;
 };
 
 export const getInitials = (str = "") => {

@@ -1,35 +1,27 @@
 import React, { useEffect, useState } from "react";
 
-import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
-  IconButton,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
-import { useRouter } from "next/router";
 
-import { Toolbar, successMessage } from "../../../../components/common";
+import { successMessage } from "../../../../components/common";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import {
   addStaffReq,
   getPatientsAccountApprovalReq,
-  getStaffsReq,
   updateStaffReq,
 } from "../../../../modules/firebase";
-import {
-  formatTimeStamp,
-  getFullName,
-  pluralize,
-} from "../../../../modules/helper";
+import { pluralize } from "../../../../modules/helper";
+import CollapsibleRow from "./CollapsibleRow";
 import ManageStaffModal from "./ManageStaffModal";
 
 const defaultModal = {
@@ -157,10 +149,13 @@ const DashboardPage = () => {
           <Table size="small">
             <TableHead>
               <TableRow>
+                <TableCell />
                 <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Gender</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Age</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>
+                  Date requested
+                </TableCell>
                 <TableCell sx={{ fontWeight: "bold" }} align="center">
                   Actions
                 </TableCell>
@@ -169,68 +164,7 @@ const DashboardPage = () => {
 
             <TableBody>
               {patients.map((i) => {
-                const {
-                  id,
-                  firstName,
-                  suffix,
-                  lastName,
-                  middleName,
-                  gender,
-                  email,
-                  birthdate,
-                  address,
-                } = i;
-
-                return (
-                  <TableRow key={id}>
-                    <TableCell sx={{ width: 260 }}>
-                      <Typography variant="body2">
-                        {getFullName({
-                          firstName,
-                          suffix,
-                          lastName,
-                          middleName,
-                        })}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ width: 260 }}>
-                      <Typography variant="body2">{email}</Typography>
-                    </TableCell>
-                    <TableCell sx={{ width: 260 }}>
-                      <Typography variant="body2">{gender}</Typography>
-                    </TableCell>
-
-                    {/* sx={{ maxWidth: 200 }} */}
-                    <TableCell>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: "2",
-                          overflow: "hidden",
-                        }}
-                        component="div"
-                      >
-                        {address}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ width: 110 }} align="center">
-                      {/* <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() =>
-                          handleEditModalOpen({
-                            ...i,
-                            birthdate: formatTimeStamp(birthdate),
-                          })
-                        }
-                      >
-                        <EditIcon />
-                      </IconButton> */}
-                    </TableCell>
-                  </TableRow>
-                );
+                return <CollapsibleRow key={i.id} data={i} />;
               })}
             </TableBody>
           </Table>

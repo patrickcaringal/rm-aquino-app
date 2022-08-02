@@ -7,10 +7,20 @@ import {
   where,
 } from "firebase/firestore";
 
-import { formatFirebasetimeStamp, getFullName } from "../helper";
+import {
+  formatFirebasetimeStamp,
+  getFullName,
+  getUniquePersonId,
+} from "../helper";
 import { db, timestampFields } from "./config";
 
 const collRef = collection(db, "patients");
+
+const transformedFields = (doc) => ({
+  name: getFullName(doc),
+  birthdate: formatFirebasetimeStamp(doc.birthdate),
+  nameBirthdate: getUniquePersonId(doc),
+});
 
 export const createPatientAccountReq = async (document) => {
   try {
@@ -44,11 +54,10 @@ export const createPatientAccountReq = async (document) => {
     // Transform Document
     const mappedDoc = {
       ...document,
-      //   id: docRef.id,
-      name: fullName,
-      birthdate,
-      approved: false,
       role: "patient",
+      approved: false,
+      deleted: false,
+      ...transformedFields(staffdoc),
       ...timestampFields({ dateCreated: true, dateUpdated: true }),
     };
 
