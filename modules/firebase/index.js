@@ -24,6 +24,7 @@ import {
 import { addBranchReq, getBranchesReq } from "./branches";
 import { auth, db } from "./config";
 import {
+  approvePatientReq,
   createPatientAccountReq,
   getPatientsAccountApprovalReq,
 } from "./patient";
@@ -60,6 +61,7 @@ export {
   // patient
   createPatientAccountReq,
   getPatientsAccountApprovalReq,
+  approvePatientReq,
   // admin
   signInAdminReq,
   getStaffsReq,

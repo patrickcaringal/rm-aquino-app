@@ -17,6 +17,7 @@ import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import {
   addStaffReq,
+  approvePatientReq,
   getPatientsAccountApprovalReq,
   updateStaffReq,
 } from "../../../../modules/firebase";
@@ -29,17 +30,18 @@ const defaultModal = {
   data: {},
 };
 
-const DashboardPage = () => {
+const PatientApprovalPage = () => {
   const { setBackdropLoader } = useBackdropLoader();
   const { openResponseDialog, openErrorDialog } = useResponseDialog();
 
   // Requests
-  const [getStaffs] = useRequest(
+  const [getPatients] = useRequest(
     getPatientsAccountApprovalReq,
     setBackdropLoader
   );
   const [addStaff] = useRequest(addStaffReq, setBackdropLoader);
   const [updateStaff] = useRequest(updateStaffReq, setBackdropLoader);
+  const [approvePatient] = useRequest(approvePatientReq, setBackdropLoader);
 
   // Local States
   const [patients, setPatients] = useState([]);
@@ -48,7 +50,7 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetch = async () => {
       // Get Staffs
-      const { data: patientList, error: getPatientError } = await getStaffs();
+      const { data: patientList, error: getPatientError } = await getPatients();
       if (getPatientError) return openErrorDialog(getPatientError);
 
       setPatients(patientList);
@@ -57,6 +59,28 @@ const DashboardPage = () => {
     fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleApprove = async (patient) => {
+    // Approve
+    const { error: approveError } = await approvePatient({
+      patient,
+    });
+    if (approveError) return openErrorDialog(approveError);
+
+    setPatients((prev) => prev.filter((i) => i.id !== patient.id));
+    openResponseDialog({
+      autoClose: true,
+      content: successMessage({
+        noun: "Patient",
+        verb: "approved",
+      }),
+      type: "SUCCESS",
+    });
+  };
+
+  const handleReject = (data) => {
+    console.log(data);
+  };
 
   const handleAddStaff = async (newStaff) => {
     // Add Staff
@@ -138,11 +162,11 @@ const DashboardPage = () => {
 
   return (
     <Box sx={{ pt: 2 }}>
-      <Box sx={{ mb: 2 }}>
+      {/* <Box sx={{ mb: 2 }}>
         <Button variant="contained" size="small" onClick={handleAddModalOpen}>
           add staff
         </Button>
-      </Box>
+      </Box> */}
 
       <Box>
         <TableContainer>
@@ -163,24 +187,29 @@ const DashboardPage = () => {
             </TableHead>
 
             <TableBody>
-              {patients.map((i) => {
-                return <CollapsibleRow key={i.id} data={i} />;
-              })}
+              {patients.map((i) => (
+                <CollapsibleRow
+                  key={i.id}
+                  data={i}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                />
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Box>
 
-      {staffModal.open && (
+      {/* {staffModal.open && (
         <ManageStaffModal
           open={staffModal.open}
           data={staffModal.data}
           onClose={handleStaffModalClose}
           onSave={!staffModal.data ? handleAddStaff : handleEditStaff}
         />
-      )}
+      )} */}
     </Box>
   );
 };
 
-export default DashboardPage;
+export default PatientApprovalPage;

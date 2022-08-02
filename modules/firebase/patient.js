@@ -1,9 +1,14 @@
 import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import {
   collection,
   doc,
   getDocs,
   query,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 
@@ -12,7 +17,7 @@ import {
   getFullName,
   getUniquePersonId,
 } from "../helper";
-import { db, timestampFields } from "./config";
+import { db, secondaryAuth, timestampFields } from "./config";
 
 const collRef = collection(db, "patients");
 
@@ -52,8 +57,10 @@ export const createPatientAccountReq = async (document) => {
     }
 
     // Transform Document
+    const docRef = doc(collRef);
     const mappedDoc = {
       ...document,
+      id: docRef.id,
       role: "patient",
       approved: false,
       deleted: false,
@@ -62,7 +69,6 @@ export const createPatientAccountReq = async (document) => {
     };
 
     // Create Document
-    const docRef = doc(collRef);
     await setDoc(docRef, mappedDoc);
 
     return { data: mappedDoc, success: true };
@@ -88,6 +94,35 @@ export const getPatientsAccountApprovalReq = async () => {
     }));
 
     return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const approvePatientReq = async ({ patient }) => {
+  try {
+    // Create Auth Account
+    const {
+      user: { uid },
+    } = await createUserWithEmailAndPassword(
+      secondaryAuth,
+      patient.email,
+      "12345678" // TODO: auto generate
+    );
+
+    // TODO: add send email
+
+    // Update ot approved
+    const docRef = doc(db, "patients", patient.id);
+    const finalDoc = {
+      authId: uid,
+      approved: true,
+      ...timestampFields({ dateUpdated: true }),
+    };
+    await updateDoc(docRef, finalDoc);
+
+    return { success: true };
   } catch (error) {
     console.log(error);
     return { error: error.message };

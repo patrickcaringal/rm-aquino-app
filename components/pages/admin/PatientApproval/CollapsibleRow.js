@@ -2,6 +2,8 @@ import React, { Fragment, useState } from "react";
 
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import {
   Box,
   Collapse,
@@ -17,7 +19,7 @@ import {
   getFullName,
 } from "../../../../modules/helper";
 
-const CollapsibleRow = ({ data }) => {
+const CollapsibleRow = ({ data, onApprove, onReject }) => {
   const [detailRowOpen, setDetailRowOpen] = useState(false);
 
   const {
@@ -73,9 +75,21 @@ const CollapsibleRow = ({ data }) => {
             {formatTimeStamp(dateCreated, "MMM dd, yyyy")}
           </Typography>
         </TableCell>
-        <TableCell sx={{ width: 110 }} align="center"></TableCell>
+        <TableCell sx={{ width: 110 }} align="center">
+          <IconButton
+            size="small"
+            color="primary"
+            onClick={() => onApprove(data)}
+          >
+            <ThumbUpIcon />
+          </IconButton>
+          <IconButton size="small" color="error" onClick={() => onReject(data)}>
+            <ThumbDownIcon />
+          </IconButton>
+        </TableCell>
       </TableRow>
 
+      {/* Collapsed Row */}
       <TableRow>
         <TableCell sx={{ py: 0 }} colSpan={6}>
           <Collapse in={detailRowOpen} timeout="auto" unmountOnExit>
