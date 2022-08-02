@@ -1,7 +1,6 @@
 import React from "react";
 
-import { LoadingButton } from "@mui/lab";
-import { Box, Grid, Link } from "@mui/material";
+import { Box, Button, Grid, Link } from "@mui/material";
 import { useRouter } from "next/router";
 
 import { Input } from "../../../common/Form";
@@ -10,7 +9,6 @@ const Form = ({
   handleSubmit,
   handleChange,
   handleBlur,
-  setFieldValue,
   values,
   errors,
   touched,
@@ -44,14 +42,9 @@ const Form = ({
           />
         </Grid>
       </Grid>
-      <LoadingButton
-        type="submit"
-        fullWidth
-        variant="contained"
-        sx={{ mt: 3, mb: 2 }}
-      >
+      <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
         Login
-      </LoadingButton>
+      </Button>
       <Grid container>
         <Grid item xs>
           <Link href="#" variant="body2">
