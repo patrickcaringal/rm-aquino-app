@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import { Box, Typography } from "@mui/material";
+import faker from "faker";
 import { useFormik } from "formik";
 import Image from "next/image";
 
@@ -11,8 +12,24 @@ import useRequest from "../hooks/useRequest";
 import { createPatientAccountReq } from "../modules/firebase";
 import { SignupSchema } from "../modules/validation";
 
-const defaultValue = false
+const defaultValue = true
   ? {
+      firstName: faker.name.firstName(),
+      suffix: "",
+      lastName: faker.name.lastName(),
+      middleName: faker.name.lastName(),
+      email: faker.internet.email(),
+      address: faker.lorem.paragraph(),
+      birthdate: faker.date.past(
+        faker.datatype.number({
+          min: 10,
+          max: 50,
+        })
+      ),
+      gender: faker.random.arrayElement(["male", "female"]),
+      password: "12345678",
+    }
+  : {
       firstName: "",
       middleName: "",
       lastName: "",
@@ -22,17 +39,6 @@ const defaultValue = false
       address: "",
       email: "",
       password: "",
-    }
-  : {
-      firstName: "THOMAS",
-      middleName: "MICHAEL",
-      lastName: "SHELBY",
-      suffix: "",
-      birthdate: "2022-07-05",
-      gender: "male",
-      address: "TEST",
-      email: "test@gmail.com",
-      password: "12345678",
     };
 
 export default function SignUpPage() {
@@ -49,7 +55,6 @@ export default function SignUpPage() {
     validationSchema: SignupSchema,
     validateOnChange: false,
     onSubmit: async (values, { resetForm }) => {
-      // alert("In Progress");
       const { error: createAccountError } = await createPatientAccount(values);
       if (createAccountError) return openErrorDialog(createAccountError);
 

@@ -28,6 +28,7 @@ import {
   createPatientAccountReq,
   getPatientsAccountApprovalReq,
   rejectPatientReq,
+  signInPatientReq,
 } from "./patient";
 import { addServiceReq, getServicesReq } from "./services";
 import { deleteImageReq, uploadImageReq } from "./storage";
@@ -60,10 +61,11 @@ export {
   uploadImageReq,
   deleteImageReq,
   // patient
+  approvePatientReq,
   createPatientAccountReq,
   getPatientsAccountApprovalReq,
-  approvePatientReq,
   rejectPatientReq,
+  signInPatientReq,
   // admin
   signInAdminReq,
   getStaffsReq,

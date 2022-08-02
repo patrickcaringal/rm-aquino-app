@@ -16,10 +16,10 @@ export const PATHS = {
   //   DASHBOARD: "/staff/dashboard",
   //   MEMBER_APPROVAL: "/staff/member/approval",
   // },
-  // PATIENT: {
-  //   DASHBOARD: "/dashboard",
-  //   FAMILY: "/family-members",
-  // },
+  PATIENT: {
+    DASHBOARD: "/dashboard",
+    FAMILY: "/family-members",
+  },
   PUBLIC: {
     ROOT: "/",
     PATIENT_SIGN_IN: "/signin",

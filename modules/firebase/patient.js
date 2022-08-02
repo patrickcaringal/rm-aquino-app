@@ -18,7 +18,7 @@ import {
   getFullName,
   getUniquePersonId,
 } from "../helper";
-import { db, secondaryAuth, timestampFields } from "./config";
+import { auth, db, secondaryAuth, timestampFields } from "./config";
 
 const collRef = collection(db, "patients");
 
@@ -27,6 +27,29 @@ const transformedFields = (doc) => ({
   birthdate: formatFirebasetimeStamp(doc.birthdate),
   nameBirthdate: getUniquePersonId(doc),
 });
+
+export const signInPatientReq = async ({ email, password }) => {
+  try {
+    // Authenticate
+    await signInWithEmailAndPassword(auth, email, password);
+
+    // Get Document
+    const q = query(collRef, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+
+    const exist = querySnapshot.docs.length === 1;
+    if (!exist) throw new Error("Account not found");
+
+    const document = querySnapshot.docs[0].data();
+    console.log(document);
+
+    return { data: document, success: true };
+  } catch (error) {
+    console.log(error);
+    const errMsg = getErrorMsg(error.code);
+    return { error: errMsg || error.message };
+  }
+};
 
 export const createPatientAccountReq = async (document) => {
   try {
@@ -65,7 +88,7 @@ export const createPatientAccountReq = async (document) => {
       role: "patient",
       approved: false,
       deleted: false,
-      ...transformedFields(staffdoc),
+      ...transformedFields(document),
       ...timestampFields({ dateCreated: true, dateUpdated: true }),
     };
 

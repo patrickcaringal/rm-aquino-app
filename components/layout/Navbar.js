@@ -94,20 +94,10 @@ const ResponsiveAppBar = () => {
   };
 
   const handleLogout = async () => {
-    // Sign Out Doctor, Staff
-    if (isAdmin) {
-      const { error: signOutError } = await signOutReq();
-      if (signOutError) return openErrorDialog(signOutError);
-      manualSetUser(null);
-      setAnchorElUser(null);
-      return;
-    }
-
-    // // Sign Out Patient
-    // const { error: signOutError } = await signOutAnonymously(userSession);
-    // if (signOutError) return openErrorDialog(signOutError);
-    // manualSetUser(null);
-    // setAnchorElUser(null);
+    const { error: signOutError } = await signOutReq();
+    if (signOutError) return openErrorDialog(signOutError);
+    manualSetUser(null);
+    setAnchorElUser(null);
   };
 
   return (

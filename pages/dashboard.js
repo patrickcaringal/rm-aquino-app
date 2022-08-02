@@ -31,6 +31,7 @@ const DashboardPage = () => {
         columnGap: 3,
       }}
     >
+      PATIENT DASHBOARD
       {/* <Card sx={{ width: 296, height: 208 }}>
         <CardActionArea
           sx={{ width: "inherit", height: "inherit" }}

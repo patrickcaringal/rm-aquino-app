@@ -1,26 +1,16 @@
 import React from "react";
 
-import { LoadingButton } from "@mui/lab";
-import {
-  Box,
-  Container,
-  Grid,
-  Link,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box } from "@mui/material";
 import { useFormik } from "formik";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
 import { Form } from "../components/pages/patient/SignIn";
 import { useAuth } from "../contexts/AuthContext";
+import { useBackdropLoader } from "../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../contexts/ResponseDialogContext";
 import useRequest from "../hooks/useRequest";
-import {
-  checkAccountCredentialReq,
-  signInAnonymouslyReq,
-} from "../modules/firebase";
+import { signInPatientReq } from "../modules/firebase";
 import { SigninSchema } from "../modules/validation";
 
 const defaultValue = {
@@ -32,37 +22,27 @@ export default function SignInPage() {
   const router = useRouter();
   const { manualSetUser } = useAuth();
   const { openErrorDialog } = useResponseDialog();
-  const [checkAccountCredential, checkAccountCredentialLoading] = useRequest(
-    checkAccountCredentialReq
-  );
-  const [signInAnonymously, signInAnonymouslyLoading] =
-    useRequest(signInAnonymouslyReq);
-  const isSignInLoading =
-    checkAccountCredentialLoading || signInAnonymouslyLoading;
+  const { setBackdropLoader } = useBackdropLoader();
+
+  const [signIn] = useRequest(signInPatientReq, setBackdropLoader);
 
   const formik = useFormik({
     initialValues: defaultValue,
     validationSchema: SigninSchema,
     validateOnChange: false,
     onSubmit: async (values) => {
-      alert("In Progress");
-      // const { email, password } = values;
-      // // Authenticate
-      // const { data: userInfo, error: authError } = await checkAccountCredential(
-      //   {
-      //     email,
-      //     password,
-      //   }
-      // );
-      // if (authError) return openErrorDialog(authError);
-      // // Sign In Anonymously
-      // const { error: signInError } = await signInAnonymously();
-      // if (signInError) return openErrorDialog(signInError);
-      // manualSetUser(userInfo);
+      const { email, password } = values;
+
+      // Authenticate
+      const { data: userInfo, error: signInError } = await signIn({
+        email,
+        password,
+      });
+      if (signInError) return openErrorDialog(signInError);
+
+      manualSetUser(userInfo);
     },
   });
-  const { handleSubmit, handleChange, handleBlur, values, errors, touched } =
-    formik;
 
   return (
     <Box
