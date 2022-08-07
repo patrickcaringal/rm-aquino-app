@@ -4,7 +4,7 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  user-select: none;
+  // user-select: none;
   overflow: overlay;
 
   *::-webkit-scrollbar {
@@ -40,4 +40,31 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+// MUI overrides
+
+.MuiTable-root {
+  $border: 1px solid rgba(34, 36, 38, 0.1);
+  border: $border;
+
+  td.MuiTableCell-root,
+  th.MuiTableCell-root {
+    &:not(:first-child) {
+      border-left: $border;
+    }
+  }
+
+  td.MuiTableCell-root,
+  th.MuiTableCell-root {
+    border-bottom: $border;
+  }
+
+  td {
+    background: #fff;
+  }
+
+  th {
+    background: #eee;
+  }
 }

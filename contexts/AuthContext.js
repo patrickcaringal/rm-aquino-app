@@ -43,14 +43,14 @@ export const AuthContextProvider = ({ children }) => {
 
   const value = {
     user,
-    isAdmin: user?.role === "superadmin",
+    isAdmin: ["doctor"].includes(user?.role),
     isStaff: user?.role === "staff",
     isPatient: user?.role === "patient",
     isLoggedIn: !!user && !!userSession,
     userSession,
     manualSetUser,
     // layout
-    isAdminPanel: ["superadmin", "staff"].includes(user?.role),
+    isAdminPanel: ["doctor"].includes(user?.role),
   };
   return (
     <AuthContext.Provider value={value}>

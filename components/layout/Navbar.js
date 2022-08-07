@@ -1,6 +1,8 @@
 import * as React from "react";
 
 import AdbIcon from "@mui/icons-material/Adb";
+import GroupIcon from "@mui/icons-material/Group";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -28,6 +30,8 @@ import {
 import { useRouter } from "next/router";
 
 import { Logo } from "../../components";
+import NavbarMenu from "../../components/common/Menu/NavbarMenu";
+import { PATHS } from "../../components/common/Routes";
 import { useAuth } from "../../contexts/AuthContext";
 import { useBackdropLoader } from "../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../contexts/ResponseDialogContext";
@@ -59,6 +63,21 @@ const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
+  const menuItems = isAdmin
+    ? [
+        {
+          text: "Staffs",
+          icon: <GroupIcon />,
+          onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
+        },
+        {
+          text: "Patient Approval",
+          icon: <HowToRegIcon />,
+          onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
+        },
+      ]
+    : [];
+
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -75,17 +94,7 @@ const ResponsiveAppBar = () => {
   };
 
   const handleLogout = async () => {
-    // Sign Out Doctor, Staff
-    if (isAdmin || isStaff) {
-      const { error: signOutError } = await signOutReq();
-      if (signOutError) return openErrorDialog(signOutError);
-      manualSetUser(null);
-      setAnchorElUser(null);
-      return;
-    }
-
-    // Sign Out Patient
-    const { error: signOutError } = await signOutAnonymously(userSession);
+    const { error: signOutError } = await signOutReq();
     if (signOutError) return openErrorDialog(signOutError);
     manualSetUser(null);
     setAnchorElUser(null);
@@ -103,7 +112,8 @@ const ResponsiveAppBar = () => {
           //   "0px 2px 4px -1px rgb(0, 0, 0, 0.05), 0px 4px 5px 0px rgb(0, 0, 0, 0.05), 0px 1px 10px 0px rgb(0, 0, 0, 0.05)",
         }}
       >
-        <Container maxWidth={isAdminPanel ? "none" : "lg"}>
+        {/* maxWidth={isAdminPanel ? "none" : "lg"} */}
+        <Container maxWidth="lg">
           <Toolbar
             disableGutters
             sx={{ height: "80px !important", minHeight: "80px !important" }}
@@ -151,6 +161,59 @@ const ResponsiveAppBar = () => {
             >
               JP Rizal St, Poblacion Uno, Cabuyao, 4026 Laguna
             </Typography>
+
+            {isLoggedIn && (
+              <>
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar sx={{ bgcolor: "primary.main" }}>
+                    {getInitials(user?.firstName)}
+                  </Avatar>
+                </IconButton>
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  <Box sx={{ width: 260, p: 2 }}>
+                    <Typography variant="body1" textAlign="center">
+                      {getFullName(user).toUpperCase()}
+                    </Typography>
+                    <Typography variant="body2" textAlign="center">
+                      {user?.email}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      textAlign="center"
+                      display="block"
+                    >
+                      {user?.role === "superadmin"
+                        ? "Doctor"
+                        : !user?.role
+                        ? "Patient"
+                        : user?.role}
+                    </Typography>
+                  </Box>
+                  <Divider />
+                  <MenuItem onClick={handleLogout}>
+                    <ListItemIcon>
+                      <LogoutIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Logout</ListItemText>
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
 
             {/* Mobile */}
             {/* <>
@@ -213,73 +276,29 @@ const ResponsiveAppBar = () => {
         <Toolbar
           sx={{
             bgcolor: "primary.dark",
-            height: "30px !important",
-            minHeight: "30px !important",
+            height: "40px !important",
+            minHeight: "40px !important",
           }}
         >
-          <Container maxWidth={isAdminPanel ? "none" : "lg"}>
-            {/* <Breadcrumbs separator="›" aria-label="breadcrumb">
-              <Typography color="common.white">LOGIN</Typography>
-            </Breadcrumbs> */}
-            {isLoggedIn && (
-              <>
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar sx={{ bgcolor: "primary.main" }}>
-                    {getInitials(user?.firstName)}
-                  </Avatar>
-                </IconButton>
-                <Menu
-                  sx={{ mt: "45px" }}
-                  id="menu-appbar"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
-                >
-                  <Box sx={{ width: 260, p: 2 }}>
-                    <Typography variant="body1" textAlign="center">
-                      {getFullName(user).toUpperCase()}
-                    </Typography>
-                    <Typography variant="body2" textAlign="center">
-                      {user?.email}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      textAlign="center"
-                      display="block"
-                    >
-                      {user?.role === "superadmin"
-                        ? "Doctor"
-                        : !user?.role
-                        ? "Patient"
-                        : user?.role}
-                    </Typography>
-                  </Box>
-                  <Divider />
-                  <MenuItem onClick={handleLogout}>
-                    <ListItemIcon>
-                      <LogoutIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Logout</ListItemText>
-                  </MenuItem>
-                </Menu>
-              </>
-            )}
+          <Container maxWidth="lg">
+            {menuItems.map(({ text, icon, onClick }) => (
+              <Button
+                sx={{ color: "common.white", mr: 2 }}
+                key={text}
+                variant="text"
+                onClick={onClick}
+                startIcon={icon}
+              >
+                {text}
+              </Button>
+            ))}
           </Container>
         </Toolbar>
       </AppBar>
       <Toolbar
         sx={{
-          height: "110px !important",
-          minHeight: "110px !important",
+          height: "120px !important",
+          minHeight: "120px !important",
         }}
       />
     </>

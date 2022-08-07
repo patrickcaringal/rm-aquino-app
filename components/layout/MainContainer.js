@@ -13,18 +13,28 @@ const MainContainer = ({ children }) => {
     <Box
       component="main"
       sx={{
-        ml: isAdminPanel ? "240px" : 0,
+        // ml: isAdminPanel ? "240px" : 0,
         bgcolor: "grey.100",
       }}
     >
-      {!isAdminPanel ? (
+      <Container
+        component="main"
+        maxWidth="lg"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          // justifyContent: "center",
+        }}
+      >
+        {children}
+      </Container>
+      {/* {!isAdminPanel ? (
         <Container
           component="main"
           maxWidth="lg"
           sx={{
             minHeight: "calc(100vh - 110px)",
             display: "flex",
-            flexDireaction: "row",
             flexDirection: "column",
             justifyContent: "center",
           }}
@@ -33,7 +43,7 @@ const MainContainer = ({ children }) => {
         </Container>
       ) : (
         children
-      )}
+      )} */}
     </Box>
   );
 };

@@ -8,6 +8,12 @@ import {
   updateFamilyMembersReq,
 } from "./account";
 import {
+  addStaffReq,
+  getStaffsReq,
+  signInAdminReq,
+  updateStaffReq,
+} from "./admin";
+import {
   monitorAuthState,
   signInAnonymouslyReq,
   signInReq,
@@ -17,8 +23,14 @@ import {
 } from "./auth";
 import { addBranchReq, getBranchesReq } from "./branches";
 import { auth, db } from "./config";
+import {
+  approvePatientReq,
+  createPatientAccountReq,
+  getPatientsAccountApprovalReq,
+  rejectPatientReq,
+  signInPatientReq,
+} from "./patient";
 import { addServiceReq, getServicesReq } from "./services";
-import { addStaffReq, getStaffsReq, signInStaffReq } from "./staff";
 import { deleteImageReq, uploadImageReq } from "./storage";
 
 export {
@@ -39,10 +51,6 @@ export {
   addFamilyMembersReq,
   updateFamilyMembersReq,
   getMemberForApprovalReq,
-  // staff
-  addStaffReq,
-  getStaffsReq,
-  signInStaffReq,
   // service
   getServicesReq,
   addServiceReq,
@@ -52,4 +60,15 @@ export {
   // storage
   uploadImageReq,
   deleteImageReq,
+  // patient
+  approvePatientReq,
+  createPatientAccountReq,
+  getPatientsAccountApprovalReq,
+  rejectPatientReq,
+  signInPatientReq,
+  // admin
+  signInAdminReq,
+  getStaffsReq,
+  addStaffReq,
+  updateStaffReq,
 };

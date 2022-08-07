@@ -16,7 +16,7 @@ export const BackdropLoaderProvider = ({ children }) => {
   const value = { openBackdropLoader, closeBackdropLoader, setBackdropLoader };
   return (
     <BackdropLoaderContext.Provider value={value}>
-      <BackdropLoader open={open} />
+      {open && <BackdropLoader open={open} />}
       {children}
     </BackdropLoaderContext.Provider>
   );

@@ -6,8 +6,8 @@ import { useRouter } from "next/router";
 import { PATHS, getRoleRoutes } from "../components/common/Routes";
 import { useAuth } from "../contexts/AuthContext";
 
-const doctorRoutes = getRoleRoutes("DOCTOR");
-const staffRoutes = getRoleRoutes("STAFF");
+const adminRoutes = getRoleRoutes("ADMIN");
+// const staffRoutes = getRoleRoutes("STAFF");
 const patientRoutes = getRoleRoutes("PATIENT");
 
 const ProtectedRoute = ({ children }) => {
@@ -16,26 +16,26 @@ const ProtectedRoute = ({ children }) => {
 
   const isRouteNotAllowed = useMemo(
     () => ({
-      doctor: isAdmin && isLoggedIn && !doctorRoutes.includes(router.pathname),
-      staff: isStaff && isLoggedIn && !staffRoutes.includes(router.pathname),
+      admin: isAdmin && isLoggedIn && !adminRoutes.includes(router.pathname),
+      // staff: isStaff && isLoggedIn && !staffRoutes.includes(router.pathname),
       patient:
         isPatient && isLoggedIn && !patientRoutes.includes(router.pathname),
     }),
-    [isLoggedIn, isAdmin, isStaff, isPatient, router.pathname]
+    [isLoggedIn, isAdmin, isPatient, router.pathname]
   );
 
   // Not Logged in
   useEffect(() => {
     if (!isLoggedIn) {
-      if (router.pathname.includes("/doctor")) {
+      if (router.pathname.includes("/admin")) {
         router.push(PATHS.PUBLIC.DOCTOR_SIGN_IN);
         return;
       }
 
-      if (router.pathname.includes("/staff")) {
-        router.push(PATHS.PUBLIC.STAFF_SIGN_IN);
-        return;
-      }
+      // if (router.pathname.includes("/staff")) {
+      //   router.push(PATHS.PUBLIC.STAFF_SIGN_IN);
+      //   return;
+      // }
 
       router.push(PATHS.PUBLIC.ROOT);
     }
@@ -43,13 +43,13 @@ const ProtectedRoute = ({ children }) => {
 
   // Logged in, Role Authorization
   useEffect(() => {
-    if (isRouteNotAllowed.staff) {
-      router.push(PATHS.STAFF.DASHBOARD);
-      return;
-    }
+    // if (isRouteNotAllowed.staff) {
+    //   router.push(PATHS.STAFF.DASHBOARD);
+    //   return;
+    // }
 
-    if (isRouteNotAllowed.doctor) {
-      router.push(PATHS.DOCTOR.DASHBOARD);
+    if (isRouteNotAllowed.admin) {
+      router.push(PATHS.ADMIN.DASHBOARD);
       return;
     }
 

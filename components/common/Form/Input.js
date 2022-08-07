@@ -33,7 +33,7 @@ const InputComponent = ({
       rows={rows}
       onChange={onChange}
       onBlur={onBlur}
-      error={error}
+      error={!!error}
       helperText={error}
       {...rest}
     />

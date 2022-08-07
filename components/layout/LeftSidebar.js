@@ -28,6 +28,7 @@ const LeftSidebar = () => {
 
   const { isAdminPanel, isAdmin } = useAuth();
 
+  return null;
   if (!isAdminPanel) return null;
 
   const sidebarItems = isAdmin
@@ -35,18 +36,18 @@ const LeftSidebar = () => {
         {
           text: "Staffs",
           icon: <GroupIcon />,
-          onClick: () => router.push(PATHS.DOCTOR.STAFF_MANAGEMENT),
+          onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
         },
-        {
-          text: "Branches",
-          icon: <MapsHomeWorkIcon />,
-          onClick: () => router.push(PATHS.DOCTOR.BRANCH_MANAGEMENT),
-        },
-        {
-          text: "Services",
-          icon: <MedicalServicesIcon />,
-          onClick: () => router.push(PATHS.DOCTOR.SERVICES_MANAGEMENT),
-        },
+        // {
+        //   text: "Branches",
+        //   icon: <MapsHomeWorkIcon />,
+        //   onClick: () => router.push(PATHS.ADMIN.BRANCH_MANAGEMENT),
+        // },
+        // {
+        //   text: "Services",
+        //   icon: <MedicalServicesIcon />,
+        //   onClick: () => router.push(PATHS.ADMIN.SERVICES_MANAGEMENT),
+        // },
       ]
     : [
         {
@@ -83,8 +84,10 @@ const LeftSidebar = () => {
         <List>
           {sidebarItems.map(({ text, icon, onClick }) => (
             <ListItem key={text} disablePadding onClick={onClick}>
-              <ListItemButton>
-                <ListItemIcon>{icon}</ListItemIcon>
+              <ListItemButton sx={{ color: "common.white" }}>
+                <ListItemIcon sx={{ color: "common.white" }}>
+                  {icon}
+                </ListItemIcon>
                 <ListItemText primary={text} />
               </ListItemButton>
             </ListItem>

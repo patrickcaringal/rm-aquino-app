@@ -1,6 +1,14 @@
 import React from "react";
 
-import { Box } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import {
+  Box,
+  Container,
+  Grid,
+  Link,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useFormik } from "formik";
 import Image from "next/image";
 
@@ -8,50 +16,56 @@ import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
-import { signInPatientReq } from "../../../../modules/firebase";
-import { SigninSchema } from "../../../../modules/validation";
+import { isMockDataEnabled } from "../../../../modules/env";
+import { signInAdminReq } from "../../../../modules/firebase";
+import { DoctorSigninSchema } from "../../../../modules/validation";
 import Form from "./Form";
 
-const defaultValue = {
-  email: "",
-  password: "",
-};
+const defaultValues = isMockDataEnabled
+  ? {
+      email: "rmaquino@gmail.com",
+      password: "12345678",
+    }
+  : {
+      email: "",
+      password: "",
+    };
 
-const PatientSignInPage = () => {
+const AdminSignInPage = () => {
   const { manualSetUser } = useAuth();
-  const { openErrorDialog } = useResponseDialog();
   const { setBackdropLoader } = useBackdropLoader();
+  const { openErrorDialog } = useResponseDialog();
 
-  const [signIn] = useRequest(signInPatientReq, setBackdropLoader);
+  // Requests
+  const [signIn] = useRequest(signInAdminReq, setBackdropLoader);
 
   const formik = useFormik({
-    initialValues: defaultValue,
-    validationSchema: SigninSchema,
+    initialValues: defaultValues,
+    validationSchema: DoctorSigninSchema,
     validateOnChange: false,
     onSubmit: async (values) => {
       const { email, password } = values;
 
       // Authenticate
-      const { data: userInfo, error: signInError } = await signIn({
+      const { data: userInfo, error: authError } = await signIn({
         email,
         password,
       });
-      if (signInError) return openErrorDialog(signInError);
+      if (authError) return openErrorDialog(authError);
 
       manualSetUser(userInfo);
     },
   });
-
   return (
     <Box
       sx={{
         display: "flex",
-        flexDirection: "row",
+        flexDirection: "row-reverse",
       }}
     >
       <Box sx={{ flex: 1, p: 10, mr: 6 }}>
         <Image
-          src="/medical-prescription1.png"
+          src="/admins.png"
           alt=""
           width="100%"
           height="100%"
@@ -76,4 +90,4 @@ const PatientSignInPage = () => {
   );
 };
 
-export default PatientSignInPage;
+export default AdminSignInPage;
