@@ -16,7 +16,7 @@ const DashboardPage = () => {
   return (
     <Box
       sx={{
-        height: "calc(100vh - 110px)",
+        height: "calc(100vh - 120px)",
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
@@ -26,7 +26,7 @@ const DashboardPage = () => {
       }}
     >
       <Typography gutterBottom variant="h6" component="div">
-        Doctor dashboard
+        Admin dashboard
       </Typography>
     </Box>
   );

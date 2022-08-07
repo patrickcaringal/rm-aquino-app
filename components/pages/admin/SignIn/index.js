@@ -16,18 +16,19 @@ import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
+import { isMockDataEnabled } from "../../../../modules/env";
 import { signInAdminReq } from "../../../../modules/firebase";
 import { DoctorSigninSchema } from "../../../../modules/validation";
 import Form from "./Form";
 
-const defaultValues = false
+const defaultValues = isMockDataEnabled
   ? {
-      email: "",
-      password: "",
-    }
-  : {
       email: "rmaquino@gmail.com",
       password: "12345678",
+    }
+  : {
+      email: "",
+      password: "",
     };
 
 const AdminSignInPage = () => {
