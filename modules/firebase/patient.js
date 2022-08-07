@@ -18,6 +18,7 @@ import {
   getFullName,
   getUniquePersonId,
 } from "../helper";
+import { getErrorMsg } from "./auth";
 import { auth, db, secondaryAuth, timestampFields } from "./config";
 
 const collRef = collection(db, "patients");
@@ -41,11 +42,9 @@ export const signInPatientReq = async ({ email, password }) => {
     if (!exist) throw new Error("Account not found");
 
     const document = querySnapshot.docs[0].data();
-    console.log(document);
 
     return { data: document, success: true };
   } catch (error) {
-    console.log(error);
     const errMsg = getErrorMsg(error.code);
     return { error: errMsg || error.message };
   }

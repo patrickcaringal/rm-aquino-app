@@ -7,6 +7,7 @@ import faker from "faker";
 import { FieldArray } from "formik";
 
 import { DatePicker, Input, Select } from "../../../../components/common/Form";
+import { isMockDataEnabled } from "../../../../modules/env";
 import { formatTimeStamp } from "../../../../modules/helper";
 
 const defaultItem = {
@@ -42,16 +43,25 @@ const Form = ({
                 variant="extended"
                 sx={{ position: "absolute", bottom: 8, left: 16 }}
                 onClick={() => {
-                  push({
-                    firstName: faker.name.firstName(),
-                    suffix: "",
-                    lastName: faker.name.lastName(),
-                    middleName: faker.name.lastName(),
-                    email: faker.internet.email(),
-                    address: faker.lorem.paragraph(),
-                    birthdate: faker.date.past(),
-                    gender: faker.random.arrayElement(["male", "female"]),
-                  });
+                  push(
+                    isMockDataEnabled
+                      ? {
+                          firstName: faker.name.firstName(),
+                          suffix: "",
+                          lastName: faker.name.lastName(),
+                          middleName: faker.name.lastName(),
+                          email: faker.internet.email(),
+                          address: faker.lorem.paragraph(),
+                          birthdate: faker.date.past(
+                            faker.datatype.number({
+                              min: 10,
+                              max: 50,
+                            })
+                          ),
+                          gender: faker.random.arrayElement(["male", "female"]),
+                        }
+                      : defaultItem
+                  );
                 }}
                 size="small"
               >

@@ -179,6 +179,7 @@ export const updateStaffReq = async ({ staff }) => {
     const querySnapshot = await getDocs(q);
 
     const isDuplicate = querySnapshot.docs.length !== 0;
+    // TODO: .filter((doc) => doc.id !== staff.id)
     if (isDuplicate) {
       throw new Error(
         duplicateMessage({

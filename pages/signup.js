@@ -9,10 +9,11 @@ import { Form } from "../components/pages/patient/SignUp";
 import { useBackdropLoader } from "../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../contexts/ResponseDialogContext";
 import useRequest from "../hooks/useRequest";
+import { isMockDataEnabled } from "../modules/env";
 import { createPatientAccountReq } from "../modules/firebase";
 import { SignupSchema } from "../modules/validation";
 
-const defaultValue = true
+const defaultValue = isMockDataEnabled
   ? {
       firstName: faker.name.firstName(),
       suffix: "",

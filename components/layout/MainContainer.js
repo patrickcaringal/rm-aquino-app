@@ -21,7 +21,6 @@ const MainContainer = ({ children }) => {
         component="main"
         maxWidth="lg"
         sx={{
-          minHeight: "calc(100vh - 120px)",
           display: "flex",
           flexDirection: "column",
           // justifyContent: "center",
