@@ -43,7 +43,7 @@ export const AuthContextProvider = ({ children }) => {
 
   const value = {
     user,
-    isAdmin: ["doctor"].includes(user?.role),
+    isAdmin: ["doctor", "staff"].includes(user?.role),
     isStaff: user?.role === "staff",
     isPatient: user?.role === "patient",
     isLoggedIn: !!user && !!userSession,
