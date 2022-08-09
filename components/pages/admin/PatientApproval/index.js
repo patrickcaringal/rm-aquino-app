@@ -60,14 +60,14 @@ const PatientApprovalPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleApprove = async (patient) => {
+  const handleApprove = async (document) => {
     // Approve
-    const { error: approveError } = await approvePatient({
-      patient,
-    });
+    const payload = { document };
+    const { error: approveError } = await approvePatient(payload);
     if (approveError) return openErrorDialog(approveError);
 
-    setPatients((prev) => prev.filter((i) => i.id !== patient.id));
+    // Success
+    setPatients((prev) => prev.filter((i) => i.id !== document.id));
     openResponseDialog({
       autoClose: true,
       content: successMessage({
@@ -78,14 +78,14 @@ const PatientApprovalPage = () => {
     });
   };
 
-  const handleReject = async (patient) => {
+  const handleReject = async (document) => {
     // Reject
-    const { error: rejectError } = await rejectPatient({
-      patient,
-    });
+    const payload = { document };
+    const { error: rejectError } = await rejectPatient(payload);
     if (rejectError) return openErrorDialog(rejectError);
 
-    setPatients((prev) => prev.filter((i) => i.id !== patient.id));
+    // Success
+    setPatients((prev) => prev.filter((i) => i.id !== document.id));
     openResponseDialog({
       autoClose: true,
       content: successMessage({

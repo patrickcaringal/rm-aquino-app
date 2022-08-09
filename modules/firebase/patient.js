@@ -18,6 +18,7 @@ import {
   formatFirebasetimeStamp,
   getFullName,
   getUniquePersonId,
+  sortBy,
 } from "../helper";
 import { getErrorMsg } from "./auth";
 import { auth, db, secondaryAuth, timestampFields } from "./config";
@@ -95,7 +96,6 @@ export const createPatientAccountReq = async ({ document }) => {
 
 export const getPatientsAccountApprovalReq = async () => {
   try {
-    // TODO: adjust when get branch needed
     const q = query(
       collRef,
       where("approved", "==", false),
@@ -103,10 +103,12 @@ export const getPatientsAccountApprovalReq = async () => {
     );
     const querySnapshot = await getDocs(q);
 
-    const data = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const data = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort(sortBy("dateCreated"));
 
     return { data, success: true };
   } catch (error) {
@@ -115,45 +117,46 @@ export const getPatientsAccountApprovalReq = async () => {
   }
 };
 
-export const approvePatientReq = async ({ patient }) => {
+export const approvePatientReq = async ({ document }) => {
   try {
     // Create Auth Account
     const {
       user: { uid },
     } = await createUserWithEmailAndPassword(
       secondaryAuth,
-      patient.email,
+      document.email,
       "12345678" // TODO: auto generate
     );
 
     // TODO: add send email
 
     // Update ot approved
-    const docRef = doc(db, "patients", patient.id);
-    const finalDoc = {
+    const docRef = doc(db, "patients", document.id);
+    const data = {
       authId: uid,
       approved: true,
       ...timestampFields({ dateUpdated: true }),
     };
-    await updateDoc(docRef, finalDoc);
+    await updateDoc(docRef, data);
 
-    return { success: true };
+    return { data, success: true };
   } catch (error) {
     console.log(error);
     return { error: error.message };
   }
 };
 
-export const rejectPatientReq = async ({ patient }) => {
+export const rejectPatientReq = async ({ document }) => {
   try {
     // TODO: add send email
     // patient.reason
+    console.log(JSON.stringify(document, null, 4));
 
     // Delete
-    const docRef = doc(db, "patients", patient.id);
+    const docRef = doc(db, "patients", document.id);
     await deleteDoc(docRef);
 
-    return { success: true };
+    return { data: document, success: true };
   } catch (error) {
     console.log(error);
     return { error: error.message };
