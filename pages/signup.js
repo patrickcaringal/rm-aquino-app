@@ -11,6 +11,7 @@ import { useResponseDialog } from "../contexts/ResponseDialogContext";
 import useRequest from "../hooks/useRequest";
 import { isMockDataEnabled } from "../modules/env";
 import { createPatientAccountReq } from "../modules/firebase";
+import { personBuiltInFields } from "../modules/helper";
 import { SignupSchema } from "../modules/validation";
 
 const defaultValue = isMockDataEnabled
@@ -42,7 +43,7 @@ const defaultValue = isMockDataEnabled
       password: "",
     };
 
-export default function SignUpPage() {
+const SignUpPage = () => {
   // const router = useRouter();
   const { setBackdropLoader } = useBackdropLoader();
   const { openResponseDialog, openErrorDialog } = useResponseDialog();
@@ -56,7 +57,16 @@ export default function SignUpPage() {
     validationSchema: SignupSchema,
     validateOnChange: false,
     onSubmit: async (values, { resetForm }) => {
-      const { error: createAccountError } = await createPatientAccount(values);
+      const document = {
+        ...values,
+        role: "patient",
+        approved: false,
+        ...personBuiltInFields(values),
+      };
+
+      const { error: createAccountError } = await createPatientAccount({
+        document,
+      });
       if (createAccountError) return openErrorDialog(createAccountError);
 
       // Success
@@ -107,4 +117,6 @@ export default function SignUpPage() {
       </Box>
     </Box>
   );
-}
+};
+
+export default SignUpPage;

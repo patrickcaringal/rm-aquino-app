@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -20,14 +21,15 @@ import {
 } from "../helper";
 import { getErrorMsg } from "./auth";
 import { auth, db, secondaryAuth, timestampFields } from "./config";
+import { checkDuplicate } from "./helpers";
 
 const collRef = collection(db, "patients");
 
-const transformedFields = (doc) => ({
-  name: getFullName(doc),
-  birthdate: formatFirebasetimeStamp(doc.birthdate),
-  nameBirthdate: getUniquePersonId(doc),
-});
+export const hashPassword = (password) => {
+  const salt = bcrypt.genSaltSync(6);
+  const hashed = bcrypt.hashSync(password, salt);
+  return hashed;
+};
 
 export const signInPatientReq = async ({ email, password }) => {
   try {
@@ -50,51 +52,41 @@ export const signInPatientReq = async ({ email, password }) => {
   }
 };
 
-export const createPatientAccountReq = async (document) => {
+export const createPatientAccountReq = async ({ document }) => {
   try {
-    const fullName = getFullName(document);
-    const birthdate = formatFirebasetimeStamp(document.birthdate);
-
-    // Check fullname, birthdate duplicate
-    let q = query(
-      collRef,
-      where("name", "==", fullName),
-      where("birthdate", "==", birthdate)
-    );
-    let querySnapshot = await getDocs(q);
-
-    let isDuplicate = querySnapshot.docs.length !== 0;
-    if (isDuplicate) {
-      throw new Error(`Patient account ${fullName} already exist.`);
-    }
-
-    const { email } = document;
-
     // Check email duplicate
-    q = query(collRef, where("email", "==", email));
-    querySnapshot = await getDocs(q);
+    await checkDuplicate({
+      collectionName: "patients",
+      whereClause: where("email", "==", document.email),
+      duplicateOutputField: "email",
+      errorMsg: {
+        noun: "Email",
+      },
+    });
 
-    isDuplicate = querySnapshot.docs.length !== 0;
-    if (isDuplicate) {
-      throw new Error(`Email (${email}) already used.`);
-    }
+    // Check duplicate
+    await checkDuplicate({
+      collectionName: "patients",
+      whereClause: where("nameBirthdate", "==", document.nameBirthdate),
+      errorMsg: {
+        noun: "Patient",
+      },
+    });
 
     // Transform Document
     const docRef = doc(collRef);
-    const mappedDoc = {
-      ...document,
+    const data = {
       id: docRef.id,
-      role: "patient",
-      approved: false,
+      ...document,
+      password: hashPassword(document.password),
       deleted: false,
-      ...transformedFields(document),
       ...timestampFields({ dateCreated: true, dateUpdated: true }),
     };
 
     // Create Document
-    await setDoc(docRef, mappedDoc);
+    await setDoc(docRef, data);
 
-    return { data: mappedDoc, success: true };
+    return { data, success: true };
   } catch (error) {
     console.log(error);
     return { error: error.message };

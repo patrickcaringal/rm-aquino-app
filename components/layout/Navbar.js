@@ -281,17 +281,18 @@ const ResponsiveAppBar = () => {
           }}
         >
           <Container maxWidth="lg">
-            {menuItems.map(({ text, icon, onClick }) => (
-              <Button
-                sx={{ color: "common.white", mr: 2 }}
-                key={text}
-                variant="text"
-                onClick={onClick}
-                startIcon={icon}
-              >
-                {text}
-              </Button>
-            ))}
+            {isLoggedIn &&
+              menuItems.map(({ text, icon, onClick }) => (
+                <Button
+                  sx={{ color: "common.white", mr: 2 }}
+                  key={text}
+                  variant="text"
+                  onClick={onClick}
+                  startIcon={icon}
+                >
+                  {text}
+                </Button>
+              ))}
           </Container>
         </Toolbar>
       </AppBar>
