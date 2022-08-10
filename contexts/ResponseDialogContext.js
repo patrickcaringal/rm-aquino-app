@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 import { ResponseDialog } from "../components/common";
 
@@ -8,6 +8,7 @@ export const DIALOG_TYPES = {
   SUCCESS: "SUCCESS",
   WARNING: "WARNING",
   ERROR: "ERROR",
+  CONFIRM: "CONFIRM",
 };
 
 export const useResponseDialog = () => useContext(ResponseDialogContext);
@@ -17,6 +18,7 @@ export const ResponseDialogProvider = ({ children }) => {
   const [type, setType] = useState(DIALOG_TYPES.SUCCESS);
   const [title, setTitle] = useState(null);
   const [content, setContent] = useState(null);
+  const [actions, setActions] = useState(null);
 
   const handleClose = () => {
     setOpen(false);
@@ -26,17 +28,22 @@ export const ResponseDialogProvider = ({ children }) => {
       setType(DIALOG_TYPES.SUCCESS);
       setTitle(null);
       setContent(null);
+      setActions(null);
     }, 250);
   };
 
   const openResponseDialog = ({
     autoClose = false,
+    title,
     content,
+    actions,
     type,
     closeCb = () => {},
   }) => {
+    setTitle(title);
     setType(type);
     setContent(content);
+    setActions(actions);
     setOpen(true);
     closeCb();
 
@@ -50,6 +57,7 @@ export const ResponseDialogProvider = ({ children }) => {
   const openErrorDialog = (content = "") => {
     setType("ERROR");
     setContent(content);
+    setActions(null);
     setOpen(true);
 
     setTimeout(() => {
@@ -57,7 +65,11 @@ export const ResponseDialogProvider = ({ children }) => {
     }, 4000);
   };
 
-  const value = { openErrorDialog, openResponseDialog };
+  const value = {
+    openErrorDialog,
+    openResponseDialog,
+    closeDialog: handleClose,
+  };
   return (
     <ResponseDialogContext.Provider value={value}>
       <ResponseDialog
@@ -65,6 +77,7 @@ export const ResponseDialogProvider = ({ children }) => {
         type={type}
         title={title}
         content={content}
+        actions={actions}
         onClose={handleClose}
       />
       {children}

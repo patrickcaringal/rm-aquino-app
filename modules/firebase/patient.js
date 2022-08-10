@@ -12,6 +12,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 
 import {
@@ -22,7 +23,7 @@ import {
 } from "../helper";
 import { getErrorMsg } from "./auth";
 import { auth, db, secondaryAuth, timestampFields } from "./config";
-import { checkDuplicate } from "./helpers";
+import { checkDuplicate, registerNames } from "./helpers";
 
 const collRef = collection(db, "patients");
 
@@ -130,14 +131,25 @@ export const approvePatientReq = async ({ document }) => {
 
     // TODO: add send email
 
-    // Update ot approved
+    // Update to approved
+    const batch = writeBatch(db);
     const docRef = doc(db, "patients", document.id);
     const data = {
       authId: uid,
       approved: true,
+      approvedBy: document.approvedBy,
       ...timestampFields({ dateUpdated: true }),
     };
-    await updateDoc(docRef, data);
+    batch.update(docRef, data);
+
+    // Register Patient name
+    const { namesDocRef, names } = await registerNames({
+      collectionName: "patients",
+      names: { [document.id]: document.name },
+    });
+    batch.update(namesDocRef, names);
+
+    await batch.commit();
 
     return { data, success: true };
   } catch (error) {

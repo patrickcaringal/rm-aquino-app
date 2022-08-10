@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 
 import { successMessage } from "../../../../components/common";
+import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
@@ -32,6 +33,7 @@ const defaultModal = {
 };
 
 const PatientApprovalPage = () => {
+  const { user } = useAuth();
   const { setBackdropLoader } = useBackdropLoader();
   const { openResponseDialog, openErrorDialog } = useResponseDialog();
 
@@ -62,7 +64,7 @@ const PatientApprovalPage = () => {
 
   const handleApprove = async (document) => {
     // Approve
-    const payload = { document };
+    const payload = { document: { ...document, approvedBy: user.id } };
     const { error: approveError } = await approvePatient(payload);
     if (approveError) return openErrorDialog(approveError);
 

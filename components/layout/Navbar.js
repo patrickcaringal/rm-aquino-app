@@ -75,6 +75,11 @@ const ResponsiveAppBar = () => {
           icon: <HowToRegIcon />,
           onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
         },
+        {
+          text: "Doctor Schedule",
+          icon: null,
+          onClick: () => router.push(PATHS.ADMIN.DOCTOR_SCHEDULE),
+        },
       ]
     : [];
 

@@ -11,6 +11,7 @@ export const PATHS = {
     DASHBOARD: "/admin/dashboard",
     STAFF_MANAGEMENT: "/admin/staffs",
     PATIENT_APPROVAL: "/admin/patient-approval",
+    DOCTOR_SCHEDULE: "/admin/doctor-schedule",
   },
   // STAFF: {
   //   DASHBOARD: "/staff/dashboard",

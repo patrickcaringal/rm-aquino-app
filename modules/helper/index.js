@@ -34,7 +34,21 @@ export const convertToDate = (timestamp) => {
   }
 };
 
-export const today = formatTimeStamp(new Date());
+export const getDayOfCurrentWeek = (day = 0) => {
+  const today = new Date();
+  const first = today.getDate() - today.getDay() + 1;
+  return new Date(today.setDate(first + day));
+};
+
+// export const today = formatTimeStamp(new Date());
+export const today = {
+  dateStr: formatTimeStamp(new Date()),
+  dayOfWeek: format(new Date(), "i"),
+};
+
+export const days = {
+  businessDays: [1, 2, 3, 4, 5],
+};
 
 export const calculateAge = (birthdate) => {
   const age = differenceInYears(new Date(), new Date(birthdate));

@@ -1,4 +1,14 @@
+import "@fullcalendar/common/main.css"; // @fullcalendar/react imports @fullcalendar/common
+import "@fullcalendar/daygrid/main.css"; // @fullcalendar/timegrid imports @fullcalendar/daygrid
+import "@fullcalendar/timegrid/main.css"; // @fullcalendar/timegrid is a direct import
+// (and @fullcalendar/interaction has no stylesheet)
 import "../styles/globals.scss";
+// import "../styles/fullcalendar/common/main.css";
+// import "../styles/fullcalendar/daygrid/main.css";
+// import "../styles/fullcalendar/timegrid/main.css";
+
+import React from "react";
+
 import { ThemeProvider } from "@mui/material/styles";
 import Head from "next/head";
 import { useRouter } from "next/router";
