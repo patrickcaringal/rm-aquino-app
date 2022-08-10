@@ -14,7 +14,7 @@ import { useFormik } from "formik";
 import { useAuth } from "../../contexts/AuthContext";
 import { useResponseDialog } from "../../contexts/ResponseDialogContext";
 import useRequest from "../../hooks/useRequest";
-import { signInStaffReq } from "../../modules/firebase";
+import { signInAdminReq } from "../../modules/firebase";
 import { DoctorSigninSchema } from "../../modules/validation";
 
 const defaultValues = {
@@ -25,7 +25,7 @@ const defaultValues = {
 const StaffSignInPage = () => {
   const { manualSetUser } = useAuth();
   const { openErrorDialog } = useResponseDialog();
-  const [signIn, isSignInLoading] = useRequest(signInStaffReq);
+  const [signIn, isSignInLoading] = useRequest(signInAdminReq);
 
   const formik = useFormik({
     initialValues: defaultValues,
