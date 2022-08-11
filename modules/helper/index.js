@@ -34,11 +34,15 @@ export const convertToDate = (timestamp) => {
   }
 };
 
-export const getDayOfCurrentWeek = (day = 0) => {
-  const today = new Date();
+export const getDayOfWeek = (day = 0, today = new Date()) => {
   const first = today.getDate() - today.getDay() + 1;
   return new Date(today.setDate(first + day));
 };
+
+// export const getDayOfNextWeek = (today = new Date(), day = 0) => {
+//   const first = today.getDate() - today.getDay() + 1;
+//   return new Date(today.setDate(first + day));
+// };
 
 // export const today = formatTimeStamp(new Date());
 export const today = {

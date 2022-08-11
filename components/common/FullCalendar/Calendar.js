@@ -15,6 +15,7 @@ export const formatDateTime = (datetime) => {
 };
 
 const Calendar = ({
+  initialDate = new Date(),
   businessHours = [],
   events,
   onTimeSelect,
@@ -22,6 +23,7 @@ const Calendar = ({
 }) => {
   return (
     <FullCalendar
+      initialDate={initialDate}
       height={504}
       // plugins={[dayGridPlugin, interactionPlugin]}
       // initialView="timeGridWeek"
@@ -31,6 +33,12 @@ const Calendar = ({
         start: "", // will normally be on the left. if RTL, will be on the right
         center: "",
         end: "", // will normally be on the right. if RTL, will be on the left
+      }}
+      dayHeaderFormat={{
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        omitCommas: true,
       }}
       weekends={false}
       nowIndicator

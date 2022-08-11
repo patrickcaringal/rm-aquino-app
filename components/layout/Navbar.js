@@ -1,11 +1,6 @@
 import * as React from "react";
 
-import AdbIcon from "@mui/icons-material/Adb";
-import GroupIcon from "@mui/icons-material/Group";
-import HowToRegIcon from "@mui/icons-material/HowToReg";
 import LogoutIcon from "@mui/icons-material/Logout";
-import MailIcon from "@mui/icons-material/Mail";
-import MenuIcon from "@mui/icons-material/Menu";
 import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
@@ -23,14 +18,15 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  MenuList,
   Toolbar,
   Tooltip,
   Typography,
 } from "@mui/material";
+import Paper from "@mui/material/Paper";
 import { useRouter } from "next/router";
 
 import { Logo } from "../../components";
-import NavbarMenu from "../../components/common/Menu/NavbarMenu";
 import { PATHS } from "../../components/common/Routes";
 import { useAuth } from "../../contexts/AuthContext";
 import { useBackdropLoader } from "../../contexts/BackdropLoaderContext";
@@ -38,9 +34,9 @@ import { useResponseDialog } from "../../contexts/ResponseDialogContext";
 import useRequest from "../../hooks/useRequest";
 import { signOutAnonymouslyReq, signOutReq } from "../../modules/firebase";
 import { getFullName, getInitials } from "../../modules/helper";
+import NavbarItem from "./NavbarItem";
 
 const pages = ["Products", "Pricing", "Blog"];
-// const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const ResponsiveAppBar = () => {
   const router = useRouter();
@@ -62,6 +58,7 @@ const ResponsiveAppBar = () => {
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [itemEl, setItemElUser] = React.useState(null);
 
   const menuItems = isAdmin
     ? [
@@ -78,7 +75,17 @@ const ResponsiveAppBar = () => {
         {
           text: "Doctor Schedule",
           icon: null,
-          onClick: () => router.push(PATHS.ADMIN.DOCTOR_SCHEDULE),
+          menuItems: [
+            {
+              text: "THIS WEEK",
+              onClick: () =>
+                router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_CURRENT_WEEK),
+            },
+            {
+              text: "NEXT WEEK",
+              onClick: () => router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_NEXT_WEEK),
+            },
+          ],
         },
       ]
     : [];
@@ -287,17 +294,25 @@ const ResponsiveAppBar = () => {
         >
           <Container maxWidth="lg">
             {isLoggedIn &&
-              menuItems.map(({ text, icon, onClick }) => (
-                <Button
-                  sx={{ color: "common.white", mr: 3 }}
-                  key={text}
-                  variant="text"
-                  onClick={onClick}
-                  startIcon={icon}
-                >
-                  {text}
-                </Button>
-              ))}
+              menuItems.map(({ text, icon, onClick, menuItems }) => {
+                if (!menuItems) {
+                  return (
+                    <Button
+                      sx={{ color: "common.white", mr: 3 }}
+                      key={text}
+                      variant="text"
+                      onClick={onClick}
+                      startIcon={icon}
+                    >
+                      {text}
+                    </Button>
+                  );
+                }
+
+                return (
+                  <NavbarItem key={text} text={text} menuItems={menuItems} />
+                );
+              })}
           </Container>
         </Toolbar>
       </AppBar>
@@ -311,68 +326,3 @@ const ResponsiveAppBar = () => {
   );
 };
 export default ResponsiveAppBar;
-
-// {isLoggedIn ? (
-//   <>
-//     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-//       <Avatar sx={{ bgcolor: "primary.main" }}>
-//         {getInitials(user?.firstName)}
-//       </Avatar>
-//     </IconButton>
-//     <Menu
-//       sx={{ mt: "45px" }}
-//       id="menu-appbar"
-//       anchorEl={anchorElUser}
-//       anchorOrigin={{
-//         vertical: "top",
-//         horizontal: "right",
-//       }}
-//       keepMounted
-//       transformOrigin={{
-//         vertical: "top",
-//         horizontal: "right",
-//       }}
-//       open={Boolean(anchorElUser)}
-//       onClose={handleCloseUserMenu}
-//     >
-//       <Box sx={{ width: 260, p: 2 }}>
-//         <Typography variant="body1" textAlign="center">
-//           {getFullName(user).toUpperCase()}
-//         </Typography>
-//         <Typography variant="body2" textAlign="center">
-//           {user?.email}
-//         </Typography>
-//         <Typography
-//           variant="caption"
-//           textAlign="center"
-//           display="block"
-//         >
-//           {user?.role === "superadmin"
-//             ? "Doctor"
-//             : !user?.role
-//             ? "Patient"
-//             : user?.role}
-//         </Typography>
-//       </Box>
-//       <Divider />
-//       <MenuItem onClick={handleLogout}>
-//         <ListItemIcon>
-//           <LogoutIcon fontSize="small" />
-//         </ListItemIcon>
-//         <ListItemText>Logout</ListItemText>
-//       </MenuItem>
-//     </Menu>
-//   </>
-// ) : // displayed if page is not signin or signup
-// !["/signin", "/signup", "/doctor/signin"].includes(
-//     router.pathname
-//   ) ? (
-//   <Button
-//     onClick={(e) => {
-//       e.preventDefault();
-//       router.push("/signin");
-//     }}
-//   >
-//     Sign in
-//   </Button>
-// ) : null}

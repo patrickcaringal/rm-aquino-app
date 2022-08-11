@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import { Box, Button, Typography } from "@mui/material";
-import { format, getWeek, isBefore } from "date-fns";
+import { addWeeks, format, getWeek, isBefore } from "date-fns";
 import lodash from "lodash";
 
-import { FullCalendar, successMessage } from "../../../../components/common";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
@@ -14,11 +13,13 @@ import {
   updateSchedulesReq,
 } from "../../../../modules/firebase";
 import { days, getDayOfWeek, today } from "../../../../modules/helper";
+import { FullCalendar, successMessage } from "../../../common";
 
 const DoctorSchedulePage = () => {
   const { openResponseDialog, openErrorDialog, closeDialog } =
     useResponseDialog();
   const { setBackdropLoader } = useBackdropLoader();
+  const baseDay = addWeeks(new Date(), 1);
 
   // Requests
   const [getSchedule] = useRequest(getScheduleReq, setBackdropLoader);
@@ -33,7 +34,7 @@ const DoctorSchedulePage = () => {
     const fetch = async () => {
       // Get Schedule
       const { data, error: getScheduleError } = await getSchedule({
-        weekNo: today.weekNo,
+        weekNo: today.weekNo + 1,
       });
       if (getScheduleError) return openErrorDialog(getScheduleError);
 
@@ -51,11 +52,7 @@ const DoctorSchedulePage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const remainingBusinessDay = lodash.range(
-    today.dayOfWeek,
-    days.businessDays.length + 1,
-    1
-  );
+  const remainingBusinessDay = lodash.range(1, days.businessDays.length + 1, 1);
 
   const handleAddEvent = (event) => {
     setSchedules((prev) =>
@@ -182,8 +179,8 @@ const DoctorSchedulePage = () => {
       schedules: v,
     }));
 
-    const start = getDayOfWeek();
-    const end = getDayOfWeek(4);
+    const start = getDayOfWeek(0, baseDay);
+    const end = getDayOfWeek(4, baseDay);
 
     const document = {
       start: format(start, "yyyy-MM-dd"),
@@ -234,6 +231,7 @@ const DoctorSchedulePage = () => {
 
       <Box>
         <FullCalendar
+          initialDate={baseDay}
           events={allEvents}
           businessHours={businessHours}
           onTimeSelect={handleTimeSelect}
