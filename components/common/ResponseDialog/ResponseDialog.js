@@ -58,7 +58,7 @@ export default function AlertDialog({
         sx={{ maxWidth: 400 }}
       >
         <Alert
-          variant="filled"
+          // variant="filled"
           severity={DIALOG_TYPES[type]}
           sx={{ width: "100%" }}
           onClose={handleClose}

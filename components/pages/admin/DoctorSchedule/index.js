@@ -11,7 +11,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { format, getWeek, isBefore, isWithinInterval } from "date-fns";
+import { format, getWeek, isBefore } from "date-fns";
 import lodash from "lodash";
 
 import { FullCalendar, successMessage } from "../../../../components/common";
@@ -19,7 +19,11 @@ import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
-import { addSchedulesReq, getScheduleReq } from "../../../../modules/firebase";
+import {
+  addSchedulesReq,
+  getScheduleReq,
+  updateSchedulesReq,
+} from "../../../../modules/firebase";
 import {
   days,
   getDayOfCurrentWeek,
@@ -42,6 +46,7 @@ const DoctorSchedulePage = () => {
   // Requests
   const [getSchedule] = useRequest(getScheduleReq, setBackdropLoader);
   const [addSchedules] = useRequest(addSchedulesReq, setBackdropLoader);
+  const [updateSchedules] = useRequest(updateSchedulesReq, setBackdropLoader);
 
   // Local States
   const [scheduleDoc, setScheduleDoc] = useState([]);
@@ -134,6 +139,17 @@ const DoctorSchedulePage = () => {
 
   const handleEventClick = (info) => {
     const { start, end } = info.event;
+
+    const isPastTime = isBefore(start, new Date());
+    if (isPastTime) {
+      openResponseDialog({
+        content: "Cannot remove schedule past current time.",
+        type: "WARNING",
+        autoClose: true,
+      });
+      return;
+    }
+
     const content = (
       <>
         <Typography variant="body1" color="text.secondary">
@@ -199,12 +215,16 @@ const DoctorSchedulePage = () => {
       schedules: schedArray,
     };
 
-    // console.log({ document });
-    // return;
-    // Add
-    const payload = { document };
-    const { error: saveError } = await addSchedules(payload);
-    if (saveError) return openErrorDialog(saveError);
+    if (scheduleDoc.id) {
+      const payload = { document: { ...document, id: scheduleDoc.id } };
+      const { error: saveError } = await updateSchedules(payload);
+      if (saveError) return openErrorDialog(saveError);
+    } else {
+      // Add
+      const payload = { document };
+      const { error: saveError } = await addSchedules(payload);
+      if (saveError) return openErrorDialog(saveError);
+    }
 
     // Success
     openResponseDialog({

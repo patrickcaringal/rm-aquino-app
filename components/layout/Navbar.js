@@ -67,12 +67,12 @@ const ResponsiveAppBar = () => {
     ? [
         {
           text: "Staffs",
-          icon: <GroupIcon />,
+          icon: null,
           onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
         },
         {
           text: "Patient Approval",
-          icon: <HowToRegIcon />,
+          icon: null,
           onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
         },
         {
@@ -289,7 +289,7 @@ const ResponsiveAppBar = () => {
             {isLoggedIn &&
               menuItems.map(({ text, icon, onClick }) => (
                 <Button
-                  sx={{ color: "common.white", mr: 2 }}
+                  sx={{ color: "common.white", mr: 3 }}
                   key={text}
                   variant="text"
                   onClick={onClick}

@@ -4,6 +4,7 @@ import {
   getDocs,
   query,
   setDoc,
+  updateDoc,
   where,
   writeBatch,
 } from "firebase/firestore";
@@ -16,7 +17,6 @@ const collRef = collection(db, "schedules");
 
 export const getScheduleReq = async ({ weekNo }) => {
   try {
-    console.log("getScheduleReq");
     const q = query(collRef, where("weekNo", "==", weekNo));
     const querySnapshot = await getDocs(q);
 
@@ -44,6 +44,25 @@ export const addSchedulesReq = async ({ document }) => {
 
     // Create Document
     await setDoc(docRef, data);
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    const errMsg = getErrorMsg(error.code);
+    return { error: errMsg || error.message };
+  }
+};
+
+export const updateSchedulesReq = async ({ document }) => {
+  try {
+    const docRef = doc(db, "schedules", document.id);
+    const data = {
+      schedules: document.schedules,
+      ...timestampFields({ dateUpdated: true }),
+    };
+
+    // Update Document
+    await updateDoc(docRef, data);
 
     return { data, success: true };
   } catch (error) {

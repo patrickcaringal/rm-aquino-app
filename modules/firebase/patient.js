@@ -97,7 +97,6 @@ export const createPatientAccountReq = async ({ document }) => {
 
 export const getPatientsAccountApprovalReq = async () => {
   try {
-    console.log("getPatientsAccountApprovalReq");
     const q = query(
       collRef,
       where("approved", "==", false),
@@ -162,8 +161,6 @@ export const approvePatientReq = async ({ document }) => {
 export const rejectPatientReq = async ({ document }) => {
   try {
     // TODO: add send email
-    // patient.reason
-    console.log(JSON.stringify(document, null, 4));
 
     // Delete
     const docRef = doc(db, "patients", document.id);

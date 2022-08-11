@@ -30,7 +30,11 @@ import {
   rejectPatientReq,
   signInPatientReq,
 } from "./patient";
-import { addSchedulesReq, getScheduleReq } from "./schedules";
+import {
+  addSchedulesReq,
+  getScheduleReq,
+  updateSchedulesReq,
+} from "./schedules";
 import { addServiceReq, getServicesReq } from "./services";
 import { deleteImageReq, uploadImageReq } from "./storage";
 
@@ -75,4 +79,5 @@ export {
   // schedules
   addSchedulesReq,
   getScheduleReq,
+  updateSchedulesReq,
 };
