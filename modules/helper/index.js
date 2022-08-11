@@ -1,4 +1,4 @@
-import { differenceInYears, format } from "date-fns";
+import { differenceInYears, format, getWeek } from "date-fns";
 import { Timestamp } from "firebase/firestore";
 import lodash from "lodash";
 
@@ -44,6 +44,7 @@ export const getDayOfCurrentWeek = (day = 0) => {
 export const today = {
   dateStr: formatTimeStamp(new Date()),
   dayOfWeek: format(new Date(), "i"),
+  weekNo: getWeek(new Date()),
 };
 
 export const days = {

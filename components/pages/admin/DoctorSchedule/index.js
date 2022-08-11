@@ -11,7 +11,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { format, getWeek } from "date-fns";
+import { format, getWeek, isBefore, isWithinInterval } from "date-fns";
 import lodash from "lodash";
 
 import { FullCalendar, successMessage } from "../../../../components/common";
@@ -19,13 +19,7 @@ import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
-import {
-  addStaffReq,
-  approvePatientReq,
-  getPatientsAccountApprovalReq,
-  rejectPatientReq,
-  updateStaffReq,
-} from "../../../../modules/firebase";
+import { addSchedulesReq, getScheduleReq } from "../../../../modules/firebase";
 import {
   days,
   getDayOfCurrentWeek,
@@ -43,9 +37,37 @@ const defaultModal = {
 const DoctorSchedulePage = () => {
   const { openResponseDialog, openErrorDialog, closeDialog } =
     useResponseDialog();
+  const { setBackdropLoader } = useBackdropLoader();
+
+  // Requests
+  const [getSchedule] = useRequest(getScheduleReq, setBackdropLoader);
+  const [addSchedules] = useRequest(addSchedulesReq, setBackdropLoader);
 
   // Local States
+  const [scheduleDoc, setScheduleDoc] = useState([]);
   const [schedules, setSchedules] = useState([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      // Get Schedule
+      const { data, error: getScheduleError } = await getSchedule({
+        weekNo: today.weekNo,
+      });
+      if (getScheduleError) return openErrorDialog(getScheduleError);
+
+      if (data?.schedules) {
+        setScheduleDoc(data);
+        setSchedules(
+          data.schedules.reduce((acc, i) => {
+            return [...acc, ...i.schedules];
+          }, [])
+        );
+      }
+    };
+
+    fetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const remainingBusinessDay = lodash.range(
     today.dayOfWeek,
@@ -68,6 +90,17 @@ const DoctorSchedulePage = () => {
 
   const handleTimeSelect = (arg) => {
     const { start, end } = arg;
+
+    const isPastTime = isBefore(start, new Date());
+    if (isPastTime) {
+      openResponseDialog({
+        content: "Cannot add schedule past current time.",
+        type: "WARNING",
+        autoClose: true,
+      });
+      return;
+    }
+
     const content = (
       <>
         <Typography variant="body1" color="text.secondary">
@@ -132,7 +165,7 @@ const DoctorSchedulePage = () => {
     });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const group = schedules.reduce((acc, i) => {
       const { start, end } = i;
       const key = format(new Date(start), "yyyy-MM-dd");
@@ -151,6 +184,11 @@ const DoctorSchedulePage = () => {
       };
     }, {});
 
+    const schedArray = Object.entries(group).map(([k, v]) => ({
+      date: k,
+      schedules: v,
+    }));
+
     const start = getDayOfCurrentWeek();
     const end = getDayOfCurrentWeek(4);
 
@@ -158,10 +196,25 @@ const DoctorSchedulePage = () => {
       start: format(start, "yyyy-MM-dd"),
       end: format(end, "yyyy-MM-dd"),
       weekNo: getWeek(new Date(start)),
-      ...group,
+      schedules: schedArray,
     };
 
-    console.log(JSON.stringify(document, null, 4));
+    // console.log({ document });
+    // return;
+    // Add
+    const payload = { document };
+    const { error: saveError } = await addSchedules(payload);
+    if (saveError) return openErrorDialog(saveError);
+
+    // Success
+    openResponseDialog({
+      autoClose: true,
+      content: successMessage({
+        noun: "Schedule",
+        verb: "saved",
+      }),
+      type: "SUCCESS",
+    });
   };
 
   const businessHours = [
@@ -172,23 +225,7 @@ const DoctorSchedulePage = () => {
     },
   ];
 
-  const allEvents = [
-    ...schedules,
-    // {
-    //   // title: "event",
-    //   // allDay: false,
-    //   start: "2022-08-10 06:00",
-    //   end: "2022-08-10 07:00",
-    //   // duration: "01:00",
-    // },
-    // {
-    //   // title: "event title",
-    //   // allDay: false,
-    //   start: "2022-08-10 08:00",
-    //   end: "2022-08-10 09:00",
-    //   // duration: "01:00",
-    // },
-  ];
+  const allEvents = [...schedules];
 
   return (
     <Box sx={{ pt: 2 }}>

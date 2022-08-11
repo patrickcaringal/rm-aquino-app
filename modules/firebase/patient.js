@@ -97,6 +97,7 @@ export const createPatientAccountReq = async ({ document }) => {
 
 export const getPatientsAccountApprovalReq = async () => {
   try {
+    console.log("getPatientsAccountApprovalReq");
     const q = query(
       collRef,
       where("approved", "==", false),
