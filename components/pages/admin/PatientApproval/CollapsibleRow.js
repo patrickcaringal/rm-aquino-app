@@ -33,14 +33,8 @@ const CollapsibleRow = ({ data, onApprove, onReject }) => {
     birthdate,
     dateCreated,
     address,
+    name,
   } = data;
-
-  const fullname = getFullName({
-    firstName,
-    suffix,
-    lastName,
-    middleName,
-  });
 
   return (
     <>
@@ -58,7 +52,7 @@ const CollapsibleRow = ({ data, onApprove, onReject }) => {
           </IconButton>
         </TableCell>
         <TableCell>
-          <Typography variant="body2">{fullname}</Typography>
+          <Typography variant="body2">{name}</Typography>
         </TableCell>
         <TableCell sx={{ width: 100 }}>
           <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
@@ -105,7 +99,7 @@ const CollapsibleRow = ({ data, onApprove, onReject }) => {
               {[
                 {
                   label: "Name",
-                  value: fullname,
+                  value: name,
                 },
                 {
                   label: "Email",

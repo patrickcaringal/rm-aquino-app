@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 
 import { successMessage } from "../../../../components/common";
+import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
@@ -32,6 +33,7 @@ const defaultModal = {
 };
 
 const PatientApprovalPage = () => {
+  const { user } = useAuth();
   const { setBackdropLoader } = useBackdropLoader();
   const { openResponseDialog, openErrorDialog } = useResponseDialog();
 
@@ -60,14 +62,14 @@ const PatientApprovalPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleApprove = async (patient) => {
+  const handleApprove = async (document) => {
     // Approve
-    const { error: approveError } = await approvePatient({
-      patient,
-    });
+    const payload = { document: { ...document, approvedBy: user.id } };
+    const { error: approveError } = await approvePatient(payload);
     if (approveError) return openErrorDialog(approveError);
 
-    setPatients((prev) => prev.filter((i) => i.id !== patient.id));
+    // Success
+    setPatients((prev) => prev.filter((i) => i.id !== document.id));
     openResponseDialog({
       autoClose: true,
       content: successMessage({
@@ -78,14 +80,14 @@ const PatientApprovalPage = () => {
     });
   };
 
-  const handleReject = async (patient) => {
+  const handleReject = async (document) => {
     // Reject
-    const { error: rejectError } = await rejectPatient({
-      patient,
-    });
+    const payload = { document };
+    const { error: rejectError } = await rejectPatient(payload);
     if (rejectError) return openErrorDialog(rejectError);
 
-    setPatients((prev) => prev.filter((i) => i.id !== patient.id));
+    // Success
+    setPatients((prev) => prev.filter((i) => i.id !== document.id));
     openResponseDialog({
       autoClose: true,
       content: successMessage({

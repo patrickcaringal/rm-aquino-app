@@ -2,11 +2,9 @@ import React from "react";
 
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DangerousIcon from "@mui/icons-material/Dangerous";
-import InfoIcon from "@mui/icons-material/Info";
+import HelpIcon from "@mui/icons-material/Help";
 import WarningIcon from "@mui/icons-material/Warning";
 import {
-  Alert,
-  AlertTitle,
   Box,
   Button,
   Dialog,
@@ -14,14 +12,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Snackbar,
 } from "@mui/material";
 
 export const DIALOG_TYPES = {
-  SUCCESS: "success",
-  WARNING: "warning",
-  ERROR: "error",
-  CONFIRM: "confirm",
+  SUCCESS: "SUCCESS",
+  WARNING: "WARNING",
+  ERROR: "ERROR",
+  CONFIRM: "CONFIRM",
 };
 
 const dialogIcons = {
@@ -33,6 +30,9 @@ const dialogIcons = {
   ),
   [DIALOG_TYPES.ERROR]: (
     <DangerousIcon sx={{ mr: 3, fontSize: 60 }} color="error" />
+  ),
+  [DIALOG_TYPES.CONFIRM]: (
+    <HelpIcon sx={{ mr: 3, fontSize: 60 }} color="primary" />
   ),
 };
 
@@ -47,27 +47,8 @@ export default function AlertDialog({
   const handleClose = () => {
     onClose();
   };
-  const getDialogIcon = () => dialogIcons[type];
 
-  if (type !== "CONFIRM")
-    return (
-      <Snackbar
-        open={open}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        sx={{ maxWidth: 400 }}
-      >
-        <Alert
-          // variant="filled"
-          severity={DIALOG_TYPES[type]}
-          sx={{ width: "100%" }}
-          onClose={handleClose}
-        >
-          <AlertTitle>{title || type}</AlertTitle>
-          <Box sx={{ wordBreak: "break-word" }}>{content}</Box>
-        </Alert>
-      </Snackbar>
-    );
+  const getDialogIcon = () => dialogIcons[type];
 
   return (
     <Dialog
@@ -88,6 +69,7 @@ export default function AlertDialog({
             // border: "1px solid red",
           }}
         >
+          {getDialogIcon()}
           <Box sx={{ wordBreak: "break-word" }}>{content}</Box>
         </DialogContentText>
       </DialogContent>

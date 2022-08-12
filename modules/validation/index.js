@@ -2,6 +2,7 @@ import {
   BranchesSchema,
   DoctorSigninSchema,
   FamilyMemberSchema,
+  PatientRejectSchema,
   ServicesSchema,
   SigninSchema,
   SignupSchema,
@@ -18,4 +19,5 @@ export {
   SignupSchema,
   StaffSchema,
   VerificationCodeSchema,
+  PatientRejectSchema,
 };

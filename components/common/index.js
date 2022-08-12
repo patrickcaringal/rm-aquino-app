@@ -1,3 +1,4 @@
+import { FullCalendar } from "./FullCalendar";
 import Modal from "./Modal";
 import {
   ResponseDialog,
@@ -7,6 +8,7 @@ import {
 import Toolbar from "./Toolbar";
 
 export {
+  FullCalendar,
   Modal,
   Toolbar,
   // ResponseDialog

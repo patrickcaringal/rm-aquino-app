@@ -68,3 +68,9 @@ a {
     background: #eee;
   }
 }
+
+// fullcalendar overrides
+table.fc-scrollgrid > tbody > tr:nth-child(1),
+table.fc-scrollgrid > tbody > tr:nth-child(2) {
+  display: none;
+}

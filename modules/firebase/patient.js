@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -11,23 +12,26 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 
 import {
   formatFirebasetimeStamp,
   getFullName,
   getUniquePersonId,
+  sortBy,
 } from "../helper";
 import { getErrorMsg } from "./auth";
 import { auth, db, secondaryAuth, timestampFields } from "./config";
+import { checkDuplicate, registerNames } from "./helpers";
 
 const collRef = collection(db, "patients");
 
-const transformedFields = (doc) => ({
-  name: getFullName(doc),
-  birthdate: formatFirebasetimeStamp(doc.birthdate),
-  nameBirthdate: getUniquePersonId(doc),
-});
+export const hashPassword = (password) => {
+  const salt = bcrypt.genSaltSync(6);
+  const hashed = bcrypt.hashSync(password, salt);
+  return hashed;
+};
 
 export const signInPatientReq = async ({ email, password }) => {
   try {
@@ -50,71 +54,39 @@ export const signInPatientReq = async ({ email, password }) => {
   }
 };
 
-export const createPatientAccountReq = async (document) => {
+export const createPatientAccountReq = async ({ document }) => {
   try {
-    const fullName = getFullName(document);
-    const birthdate = formatFirebasetimeStamp(document.birthdate);
-
-    // Check fullname, birthdate duplicate
-    let q = query(
-      collRef,
-      where("name", "==", fullName),
-      where("birthdate", "==", birthdate)
-    );
-    let querySnapshot = await getDocs(q);
-
-    let isDuplicate = querySnapshot.docs.length !== 0;
-    if (isDuplicate) {
-      throw new Error(`Patient account ${fullName} already exist.`);
-    }
-
-    const { email } = document;
-
     // Check email duplicate
-    q = query(collRef, where("email", "==", email));
-    querySnapshot = await getDocs(q);
+    await checkDuplicate({
+      collectionName: "patients",
+      whereClause: where("email", "==", document.email),
+      duplicateOutputField: "email",
+      errorMsg: {
+        noun: "Email",
+      },
+    });
 
-    isDuplicate = querySnapshot.docs.length !== 0;
-    if (isDuplicate) {
-      throw new Error(`Email (${email}) already used.`);
-    }
+    // Check duplicate
+    await checkDuplicate({
+      collectionName: "patients",
+      whereClause: where("nameBirthdate", "==", document.nameBirthdate),
+      errorMsg: {
+        noun: "Patient",
+      },
+    });
 
     // Transform Document
     const docRef = doc(collRef);
-    const mappedDoc = {
-      ...document,
+    const data = {
       id: docRef.id,
-      role: "patient",
-      approved: false,
+      ...document,
+      password: hashPassword(document.password),
       deleted: false,
-      ...transformedFields(document),
       ...timestampFields({ dateCreated: true, dateUpdated: true }),
     };
 
     // Create Document
-    await setDoc(docRef, mappedDoc);
-
-    return { data: mappedDoc, success: true };
-  } catch (error) {
-    console.log(error);
-    return { error: error.message };
-  }
-};
-
-export const getPatientsAccountApprovalReq = async () => {
-  try {
-    // TODO: adjust when get branch needed
-    const q = query(
-      collRef,
-      where("approved", "==", false),
-      where("deleted", "==", false)
-    );
-    const querySnapshot = await getDocs(q);
-
-    const data = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    await setDoc(docRef, data);
 
     return { data, success: true };
   } catch (error) {
@@ -123,45 +95,78 @@ export const getPatientsAccountApprovalReq = async () => {
   }
 };
 
-export const approvePatientReq = async ({ patient }) => {
+export const getPatientsAccountApprovalReq = async () => {
   try {
-    // Create Auth Account
-    const {
-      user: { uid },
-    } = await createUserWithEmailAndPassword(
-      secondaryAuth,
-      patient.email,
-      "12345678" // TODO: auto generate
+    const q = query(
+      collRef,
+      where("approved", "==", false),
+      where("deleted", "==", false)
     );
+    const querySnapshot = await getDocs(q);
 
-    // TODO: add send email
+    const data = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort(sortBy("dateCreated"));
 
-    // Update ot approved
-    const docRef = doc(db, "patients", patient.id);
-    const finalDoc = {
-      authId: uid,
-      approved: true,
-      ...timestampFields({ dateUpdated: true }),
-    };
-    await updateDoc(docRef, finalDoc);
-
-    return { success: true };
+    return { data, success: true };
   } catch (error) {
     console.log(error);
     return { error: error.message };
   }
 };
 
-export const rejectPatientReq = async ({ patient }) => {
+export const approvePatientReq = async ({ document }) => {
+  try {
+    // Create Auth Account
+    const {
+      user: { uid },
+    } = await createUserWithEmailAndPassword(
+      secondaryAuth,
+      document.email,
+      "12345678" // TODO: auto generate
+    );
+
+    // TODO: add send email
+
+    // Update to approved
+    const batch = writeBatch(db);
+    const docRef = doc(db, "patients", document.id);
+    const data = {
+      authId: uid,
+      approved: true,
+      approvedBy: document.approvedBy,
+      ...timestampFields({ dateUpdated: true }),
+    };
+    batch.update(docRef, data);
+
+    // Register Patient name
+    const { namesDocRef, names } = await registerNames({
+      collectionName: "patients",
+      names: { [document.id]: document.name },
+    });
+    batch.update(namesDocRef, names);
+
+    await batch.commit();
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const rejectPatientReq = async ({ document }) => {
   try {
     // TODO: add send email
-    // patient.reason
 
     // Delete
-    const docRef = doc(db, "patients", patient.id);
+    const docRef = doc(db, "patients", document.id);
     await deleteDoc(docRef);
 
-    return { success: true };
+    return { data: document, success: true };
   } catch (error) {
     console.log(error);
     return { error: error.message };

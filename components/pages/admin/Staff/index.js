@@ -13,10 +13,9 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import faker from "faker";
 import { useRouter } from "next/router";
 
-import { Toolbar, successMessage } from "../../../../components/common";
+import { successMessage } from "../../../../components/common";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
@@ -28,6 +27,8 @@ import {
 import {
   formatTimeStamp,
   getFullName,
+  localUpdateDocs,
+  personBuiltInFields,
   pluralize,
 } from "../../../../modules/helper";
 import ManageStaffModal from "./ManageStaffModal";
@@ -64,20 +65,23 @@ const DashboardPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleAddStaff = async (newStaff) => {
+  const handleAddStaff = async (docs) => {
+    docs = docs.map((i) => ({
+      ...i,
+      ...personBuiltInFields(i),
+    }));
+
     // Add Staff
-    const { data: addedStaff, error: addStaffError } = await addStaff({
-      staffs: newStaff,
-    });
-    if (addStaffError) return openErrorDialog(addStaffError);
+    const payload = { docs };
+    const { data: newDocs, error: addError } = await addStaff(payload);
+    if (addError) return openErrorDialog(addError);
 
     // Successful
-    setStaffs((prev) => [...prev, ...addedStaff]);
-
+    setStaffs((prev) => [...prev, ...newDocs]);
     openResponseDialog({
       autoClose: true,
       content: successMessage({
-        noun: pluralize("Staff", addedStaff.length),
+        noun: pluralize("Staff", newDocs.length),
         verb: "added",
       }),
       type: "SUCCESS",
@@ -88,14 +92,14 @@ const DashboardPage = () => {
   };
 
   const handleEditStaff = async (updatedDocs) => {
-    const updatedStaff = updatedDocs[0];
-    const staffCopy = [...staffs];
-    const index = staffCopy.findIndex((i) => i.id === updatedStaff.id);
-
-    staffCopy[index] = {
-      ...staffCopy[index],
-      ...updatedStaff,
+    const updatedStaff = {
+      ...updatedDocs[0],
+      ...personBuiltInFields(updatedDocs[0]),
     };
+    const { latestDocs, updates } = localUpdateDocs({
+      updatedDoc: updatedStaff,
+      oldDocs: [...staffs],
+    });
 
     // TODO: change email
     // const isEmailUpdated = !lodash.isEqual(
@@ -105,12 +109,12 @@ const DashboardPage = () => {
 
     // Update
     const { error: updateError } = await updateStaff({
-      staff: updatedStaff,
+      staff: updates,
     });
     if (updateError) return openErrorDialog(updateError);
 
     // Success
-    setStaffs(staffCopy);
+    setStaffs(latestDocs);
     openResponseDialog({
       autoClose: true,
       content: successMessage({
@@ -192,7 +196,6 @@ const DashboardPage = () => {
                     <TableCell sx={{ width: 260 }}>
                       <Typography variant="body2">{email}</Typography>
                     </TableCell>
-                    {/* sx={{ maxWidth: 200 }} */}
                     <TableCell>
                       <Typography
                         variant="caption"

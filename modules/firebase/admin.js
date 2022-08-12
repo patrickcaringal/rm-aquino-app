@@ -23,6 +23,7 @@ import {
 } from "../helper";
 import { getErrorMsg } from "./auth";
 import { auth, db, secondaryAuth, timestampFields } from "./config";
+import { checkDuplicate, registerNames } from "./helpers";
 
 const collRef = collection(db, "admins");
 
@@ -66,7 +67,6 @@ export const signOutReq = async () => {
 
 export const getStaffsReq = async () => {
   try {
-    // TODO: adjust when get branch needed
     const q = query(
       collRef,
       where("role", "==", "staff"),
@@ -86,57 +86,40 @@ export const getStaffsReq = async () => {
   }
 };
 
-export const addStaffReq = async ({ staffs }) => {
+export const addStaffReq = async ({ docs }) => {
   try {
     // Check email duplicate
-    let q = query(
-      collRef,
-      where(
+    await checkDuplicate({
+      collectionName: "admins",
+      whereClause: where(
         "email",
         "in",
-        staffs.map((i) => i.email)
-      )
-    );
-    let querySnapshot = await getDocs(q);
+        docs.map((i) => i.email)
+      ),
+      duplicateOutputField: "email",
+      errorMsg: {
+        noun: "Email",
+      },
+    });
 
-    let isDuplicate = querySnapshot.docs.length !== 0;
-    if (isDuplicate) {
-      const duplicates = querySnapshot.docs.map((i) => i.data().email);
-      throw new Error(
-        duplicateMessage({
-          noun: pluralize("email", duplicates.length),
-          item: arrayStringify(duplicates),
-        })
-      );
-    }
-
-    // Check fullname, birthdate duplicate
-    q = query(
-      collRef,
-      where(
+    // Check duplicate
+    await checkDuplicate({
+      collectionName: "patients",
+      whereClause: where(
         "nameBirthdate",
         "in",
-        staffs.map((i) => getUniquePersonId(i))
-      )
-    );
-    querySnapshot = await getDocs(q);
-
-    isDuplicate = querySnapshot.docs.length !== 0;
-    if (isDuplicate) {
-      const duplicates = querySnapshot.docs.map((i) => i.data().name);
-      throw new Error(
-        duplicateMessage({
-          noun: pluralize("Staff", duplicates.length),
-          item: arrayStringify(duplicates),
-        })
-      );
-    }
+        docs.map((i) => i.nameBirthdate)
+      ),
+      errorMsg: {
+        noun: "Patient",
+      },
+    });
 
     // Bulk Create Auth Account
     const batch = writeBatch(db);
 
-    for (let index = 0; index < staffs.length; index++) {
-      const staffdoc = { ...staffs[index] };
+    for (let index = 0; index < docs.length; index++) {
+      let staffdoc = { ...docs[index] };
 
       const {
         user: { uid },
@@ -146,25 +129,34 @@ export const addStaffReq = async ({ staffs }) => {
         "12345678"
       );
 
+      const docRef = doc(collRef);
       staffdoc = {
         ...staffdoc,
-        id: uid,
+        id: docRef.id,
+        authId: uid,
         role: "staff",
         deleted: false,
-        ...transformedFields(staffdoc),
         ...timestampFields({ dateCreated: true, dateUpdated: true }),
       };
 
-      batch.set(doc(db, "admins", uid), staffdoc);
+      batch.set(docRef, staffdoc);
 
-      staffs[index] = { ...staffdoc };
+      docs[index] = { ...staffdoc };
     }
+
+    // Register admin name
+    const { namesDocRef, names } = await registerNames({
+      collectionName: "admins",
+      names: docs.reduce((acc, i) => ({ ...acc, [i.id]: i.name }), {}),
+    });
+    batch.update(namesDocRef, names);
 
     // Bulk Create Account Document
     await batch.commit();
 
-    return { data: staffs, success: true };
+    return { data: docs, success: true };
   } catch (error) {
+    console.log(error);
     const errMsg = getErrorMsg(error.code);
     return { error: errMsg || error.message };
   }
@@ -172,31 +164,36 @@ export const addStaffReq = async ({ staffs }) => {
 
 export const updateStaffReq = async ({ staff }) => {
   try {
-    const nameBirthdate = getUniquePersonId(staff);
-
-    // Check fullname, birthdate duplicate
-    const q = query(collRef, where("nameBirthdate", "==", nameBirthdate));
-    const querySnapshot = await getDocs(q);
-
-    const isDuplicate = querySnapshot.docs.length !== 0;
-    // TODO: .filter((doc) => doc.id !== staff.id)
-    if (isDuplicate) {
-      throw new Error(
-        duplicateMessage({
+    // Check duplicate
+    if (staff.name || staff.birthdate) {
+      await checkDuplicate({
+        collectionName: "admins",
+        whereClause: where("nameBirthdate", "==", staff.nameBirthdate),
+        errorMsg: {
           noun: "Staff",
-          item: getFullName(staff),
-        })
-      );
+        },
+      });
     }
 
     // Update
+    const batch = writeBatch(db);
     const docRef = doc(db, "admins", staff.id);
     const finalDoc = {
       ...staff,
-      ...transformedFields(staff),
       ...timestampFields({ dateUpdated: true }),
     };
-    await updateDoc(docRef, finalDoc);
+    batch.update(docRef, finalDoc);
+
+    // Register staff name
+    if (staff.name) {
+      const { namesDocRef, names } = await registerNames({
+        collectionName: "admins",
+        names: { [staff.id]: staff.name },
+      });
+      batch.update(namesDocRef, names);
+    }
+
+    await batch.commit();
 
     return { success: true };
   } catch (error) {

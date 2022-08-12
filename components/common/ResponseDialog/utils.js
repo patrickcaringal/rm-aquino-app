@@ -1,5 +1,5 @@
 export const successMessage = ({ noun = "Item", verb = "" }) => {
-  return `${noun} successfully ${verb}.`;
+  return `Successfully ${verb} ${noun}.`;
 };
 
 export const duplicateMessage = ({ noun = "Item", item }) => {
