@@ -196,7 +196,6 @@ const DashboardPage = () => {
                     <TableCell sx={{ width: 260 }}>
                       <Typography variant="body2">{email}</Typography>
                     </TableCell>
-                    {/* sx={{ maxWidth: 200 }} */}
                     <TableCell>
                       <Typography
                         variant="caption"
