@@ -28,6 +28,7 @@ import {
 import {
   formatTimeStamp,
   getFullName,
+  personBuiltInFields,
   pluralize,
 } from "../../../../modules/helper";
 import ManageStaffModal from "./ManageStaffModal";
@@ -64,20 +65,23 @@ const DashboardPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleAddStaff = async (newStaff) => {
+  const handleAddStaff = async (docs) => {
+    docs = docs.map((i) => ({
+      ...i,
+      ...personBuiltInFields(i),
+    }));
+
     // Add Staff
-    const { data: addedStaff, error: addStaffError } = await addStaff({
-      staffs: newStaff,
-    });
-    if (addStaffError) return openErrorDialog(addStaffError);
+    const payload = { docs };
+    const { data: newDocs, error: addError } = await addStaff(payload);
+    if (addError) return openErrorDialog(addError);
 
     // Successful
-    setStaffs((prev) => [...prev, ...addedStaff]);
-
+    setStaffs((prev) => [...prev, ...newDocs]);
     openResponseDialog({
       autoClose: true,
       content: successMessage({
-        noun: pluralize("Staff", addedStaff.length),
+        noun: pluralize("Staff", newDocs.length),
         verb: "added",
       }),
       type: "SUCCESS",
