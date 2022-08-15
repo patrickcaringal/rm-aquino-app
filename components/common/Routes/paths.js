@@ -21,6 +21,7 @@ export const PATHS = {
   PATIENT: {
     DASHBOARD: "/dashboard",
     FAMILY: "/family-members",
+    SCHEDULE_APPOINTMENT: "/schedule-appointment",
   },
   PUBLIC: {
     ROOT: "/",
