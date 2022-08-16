@@ -39,6 +39,7 @@ import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import { addAppointmentReq, db } from "../../../../modules/firebase";
 import { formatTimeStamp, today } from "../../../../modules/helper";
+import PlaceholderComponent from "./Placeholder";
 import TimeslotComponent from "./Timeslot";
 
 const CustomPickersDay = styled(PickersDay, {
@@ -68,6 +69,8 @@ const ScheduleAppointmentPage = () => {
 
   // Local States
   const [schedules, setSchedules] = useState({});
+  const [takenTimeslots, setTakenTimeslots] = useState({});
+  const [userTimeslots, setUserTakenTimeslots] = useState({});
 
   const formik = useFormik({
     initialValues: {
@@ -76,7 +79,7 @@ const ScheduleAppointmentPage = () => {
       reasonAppointment: "",
     },
     validateOnChange: false,
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values, { setFieldValue }) => {
       const { date, startTime, reasonAppointment } = values;
       const endTimeEstimate = formatTimeStamp(
         addMinutes(new Date(`${date} ${startTime}`), 30),
@@ -93,12 +96,13 @@ const ScheduleAppointmentPage = () => {
         patientEmail: user.email,
         patientName: user.name,
         approved: false,
+        rejected: false,
         // contactNo
       };
 
       // Add Appointment
       const payload = { document };
-      const { data: newDocs, error: addError } = await addAppointment(payload);
+      const { data, error: addError } = await addAppointment(payload);
       if (addError) return openErrorDialog(addError);
 
       // Successful
@@ -109,6 +113,10 @@ const ScheduleAppointmentPage = () => {
           verb: "submitted",
         }),
         type: "SUCCESS",
+        closeCb() {
+          setFieldValue("startTime", "");
+          setFieldValue("reasonAppointment", "");
+        },
       });
     },
   });
@@ -156,6 +164,54 @@ const ScheduleAppointmentPage = () => {
     return () => unsub();
   }, []);
 
+  useEffect(() => {
+    const weeks = getNext2DaysWeekNo();
+    const q = query(
+      collection(db, "appointments"),
+      where("weekNo", "in", weeks),
+      where("rejected", "==", false)
+    );
+
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      if (querySnapshot.docs.length > 0) {
+        let userAppoinment = {};
+        const data = querySnapshot.docs.reduce((acc, doc) => {
+          const appointment = doc.data();
+          const { date, startTime } = appointment;
+          if (appointment.patientId === user.id) {
+            userAppoinment = {
+              ...userAppoinment,
+              [date]: userAppoinment[date]
+                ? [...userAppoinment[date], startTime]
+                : [startTime],
+            };
+          }
+
+          if (!!acc[date]) {
+            return {
+              ...acc,
+              [date]: [...acc[date], startTime],
+            };
+          }
+
+          return {
+            ...acc,
+            [date]: [startTime],
+          };
+        }, {});
+
+        setTakenTimeslots(data);
+        setUserTakenTimeslots(userAppoinment);
+      } else {
+        // console.log("no queue");
+        // setQueueToday({});
+      }
+    });
+
+    return () => unsub();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const getNext2DaysWeekNo = () => {
     if (["1", "2", "3"].includes(today.dayOfWeek)) {
       return [today.weekNo];
@@ -165,10 +221,6 @@ const ScheduleAppointmentPage = () => {
   };
 
   const availalbeSchedulesDates = lodash.keys(schedules);
-
-  // const notAvailalbeSchedulesDates = [
-  //   formatTimeStamp(new Date(new Date().valueOf() + 1000 * 3600 * 48)),
-  // ];
 
   const renderWeekPickerDay = (date, selectedDates, pickersDayProps) => {
     const dateHasAvailableSched = availalbeSchedulesDates.includes(
@@ -260,7 +312,7 @@ const ScheduleAppointmentPage = () => {
         sx={{
           display: "flex",
           flexDirection: "row",
-          gap: 3,
+          gap: 5,
           mb: 3,
           minHeight: 375,
         }}
@@ -273,8 +325,8 @@ const ScheduleAppointmentPage = () => {
               views={["day"]}
               orientation="landscape"
               // openTo="day"
+              value={values.date}
               disablePast
-              value={null}
               shouldDisableDate={isWeekend}
               onChange={handleSelectDate}
               renderDay={renderWeekPickerDay}
@@ -289,39 +341,14 @@ const ScheduleAppointmentPage = () => {
             onSelectTimeslot={handleSelectTimeslot}
             AMTimeslot={AMTimeslot}
             PMTimeslot={PMTimeslot}
+            unavailableTimeslots={takenTimeslots[selectedDate]}
+            ownedTimeslots={userTimeslots[selectedDate]}
           />
         ) : (
-          // Placeholder
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            {is3DaysFromNow ? (
-              <>
-                <Typography variant="h6" gutterBottom>
-                  {selectedDate &&
-                    formatTimeStamp(selectedDate, "MMM dd, yyyy (EEEE)")}{" "}
-                </Typography>
-                <Typography gutterBottom>
-                  Appointment of schedule for this day will be available on{" "}
-                  {formatTimeStamp(
-                    subBusinessDays(new Date(selectedDate), 2),
-                    "MMM dd, yyyy (EEEE)"
-                  )}
-                </Typography>
-              </>
-            ) : selectedDate ? (
-              <Typography variant="h6">
-                No schedule for{" "}
-                {selectedDate &&
-                  formatTimeStamp(selectedDate, "MMM dd, yyyy (EEEE)")}{" "}
-              </Typography>
-            ) : (
-              <Typography variant="h6">Select a date</Typography>
-            )}
-          </Box>
+          <PlaceholderComponent
+            is3DaysFromNow={is3DaysFromNow}
+            date={selectedDate}
+          />
         )}
       </Box>
 

@@ -1,67 +1,57 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import {
   Box,
-  Button,
+  Chip,
   FormControlLabel,
   Radio,
   RadioGroup,
   Typography,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { PickersDay } from "@mui/x-date-pickers/PickersDay";
-import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
-import {
-  addBusinessDays,
-  addDays,
-  addMinutes,
-  eachMinuteOfInterval,
-  format,
-  getWeek,
-  isAfter,
-  isBefore,
-  isSameDay,
-  isWeekend,
-  startOfToday,
-} from "date-fns";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import lodash from "lodash";
+import { addMinutes, isAfter } from "date-fns";
 
-import { successMessage } from "../../../../components/common";
-import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
-import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
-import useRequest from "../../../../hooks/useRequest";
-import { db } from "../../../../modules/firebase";
-import { formatTimeStamp, today } from "../../../../modules/helper";
+import { formatTimeStamp } from "../../../../modules/helper";
 
-const CustomPickersDay = styled(PickersDay, {
-  shouldForwardProp: (prop) => prop !== "availSched" && prop !== "isSelected",
-})(({ theme, availSched, notAvailSched, selected }) => ({
-  ...(availSched && {
-    backgroundColor: theme.palette.success.light,
-    // color: theme.palette.common.white,
-  }),
-  ...(notAvailSched && {
-    backgroundColor: theme.palette.error.light,
-    // color: theme.palette.common.white,
-  }),
-  ...(selected && {
-    backgroundColor: `${theme.palette.info.main} !important`,
-    // color: theme.palette.common.white,
-  }),
-}));
+const SlotComponent = ({ slot, unavailableTimeslots, ownedTimeslots }) => {
+  const start = formatTimeStamp(slot, "hh:mm a");
+  const end = formatTimeStamp(addMinutes(slot, 30), "hh:mm a");
+  const content = `${start} - ${end}`;
+  const isPast = isAfter(new Date(), slot);
+  const unavailable = unavailableTimeslots.includes(start);
+  const owned = ownedTimeslots.includes(start);
+  const disabled = isPast || unavailable;
+
+  return (
+    <Box>
+      <FormControlLabel
+        value={start}
+        control={<Radio />}
+        label={content}
+        disabled={disabled}
+      />
+      {(owned || unavailable) && (
+        <Chip
+          label={`${owned ? "Your Slot" : "Slot Taken"} `}
+          size="small"
+          color={`${owned ? "primary" : "error"}`}
+        />
+      )}
+    </Box>
+  );
+};
 
 const ScheduleAppointmentPage = ({
   selectedDate,
   AMTimeslot,
   PMTimeslot,
+  unavailableTimeslots = [],
+  ownedTimeslots = [],
   selectedTimeslot,
   onSelectTimeslot,
 }) => {
   const hasAMSlot = !!AMTimeslot.length;
   const hasPMSlot = !!PMTimeslot.length;
+
   return (
     <Box
       sx={{
@@ -92,16 +82,12 @@ const ScheduleAppointmentPage = ({
             }}
           >
             {AMTimeslot.map((slot) => {
-              const start = formatTimeStamp(slot, "hh:mm a");
-              const end = formatTimeStamp(addMinutes(slot, 30), "hh:mm a");
-              const content = `${start} - ${end}`;
               return (
-                <FormControlLabel
-                  key={content}
-                  value={start}
-                  control={<Radio />}
-                  label={content}
-                  disabled={isAfter(new Date(), slot)}
+                <SlotComponent
+                  key={formatTimeStamp(slot, "hh:mm a")}
+                  slot={slot}
+                  unavailableTimeslots={unavailableTimeslots}
+                  ownedTimeslots={ownedTimeslots}
                 />
               );
             })}
@@ -116,16 +102,12 @@ const ScheduleAppointmentPage = ({
             }}
           >
             {PMTimeslot.map((slot) => {
-              const start = formatTimeStamp(slot, "hh:mm a");
-              const end = formatTimeStamp(addMinutes(slot, 30), "hh:mm a");
-              const content = `${start} - ${end}`;
               return (
-                <FormControlLabel
-                  key={content}
-                  value={start}
-                  control={<Radio />}
-                  label={content}
-                  disabled={isAfter(new Date(), slot)}
+                <SlotComponent
+                  key={formatTimeStamp(slot, "hh:mm a")}
+                  slot={slot}
+                  unavailableTimeslots={unavailableTimeslots}
+                  ownedTimeslots={ownedTimeslots}
                 />
               );
             })}
