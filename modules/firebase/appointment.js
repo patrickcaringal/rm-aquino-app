@@ -10,28 +10,34 @@ import {
   writeBatch,
 } from "firebase/firestore";
 
-import { pluralize } from "../helper";
+import { pluralize, sortBy } from "../helper";
 import { getErrorMsg } from "./auth";
 import { db, timestampFields } from "./config";
 
 const collRef = collection(db, "appointments");
 
-// export const getScheduleReq = async ({ weekNo }) => {
-//   try {
-//     const q = query(collRef, where("weekNo", "==", weekNo));
-//     const querySnapshot = await getDocs(q);
+export const getPatientAppointmentReq = async ({ id }) => {
+  try {
+    const q = query(
+      collRef,
+      where("patientId", "==", id),
+      where("deleted", "==", false)
+    );
+    const querySnapshot = await getDocs(q);
 
-//     let data = {};
-//     if (querySnapshot.docs.length >= 1) {
-//       data = querySnapshot.docs[0].data();
-//     }
+    const data = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort(sortBy("dateCreated"));
 
-//     return { data, success: true };
-//   } catch (error) {
-//     console.log(error);
-//     return { error: error.message };
-//   }
-// };
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
 
 export const addAppointmentReq = async ({ document }) => {
   try {
