@@ -88,7 +88,18 @@ const ResponsiveAppBar = () => {
           ],
         },
       ]
-    : [];
+    : [
+        // {
+        //   text: "Appointments",
+        //   icon: null,
+        //   onClick: () => router.push(PATHS.PATIENT.APPOINTMENT),
+        // },
+        {
+          text: "Schedule Appointment",
+          icon: null,
+          onClick: () => router.push(PATHS.PATIENT.SCHEDULE_APPOINTMENT),
+        },
+      ];
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);

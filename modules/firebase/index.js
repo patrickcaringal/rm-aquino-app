@@ -4,6 +4,7 @@ import {
   signInAdminReq,
   updateStaffReq,
 } from "./admin";
+import { addAppointmentReq, getPatientAppointmentReq } from "./appointment";
 import {
   monitorAuthState,
   signInReq,
@@ -55,4 +56,7 @@ export {
   addSchedulesReq,
   getScheduleReq,
   updateSchedulesReq,
+  // appointment
+  addAppointmentReq,
+  getPatientAppointmentReq,
 };
