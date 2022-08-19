@@ -89,11 +89,11 @@ const ResponsiveAppBar = () => {
         },
       ]
     : [
-        {
-          text: "Appointments",
-          icon: null,
-          onClick: () => router.push(PATHS.PATIENT.APPOINTMENT),
-        },
+        // {
+        //   text: "Appointments",
+        //   icon: null,
+        //   onClick: () => router.push(PATHS.PATIENT.APPOINTMENT),
+        // },
         {
           text: "Schedule Appointment",
           icon: null,
