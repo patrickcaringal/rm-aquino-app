@@ -130,8 +130,8 @@ const ScheduleAppointmentPage = () => {
   const selectedTimeslot = values.startTime;
 
   const forApprovalTimeslot = getMyForApprovalAppointments({
+    id: user.id,
     data: appointments,
-    isArray: false,
   });
 
   useEffect(() => {

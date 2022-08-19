@@ -1,6 +1,6 @@
-export const getMyForApprovalAppointments = ({ data }) => {
+export const getMyForApprovalAppointments = ({ id, data }) => {
   const res = data.reduce((acc, i) => {
-    if (!i.approved && !i.rejected) {
+    if (i.patientId === id && !i.approved && !i.rejected) {
       return {
         ...acc,
         [i.date]: !!acc[i.date] ? [...acc[i.date], i.startTime] : [i.startTime],
