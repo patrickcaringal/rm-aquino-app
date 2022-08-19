@@ -72,7 +72,7 @@ const ScheduleAppointmentPage = () => {
   const [schedules, setSchedules] = useState({});
   const [appointments, setAppointments] = useState([]);
   const [takenTimeslots, setTakenTimeslots] = useState({}); // TODO: convert to non state
-  const [userTimeslots, setUserTakenTimeslots] = useState(); // TODO: convert to non state
+  const [userTimeslots, setUserTakenTimeslots] = useState({}); // TODO: convert to non state
 
   const formik = useFormik({
     initialValues: {
@@ -161,6 +161,7 @@ const ScheduleAppointmentPage = () => {
           };
         }, {});
 
+        console.log(data);
         setSchedules(data);
       } else {
         // console.log("no queue");
