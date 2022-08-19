@@ -12,14 +12,34 @@ import { addMinutes, isAfter } from "date-fns";
 
 import { formatTimeStamp } from "../../../../modules/helper";
 
-const SlotComponent = ({ slot, unavailableTimeslots, ownedTimeslots }) => {
+const SlotComponent = ({
+  slot,
+  unavailableTimeslots,
+  ownedTimeslots,
+  forApprovalTimeslot,
+}) => {
   const start = formatTimeStamp(slot, "hh:mm a");
   const end = formatTimeStamp(addMinutes(slot, 30), "hh:mm a");
   const content = `${start} - ${end}`;
   const isPast = isAfter(new Date(), slot);
   const unavailable = unavailableTimeslots.includes(start);
   const owned = ownedTimeslots.includes(start);
+  const forApproval = forApprovalTimeslot.includes(start);
   const disabled = isPast || unavailable;
+
+  const renderChip = () => {
+    // if (isPast) return null;
+
+    if (forApproval)
+      return <Chip label="Slot for approval" size="small" color="primary" />;
+
+    if (owned) return <Chip label="Your Slot" size="small" color="primary" />;
+
+    if (unavailable)
+      return <Chip label="Slot Taken" size="small" color="error" />;
+
+    return null;
+  };
 
   return (
     <Box>
@@ -29,23 +49,18 @@ const SlotComponent = ({ slot, unavailableTimeslots, ownedTimeslots }) => {
         label={content}
         disabled={disabled}
       />
-      {(owned || unavailable) && (
-        <Chip
-          label={`${owned ? "Your Slot" : "Slot Taken"} `}
-          size="small"
-          color={`${owned ? "primary" : "error"}`}
-        />
-      )}
+      {renderChip()}
     </Box>
   );
 };
 
-const ScheduleAppointmentPage = ({
+const Timeslot = ({
   selectedDate,
   AMTimeslot,
   PMTimeslot,
   unavailableTimeslots = [],
   ownedTimeslots = [],
+  forApprovalTimeslot = [],
   selectedTimeslot,
   onSelectTimeslot,
 }) => {
@@ -88,6 +103,7 @@ const ScheduleAppointmentPage = ({
                   slot={slot}
                   unavailableTimeslots={unavailableTimeslots}
                   ownedTimeslots={ownedTimeslots}
+                  forApprovalTimeslot={forApprovalTimeslot}
                 />
               );
             })}
@@ -108,6 +124,7 @@ const ScheduleAppointmentPage = ({
                   slot={slot}
                   unavailableTimeslots={unavailableTimeslots}
                   ownedTimeslots={ownedTimeslots}
+                  forApprovalTimeslot={forApprovalTimeslot}
                 />
               );
             })}
@@ -118,4 +135,4 @@ const ScheduleAppointmentPage = ({
   );
 };
 
-export default ScheduleAppointmentPage;
+export default Timeslot;

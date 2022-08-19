@@ -41,6 +41,7 @@ import { addAppointmentReq, db } from "../../../../modules/firebase";
 import { formatTimeStamp, today } from "../../../../modules/helper";
 import PlaceholderComponent from "./Placeholder";
 import TimeslotComponent from "./Timeslot";
+import { getMyForApprovalAppointments } from "./utils";
 
 const CustomPickersDay = styled(PickersDay, {
   shouldForwardProp: (prop) => prop !== "availSched" && prop !== "isSelected",
@@ -69,8 +70,9 @@ const ScheduleAppointmentPage = () => {
 
   // Local States
   const [schedules, setSchedules] = useState({});
-  const [takenTimeslots, setTakenTimeslots] = useState({});
-  const [userTimeslots, setUserTakenTimeslots] = useState({});
+  const [appointments, setAppointments] = useState([]);
+  const [takenTimeslots, setTakenTimeslots] = useState({}); // TODO: convert to non state
+  const [userTimeslots, setUserTakenTimeslots] = useState(); // TODO: convert to non state
 
   const formik = useFormik({
     initialValues: {
@@ -126,6 +128,11 @@ const ScheduleAppointmentPage = () => {
 
   const selectedDate = values.date;
   const selectedTimeslot = values.startTime;
+
+  const forApprovalTimeslot = getMyForApprovalAppointments({
+    data: appointments,
+    isArray: false,
+  });
 
   useEffect(() => {
     const weeks = getNext2DaysWeekNo();
@@ -200,11 +207,14 @@ const ScheduleAppointmentPage = () => {
           };
         }, {});
 
+        const appointmentList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
         setTakenTimeslots(data);
         setUserTakenTimeslots(userAppoinment);
-      } else {
-        // console.log("no queue");
-        // setQueueToday({});
+        setAppointments(appointmentList);
       }
     });
 
@@ -343,6 +353,7 @@ const ScheduleAppointmentPage = () => {
             PMTimeslot={PMTimeslot}
             unavailableTimeslots={takenTimeslots[selectedDate]}
             ownedTimeslots={userTimeslots[selectedDate]}
+            forApprovalTimeslot={forApprovalTimeslot[selectedDate]}
           />
         ) : (
           <PlaceholderComponent
