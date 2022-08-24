@@ -25,11 +25,9 @@ const SlotComponent = ({
   const unavailable = unavailableTimeslots.includes(start);
   const owned = ownedTimeslots.includes(start);
   const forApproval = forApprovalTimeslot.includes(start);
-  const disabled = isPast || unavailable;
+  const disabled = isPast || unavailable || owned || forApproval;
 
   const renderChip = () => {
-    // if (isPast) return null;
-
     if (forApproval)
       return <Chip label="Slot for approval" size="small" color="primary" />;
 
