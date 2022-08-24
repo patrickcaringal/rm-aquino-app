@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   FormControlLabel,
+  MenuItem,
   Radio,
   RadioGroup,
   Table,
@@ -38,13 +39,14 @@ import { useFormik } from "formik";
 import lodash from "lodash";
 
 import { successMessage } from "../../../../components/common";
-import { Input } from "../../../../components/common/Form";
+import { DatePicker, Select } from "../../../../components/common/Form";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import { db, getPatientAppointmentReq } from "../../../../modules/firebase";
 import { formatTimeStamp, today } from "../../../../modules/helper";
+import useFilter from "./useFilter";
 
 const AppointmentsPage = () => {
   const { user } = useAuth();
@@ -59,6 +61,15 @@ const AppointmentsPage = () => {
 
   // Local States
   const [appointments, setAppointments] = useState([]);
+  const { filtered, setData, filters, onStatusChange, onDateChange } =
+    useFilter({
+      defaultStatus: "all",
+    });
+
+  useEffect(() => {
+    setData(appointments);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appointments]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -78,19 +89,47 @@ const AppointmentsPage = () => {
 
   return (
     <Box sx={{ pt: 2 }}>
-      {/* <Box sx={{ mb: 2 }}>
-        <Button variant="contained" size="small" onClick={() => {}}>
-          submit appointment
-        </Button>
-      </Box> */}
+      <Box sx={{ mb: 2, display: "flex", flexDirection: "row", gap: 2 }}>
+        <Box sx={{ width: 200 }}>
+          <Select
+            label="Status"
+            value={filters.status}
+            onChange={(e) => {
+              onStatusChange(e.target.value);
+            }}
+          >
+            <MenuItem value="all" dense>
+              All
+            </MenuItem>
+            <MenuItem value="for approval" dense>
+              For Approval
+            </MenuItem>
+            <MenuItem value="approved" dense>
+              Approved
+            </MenuItem>
+            <MenuItem value="rejected" dense>
+              Rejected
+            </MenuItem>
+          </Select>
+        </Box>
+        <Box sx={{ width: 200 }}>
+          <DatePicker
+            label="Date"
+            value={filters.date}
+            onChange={(value) => {
+              onDateChange(value ? formatTimeStamp(value) : "");
+            }}
+          />
+        </Box>
+      </Box>
 
       <Box>
         <TableContainer>
-          <Table size="small">
+          <Table>
             <TableHead>
               <TableRow>
                 {[
-                  { text: "Appointment Date", sx: { width: 200 } },
+                  { text: "Appointment Date", sx: { width: 220 } },
                   { text: "Appointment Time", sx: { width: 200 } },
                   { text: "Status", sx: { width: 200 } },
                   { text: "Reason for Appointment" },
@@ -99,7 +138,7 @@ const AppointmentsPage = () => {
                   <TableCell
                     key={text}
                     {...(align && { align })}
-                    {...(sx && { sx: { ...sx, fontWeight: "bold" } })}
+                    sx={{ ...sx, fontWeight: "bold" }}
                   >
                     {text}
                   </TableCell>
@@ -108,11 +147,10 @@ const AppointmentsPage = () => {
             </TableHead>
 
             <TableBody>
-              {appointments.map((i) => {
+              {filtered.map((i) => {
                 const {
                   id,
                   date,
-                  dateCreated,
                   startTime,
                   endTimeEstimate,
                   approved,
@@ -124,7 +162,7 @@ const AppointmentsPage = () => {
                   <TableRow key={id}>
                     <TableCell>
                       <Typography variant="body2">
-                        {formatTimeStamp(dateCreated, "MMM dd, yyyy (EEEE)")}
+                        {formatTimeStamp(date, "MMM dd, yyyy (EEEE)")}
                       </Typography>
                     </TableCell>
                     <TableCell>

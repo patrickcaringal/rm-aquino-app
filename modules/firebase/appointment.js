@@ -30,7 +30,7 @@ export const getPatientAppointmentReq = async ({ id }) => {
         id: doc.id,
         ...doc.data(),
       }))
-      .sort(sortBy("dateCreated"));
+      .sort(sortBy("dateCreated", "desc"));
 
     return { data, success: true };
   } catch (error) {
