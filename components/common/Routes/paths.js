@@ -13,6 +13,8 @@ export const PATHS = {
     PATIENT_APPROVAL: "/admin/patient-approval",
     DOCTOR_SCHEDULE_CURRENT_WEEK: "/admin/doctor-schedule/current-week",
     DOCTOR_SCHEDULE_NEXT_WEEK: "/admin/doctor-schedule/next-week",
+    APPOINTMENT_MANAGEMENT: "/admin/appointments",
+    APPOINTMENT_APPROVAL: "/admin/appointments/approval",
   },
   // STAFF: {
   //   DASHBOARD: "/staff/dashboard",

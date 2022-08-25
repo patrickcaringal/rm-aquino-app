@@ -38,7 +38,7 @@ const NavbarItem = ({ text, menuItems = [] }) => {
         open={Boolean(itemEl)}
         onClose={handleCloseMenu}
       >
-        <MenuList dense sx={{ p: 0, width: 160 }}>
+        <MenuList dense sx={{ p: 0, minWidth: 160 }}>
           {menuItems.map(({ text, onClick }, index) => (
             <MenuItem
               key={index}

@@ -16,6 +16,49 @@ import { db, timestampFields } from "./config";
 
 const collRef = collection(db, "appointments");
 
+export const getAppointmentReq = async () => {
+  try {
+    const q = query(collRef, where("deleted", "==", false));
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const getAppointmentForApprovalReq = async () => {
+  try {
+    const q = query(
+      collRef,
+      where("deleted", "==", false),
+      where("approved", "==", false),
+      where("rejected", "==", false)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
 export const getPatientAppointmentReq = async ({ id }) => {
   try {
     const q = query(

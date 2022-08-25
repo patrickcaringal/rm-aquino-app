@@ -77,13 +77,27 @@ const ResponsiveAppBar = () => {
           icon: null,
           menuItems: [
             {
-              text: "THIS WEEK",
+              text: "Schedule This Week",
               onClick: () =>
                 router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_CURRENT_WEEK),
             },
             {
-              text: "NEXT WEEK",
+              text: "Schedule Next Week",
               onClick: () => router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_NEXT_WEEK),
+            },
+          ],
+        },
+        {
+          text: "Appointments",
+          icon: null,
+          menuItems: [
+            {
+              text: "Appointment Approval",
+              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_APPROVAL),
+            },
+            {
+              text: "Appointment List",
+              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_MANAGEMENT),
             },
           ],
         },
@@ -136,7 +150,7 @@ const ResponsiveAppBar = () => {
         }}
       >
         {/* maxWidth={isAdminPanel ? "none" : "lg"} */}
-        <Container maxWidth="lg">
+        <Container maxWidth={isAdminPanel ? "none" : "lg"}>
           <Toolbar
             disableGutters
             sx={{ height: "80px !important", minHeight: "80px !important" }}
@@ -297,13 +311,14 @@ const ResponsiveAppBar = () => {
           </Toolbar>
         </Container>
         <Toolbar
+          disableGutters
           sx={{
             bgcolor: "primary.dark",
             height: "40px !important",
             minHeight: "40px !important",
           }}
         >
-          <Container maxWidth="lg">
+          <Container maxWidth={isAdminPanel ? "none" : "lg"}>
             {isLoggedIn &&
               menuItems.map(({ text, icon, onClick, menuItems }) => {
                 if (!menuItems) {

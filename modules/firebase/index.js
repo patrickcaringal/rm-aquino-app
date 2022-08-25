@@ -4,7 +4,12 @@ import {
   signInAdminReq,
   updateStaffReq,
 } from "./admin";
-import { addAppointmentReq, getPatientAppointmentReq } from "./appointment";
+import {
+  addAppointmentReq,
+  getAppointmentForApprovalReq,
+  getAppointmentReq,
+  getPatientAppointmentReq,
+} from "./appointment";
 import {
   monitorAuthState,
   signInReq,
@@ -58,5 +63,7 @@ export {
   updateSchedulesReq,
   // appointment
   addAppointmentReq,
+  getAppointmentForApprovalReq,
+  getAppointmentReq,
   getPatientAppointmentReq,
 };
