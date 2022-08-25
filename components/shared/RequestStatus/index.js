@@ -11,7 +11,19 @@ const ICONS = {
   forapproval: <FlakyIcon color="warning" fontSize="small" />,
 };
 
-const RequestStatusIcon = ({ status, text = "" }) => {
+export const REQUEST_STATUS = {
+  approved: "approved",
+  rejected: "rejected",
+  forapproval: "forapproval",
+};
+
+const REQUEST_DICTIONARY = {
+  approved: "approved",
+  rejected: "rejected",
+  forapproval: "for approval",
+};
+
+const RequestStatusIcon = ({ status = "", text = "" }) => {
   const statusKey = status.toLowerCase().replace(" ", "");
 
   return (
@@ -25,7 +37,7 @@ const RequestStatusIcon = ({ status, text = "" }) => {
       }}
     >
       {ICONS[statusKey]}
-      {text || status}
+      {text || REQUEST_DICTIONARY[status]}
     </Typography>
   );
 };

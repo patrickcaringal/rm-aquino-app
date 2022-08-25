@@ -6,9 +6,11 @@ import {
 } from "./admin";
 import {
   addAppointmentReq,
+  approveAppointmentReq,
   getAppointmentForApprovalReq,
   getAppointmentReq,
   getPatientAppointmentReq,
+  rejectAppointmentReq,
 } from "./appointment";
 import {
   monitorAuthState,
@@ -63,7 +65,9 @@ export {
   updateSchedulesReq,
   // appointment
   addAppointmentReq,
+  approveAppointmentReq,
   getAppointmentForApprovalReq,
   getAppointmentReq,
   getPatientAppointmentReq,
+  rejectAppointmentReq,
 };

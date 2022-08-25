@@ -16,13 +16,18 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 
-import { ResponseDialog } from "../../../../components/common";
+import { ResponseDialog, successMessage } from "../../../../components/common";
 import { Input } from "../../../../components/common/Form";
 import { RejectModal, RequestStatus } from "../../../../components/shared";
+import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
-import { getAppointmentForApprovalReq } from "../../../../modules/firebase";
+import {
+  approveAppointmentReq,
+  getAppointmentForApprovalReq,
+  rejectAppointmentReq,
+} from "../../../../modules/firebase";
 import { formatTimeStamp } from "../../../../modules/helper";
 import Filters from "./Filters";
 import useFilter from "./useFilter";
@@ -33,6 +38,7 @@ const defaultModal = {
 };
 
 const AppointmentsPage = () => {
+  const { user } = useAuth();
   const { openResponseDialog, openErrorDialog, closeDialog } =
     useResponseDialog();
   const { setBackdropLoader } = useBackdropLoader();
@@ -40,6 +46,14 @@ const AppointmentsPage = () => {
   // Requests
   const [getAppointments] = useRequest(
     getAppointmentForApprovalReq,
+    setBackdropLoader
+  );
+  const [approveAppointment] = useRequest(
+    approveAppointmentReq,
+    setBackdropLoader
+  );
+  const [rejectAppointment] = useRequest(
+    rejectAppointmentReq,
     setBackdropLoader
   );
 
@@ -93,8 +107,10 @@ const AppointmentsPage = () => {
         <Button
           variant="contained"
           onClick={() => {
-            handleApprove(document);
             closeDialog();
+            setTimeout(() => {
+              handleApprove(document);
+            }, 500);
           }}
           size="small"
         >
@@ -111,43 +127,43 @@ const AppointmentsPage = () => {
     });
   };
 
-  const handleApprove = (document) => {
-    console.log(JSON.stringify(document, null, 4));
-    // // Approve
-    // const payload = { document: { ...document, approvedBy: user.id } };
-    // const { error: approveError } = await approvePatient(payload);
-    // if (approveError) return openErrorDialog(approveError);
-    // // Success
-    // setPatients((prev) => prev.filter((i) => i.id !== document.id));
-    // openResponseDialog({
-    //   autoClose: true,
-    //   content: successMessage({
-    //     noun: "Patient",
-    //     verb: "approved",
-    //   }),
-    //   type: "SUCCESS",
-    // });
+  const handleApprove = async (document) => {
+    // Approve
+    const payload = { document: { ...document, approvedBy: user.id } };
+    const { error: approveError } = await approveAppointment(payload);
+    if (approveError) return openErrorDialog(approveError);
+
+    // Success
+    setAppointments((prev) => prev.filter((i) => i.id !== document.id));
+    openResponseDialog({
+      autoClose: true,
+      content: successMessage({
+        noun: "Appointment",
+        verb: "approved",
+      }),
+      type: "SUCCESS",
+    });
   };
 
   const handleReject = async (document) => {
-    console.log(JSON.stringify(document, null, 4));
-    // // Reject
-    // const payload = { document };
-    // const { error: rejectError } = await rejectPatient(payload);
-    // if (rejectError) return openErrorDialog(rejectError);
-    // // Success
-    // setPatients((prev) => prev.filter((i) => i.id !== document.id));
-    // openResponseDialog({
-    //   autoClose: true,
-    //   content: successMessage({
-    //     noun: "Patient",
-    //     verb: "rejected",
-    //   }),
-    //   type: "SUCCESS",
-    //   closeCb() {
-    //     setRejectModal(defaultModal);
-    //   },
-    // });
+    // Reject
+    const payload = { document: { ...document, rejectedBy: user.id } };
+    const { error: rejectError } = await rejectAppointment(payload);
+    if (rejectError) return openErrorDialog(rejectError);
+
+    // Success
+    setAppointments((prev) => prev.filter((i) => i.id !== document.id));
+    openResponseDialog({
+      autoClose: true,
+      content: successMessage({
+        noun: "Appointment",
+        verb: "rejected",
+      }),
+      type: "SUCCESS",
+      closeCb() {
+        setRejectModal(defaultModal);
+      },
+    });
   };
 
   const handleRejectModalClose = () => {
@@ -211,17 +227,10 @@ const AppointmentsPage = () => {
                   dateCreated,
                   startTime,
                   endTimeEstimate,
-                  approved,
-                  rejected,
+                  status,
                   reasonAppointment,
                   patientName,
                 } = i;
-
-                const status = approved
-                  ? "Approved"
-                  : rejected
-                  ? "Rejected"
-                  : "For approval";
 
                 return (
                   <TableRow key={id}>

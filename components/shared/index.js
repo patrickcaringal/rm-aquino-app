@@ -1,4 +1,4 @@
 import RejectModal from "./RejectModal";
-import RequestStatus from "./RequestStatus";
+import RequestStatus, { REQUEST_STATUS } from "./RequestStatus";
 
-export { RequestStatus, RejectModal };
+export { RequestStatus, REQUEST_STATUS, RejectModal };

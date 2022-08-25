@@ -32,7 +32,6 @@ export default function ManageStaffModal({
     resetForm,
     handleChange,
     handleBlur,
-    dirty,
     errors,
     touched,
   } = formik;
@@ -54,12 +53,12 @@ export default function ManageStaffModal({
             sx={{ mr: 2 }}
             color="error"
             variant="outlined"
-            disabled={!dirty}
+            size="small"
             onClick={submitForm}
           >
             reject
           </Button>
-          <Button color="inherit" onClick={handleClose}>
+          <Button color="inherit" size="small" onClick={handleClose}>
             Cancel
           </Button>
         </>

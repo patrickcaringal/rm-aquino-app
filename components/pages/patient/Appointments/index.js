@@ -40,6 +40,7 @@ import lodash from "lodash";
 
 import { successMessage } from "../../../../components/common";
 import { DatePicker, Select } from "../../../../components/common/Form";
+import { RequestStatus } from "../../../../components/shared";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
@@ -129,6 +130,8 @@ const AppointmentsPage = () => {
             <TableHead>
               <TableRow>
                 {[
+                  { text: "id", sx: { width: 210 } },
+                  { text: "Date Requested", sx: { width: 210 } },
                   { text: "Appointment Date", sx: { width: 220 } },
                   { text: "Appointment Time", sx: { width: 200 } },
                   { text: "Status", sx: { width: 200 } },
@@ -151,15 +154,19 @@ const AppointmentsPage = () => {
                 const {
                   id,
                   date,
+                  dateCreated,
                   startTime,
                   endTimeEstimate,
-                  approved,
-                  rejected,
+                  status,
                   reasonAppointment,
                 } = i;
 
                 return (
                   <TableRow key={id}>
+                    <TableCell>{id}</TableCell>
+                    <TableCell>
+                      {formatTimeStamp(dateCreated, "MMM dd, yyyy (EEEE)")}
+                    </TableCell>
                     <TableCell>
                       <Typography variant="body2">
                         {formatTimeStamp(date, "MMM dd, yyyy (EEEE)")}
@@ -171,15 +178,7 @@ const AppointmentsPage = () => {
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      {approved && (
-                        <Typography variant="body2">approved</Typography>
-                      )}
-                      {rejected && (
-                        <Typography variant="body2">rejected</Typography>
-                      )}
-                      {!approved && !rejected && (
-                        <Typography variant="body2">for approval</Typography>
-                      )}
+                      <RequestStatus status={status} />
                     </TableCell>
                     <TableCell>
                       <Typography

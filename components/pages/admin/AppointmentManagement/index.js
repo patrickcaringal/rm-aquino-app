@@ -92,17 +92,10 @@ const AppointmentsPage = () => {
                   dateCreated,
                   startTime,
                   endTimeEstimate,
-                  approved,
-                  rejected,
+                  status,
                   reasonAppointment,
                   patientName,
                 } = i;
-
-                const status = approved
-                  ? "Approved"
-                  : rejected
-                  ? "Rejected"
-                  : "For approval";
 
                 return (
                   <TableRow key={id}>

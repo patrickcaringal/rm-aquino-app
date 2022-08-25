@@ -33,6 +33,7 @@ import lodash from "lodash";
 
 import { successMessage } from "../../../../components/common";
 import { Input } from "../../../../components/common/Form";
+import { REQUEST_STATUS } from "../../../../components/shared";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
@@ -95,6 +96,7 @@ const ScheduleAppointmentPage = () => {
         patientId: user.id,
         patientEmail: user.email,
         patientName: user.name,
+        status: REQUEST_STATUS.forapproval,
         approved: false,
         rejected: false,
         // contactNo
