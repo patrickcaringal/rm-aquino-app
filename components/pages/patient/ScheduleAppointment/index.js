@@ -42,7 +42,7 @@ import { addAppointmentReq, db } from "../../../../modules/firebase";
 import { formatTimeStamp, today } from "../../../../modules/helper";
 import PlaceholderComponent from "./Placeholder";
 import TimeslotComponent from "./Timeslot";
-import { getMyAppointments, getMyForApprovalAppointments } from "./utils";
+import { getMyAppointments } from "./utils";
 
 const CustomPickersDay = styled(PickersDay, {
   shouldForwardProp: (prop) => prop !== "availSched" && prop !== "isSelected",
@@ -172,8 +172,7 @@ const ScheduleAppointmentPage = () => {
     const weeks = getNext2DaysWeekNo();
     const q = query(
       collection(db, "appointments"),
-      where("weekNo", "in", weeks),
-      where("rejected", "==", false)
+      where("weekNo", "in", weeks)
     );
 
     const unsub = onSnapshot(q, (querySnapshot) => {

@@ -29,9 +29,10 @@ const SlotComponent = ({
 
   const renderChip = () => {
     if (forApproval)
-      return <Chip label="Slot for approval" size="small" color="primary" />;
+      return <Chip label="Slot for approval" size="small" color="warning" />;
 
-    if (owned) return <Chip label="Your Slot" size="small" color="primary" />;
+    if (owned)
+      return <Chip label="Slot approved" size="small" color="primary" />;
 
     if (unavailable)
       return <Chip label="Slot Taken" size="small" color="error" />;
