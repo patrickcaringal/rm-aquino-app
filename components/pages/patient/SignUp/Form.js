@@ -118,6 +118,17 @@ const Form = ({
             error={touched.address && errors.address}
           />
         </Grid>
+        <Grid item xs={12}>
+          <Input
+            required
+            label="Contact Number"
+            name="contactNo"
+            value={values.contactNo}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.contactNo && errors.contactNo}
+          />
+        </Grid>
 
         {/* CREDENTIAL */}
         <Grid item xs={12}>

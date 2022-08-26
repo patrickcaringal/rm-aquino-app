@@ -200,7 +200,7 @@ const AppointmentsPage = () => {
             <TableHead>
               <TableRow>
                 {[
-                  { text: "Requester" },
+                  { text: "Patient Name" },
                   { text: "Date Requested", sx: { width: 210 } },
                   { text: "Appointment Date", sx: { width: 210 } },
                   { text: "Appointment Time", sx: { width: 180 } },

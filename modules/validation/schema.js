@@ -9,6 +9,9 @@ export const SignupSchema = Yup.object().shape({
   gender: Yup.string().required("Required"),
   address: Yup.string().required("Required"),
   email: Yup.string().email("Invalid email").required("Required"),
+  contactNo: Yup.string()
+    .matches(/^(09)\d{9}$/, "Invalid Contact Number")
+    .required("Required"),
   password: Yup.string()
     .min(8, "Must be 8 characters long")
     .required("Required"),

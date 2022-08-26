@@ -65,8 +65,7 @@ const AppointmentsPage = () => {
             <TableHead>
               <TableRow>
                 {[
-                  { text: "Requester" },
-                  { text: "Date Requested", sx: { width: 210 } },
+                  { text: "Paatient Name" },
                   { text: "Appointment Date", sx: { width: 210 } },
                   { text: "Appointment Time", sx: { width: 180 } },
                   { text: "Status", sx: { width: 160 } },
@@ -100,9 +99,6 @@ const AppointmentsPage = () => {
                 return (
                   <TableRow key={id}>
                     <TableCell>{patientName}</TableCell>
-                    <TableCell>
-                      {formatTimeStamp(dateCreated, "MMM dd, yyyy (EEEE)")}
-                    </TableCell>
                     <TableCell>
                       {formatTimeStamp(date, "MMM dd, yyyy (EEEE)")}
                     </TableCell>

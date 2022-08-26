@@ -68,9 +68,18 @@ const ResponsiveAppBar = () => {
           onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
         },
         {
-          text: "Patient Approval",
+          text: "Patients",
           icon: null,
-          onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
+          menuItems: [
+            {
+              text: "Patient List",
+              onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
+            },
+            {
+              text: "Patient Approval",
+              onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
+            },
+          ],
         },
         {
           text: "Doctor Schedule",
