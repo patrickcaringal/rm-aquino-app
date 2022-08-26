@@ -95,6 +95,29 @@ export const createPatientAccountReq = async ({ document }) => {
   }
 };
 
+export const getPatientsReq = async () => {
+  try {
+    const q = query(
+      collRef,
+      where("approved", "==", true),
+      where("deleted", "==", false)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort(sortBy("dateCreated"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
 export const getPatientsAccountApprovalReq = async () => {
   try {
     const q = query(

@@ -25,6 +25,7 @@ import {
   approvePatientReq,
   createPatientAccountReq,
   getPatientsAccountApprovalReq,
+  getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
 } from "./patient";
@@ -52,6 +53,7 @@ export {
   approvePatientReq,
   createPatientAccountReq,
   getPatientsAccountApprovalReq,
+  getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
   // admin

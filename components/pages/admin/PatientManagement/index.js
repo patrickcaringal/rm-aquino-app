@@ -24,6 +24,7 @@ import {
   addStaffReq,
   approvePatientReq,
   getPatientsAccountApprovalReq,
+  getPatientsReq,
   rejectPatientReq,
   updateStaffReq,
 } from "../../../../modules/firebase";
@@ -42,10 +43,7 @@ const PatientApprovalPage = () => {
   const { openResponseDialog, openErrorDialog } = useResponseDialog();
 
   // Requests
-  const [getPatients] = useRequest(
-    getPatientsAccountApprovalReq,
-    setBackdropLoader
-  );
+  const [getPatients] = useRequest(getPatientsReq, setBackdropLoader);
   const [approvePatient] = useRequest(approvePatientReq, setBackdropLoader);
   const [rejectPatient] = useRequest(rejectPatientReq, setBackdropLoader);
 
