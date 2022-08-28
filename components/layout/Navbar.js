@@ -68,32 +68,55 @@ const ResponsiveAppBar = () => {
           onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
         },
         {
-          text: "Patient Approval",
+          text: "Patients",
           icon: null,
-          onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
+          menuItems: [
+            {
+              text: "Patient List",
+              onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
+            },
+            {
+              text: "Patient Approval",
+              onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
+            },
+          ],
         },
         {
           text: "Doctor Schedule",
           icon: null,
           menuItems: [
             {
-              text: "THIS WEEK",
+              text: "Schedule This Week",
               onClick: () =>
                 router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_CURRENT_WEEK),
             },
             {
-              text: "NEXT WEEK",
+              text: "Schedule Next Week",
               onClick: () => router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_NEXT_WEEK),
+            },
+          ],
+        },
+        {
+          text: "Appointments",
+          icon: null,
+          menuItems: [
+            {
+              text: "Appointment List",
+              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_MANAGEMENT),
+            },
+            {
+              text: "Appointment Approval",
+              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_APPROVAL),
             },
           ],
         },
       ]
     : [
-        // {
-        //   text: "Appointments",
-        //   icon: null,
-        //   onClick: () => router.push(PATHS.PATIENT.APPOINTMENT),
-        // },
+        {
+          text: "Appointments",
+          icon: null,
+          onClick: () => router.push(PATHS.PATIENT.APPOINTMENT),
+        },
         {
           text: "Schedule Appointment",
           icon: null,
@@ -136,7 +159,7 @@ const ResponsiveAppBar = () => {
         }}
       >
         {/* maxWidth={isAdminPanel ? "none" : "lg"} */}
-        <Container maxWidth="lg">
+        <Container maxWidth={isAdminPanel ? "none" : "lg"}>
           <Toolbar
             disableGutters
             sx={{ height: "80px !important", minHeight: "80px !important" }}
@@ -297,13 +320,14 @@ const ResponsiveAppBar = () => {
           </Toolbar>
         </Container>
         <Toolbar
+          disableGutters
           sx={{
             bgcolor: "primary.dark",
             height: "40px !important",
             minHeight: "40px !important",
           }}
         >
-          <Container maxWidth="lg">
+          <Container maxWidth={isAdminPanel ? "none" : "lg"}>
             {isLoggedIn &&
               menuItems.map(({ text, icon, onClick, menuItems }) => {
                 if (!menuItems) {

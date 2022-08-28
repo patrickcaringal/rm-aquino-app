@@ -21,6 +21,7 @@ const defaultValue = isMockDataEnabled
       lastName: faker.name.lastName(),
       middleName: faker.name.lastName(),
       email: faker.internet.email(),
+      contactNo: faker.phone.phoneNumber("09#########"),
       address: faker.lorem.paragraph(),
       birthdate: faker.date.past(
         faker.datatype.number({
@@ -40,6 +41,7 @@ const defaultValue = isMockDataEnabled
       gender: "",
       address: "",
       email: "",
+      contactNo: "",
       password: "",
     };
 

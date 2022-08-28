@@ -19,7 +19,7 @@ const MainContainer = ({ children }) => {
     >
       <Container
         component="main"
-        maxWidth="lg"
+        maxWidth={isAdminPanel ? "none" : "lg"}
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -28,22 +28,6 @@ const MainContainer = ({ children }) => {
       >
         {children}
       </Container>
-      {/* {!isAdminPanel ? (
-        <Container
-          component="main"
-          maxWidth="lg"
-          sx={{
-            minHeight: "calc(100vh - 110px)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          {children}
-        </Container>
-      ) : (
-        children
-      )} */}
     </Box>
   );
 };

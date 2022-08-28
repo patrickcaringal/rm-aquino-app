@@ -33,6 +33,7 @@ import lodash from "lodash";
 
 import { successMessage } from "../../../../components/common";
 import { Input } from "../../../../components/common/Form";
+import { REQUEST_STATUS } from "../../../../components/shared";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
@@ -41,7 +42,7 @@ import { addAppointmentReq, db } from "../../../../modules/firebase";
 import { formatTimeStamp, today } from "../../../../modules/helper";
 import PlaceholderComponent from "./Placeholder";
 import TimeslotComponent from "./Timeslot";
-import { getMyForApprovalAppointments } from "./utils";
+import { getMyAppointments } from "./utils";
 
 const CustomPickersDay = styled(PickersDay, {
   shouldForwardProp: (prop) => prop !== "availSched" && prop !== "isSelected",
@@ -71,8 +72,6 @@ const ScheduleAppointmentPage = () => {
   // Local States
   const [schedules, setSchedules] = useState({});
   const [appointments, setAppointments] = useState([]);
-  const [takenTimeslots, setTakenTimeslots] = useState({}); // TODO: convert to non state
-  const [userTimeslots, setUserTakenTimeslots] = useState({}); // TODO: convert to non state
 
   const formik = useFormik({
     initialValues: {
@@ -97,6 +96,7 @@ const ScheduleAppointmentPage = () => {
         patientId: user.id,
         patientEmail: user.email,
         patientName: user.name,
+        status: REQUEST_STATUS.forapproval,
         approved: false,
         rejected: false,
         // contactNo
@@ -128,11 +128,11 @@ const ScheduleAppointmentPage = () => {
 
   const selectedDate = values.date;
   const selectedTimeslot = values.startTime;
-
-  const forApprovalTimeslot = getMyForApprovalAppointments({
-    id: user.id,
-    data: appointments,
-  });
+  const [ownedTimeslots, forApprovalTimeslot, takenTimeslots] =
+    getMyAppointments({
+      id: user.id,
+      data: appointments,
+    });
 
   useEffect(() => {
     const weeks = getNext2DaysWeekNo();
@@ -161,11 +161,7 @@ const ScheduleAppointmentPage = () => {
           };
         }, {});
 
-        console.log(data);
         setSchedules(data);
-      } else {
-        // console.log("no queue");
-        // setQueueToday({});
       }
     });
 
@@ -176,45 +172,16 @@ const ScheduleAppointmentPage = () => {
     const weeks = getNext2DaysWeekNo();
     const q = query(
       collection(db, "appointments"),
-      where("weekNo", "in", weeks),
-      where("rejected", "==", false)
+      where("weekNo", "in", weeks)
     );
 
     const unsub = onSnapshot(q, (querySnapshot) => {
       if (querySnapshot.docs.length > 0) {
-        let userAppoinment = {};
-        const data = querySnapshot.docs.reduce((acc, doc) => {
-          const appointment = doc.data();
-          const { date, startTime } = appointment;
-          if (appointment.patientId === user.id) {
-            userAppoinment = {
-              ...userAppoinment,
-              [date]: userAppoinment[date]
-                ? [...userAppoinment[date], startTime]
-                : [startTime],
-            };
-          }
-
-          if (!!acc[date]) {
-            return {
-              ...acc,
-              [date]: [...acc[date], startTime],
-            };
-          }
-
-          return {
-            ...acc,
-            [date]: [startTime],
-          };
-        }, {});
-
         const appointmentList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
 
-        setTakenTimeslots(data);
-        setUserTakenTimeslots(userAppoinment);
         setAppointments(appointmentList);
       }
     });
@@ -285,6 +252,7 @@ const ScheduleAppointmentPage = () => {
   const handleSelectDate = (value) => {
     setFieldValue("date", formatTimeStamp(value));
     setFieldValue("startTime", null);
+    setFieldValue("reasonAppointment", "");
   };
 
   const handleSelectTimeslot = (event) => {
@@ -292,6 +260,19 @@ const ScheduleAppointmentPage = () => {
   };
 
   const handleSave = () => {
+    // check if user has existing appointment on the same day
+    const hasAppointment =
+      ownedTimeslots?.[values.date]?.length ||
+      forApprovalTimeslot?.[values.date]?.length;
+    if (hasAppointment) {
+      openResponseDialog({
+        type: "WARNING",
+        autoClose: true,
+        content: "You already have an appointment on the selected date.",
+      });
+      return;
+    }
+
     if (!values.date || !values.startTime || !values.reasonAppointment) {
       openResponseDialog({
         type: "WARNING",
@@ -353,7 +334,7 @@ const ScheduleAppointmentPage = () => {
             AMTimeslot={AMTimeslot}
             PMTimeslot={PMTimeslot}
             unavailableTimeslots={takenTimeslots[selectedDate]}
-            ownedTimeslots={userTimeslots[selectedDate]}
+            ownedTimeslots={ownedTimeslots[selectedDate]}
             forApprovalTimeslot={forApprovalTimeslot[selectedDate]}
           />
         ) : (

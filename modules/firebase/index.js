@@ -4,7 +4,14 @@ import {
   signInAdminReq,
   updateStaffReq,
 } from "./admin";
-import { addAppointmentReq, getPatientAppointmentReq } from "./appointment";
+import {
+  addAppointmentReq,
+  approveAppointmentReq,
+  getAppointmentForApprovalReq,
+  getAppointmentReq,
+  getPatientAppointmentReq,
+  rejectAppointmentReq,
+} from "./appointment";
 import {
   monitorAuthState,
   signInReq,
@@ -18,6 +25,7 @@ import {
   approvePatientReq,
   createPatientAccountReq,
   getPatientsAccountApprovalReq,
+  getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
 } from "./patient";
@@ -45,6 +53,7 @@ export {
   approvePatientReq,
   createPatientAccountReq,
   getPatientsAccountApprovalReq,
+  getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
   // admin
@@ -58,5 +67,9 @@ export {
   updateSchedulesReq,
   // appointment
   addAppointmentReq,
+  approveAppointmentReq,
+  getAppointmentForApprovalReq,
+  getAppointmentReq,
   getPatientAppointmentReq,
+  rejectAppointmentReq,
 };
