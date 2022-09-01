@@ -1,3 +1,4 @@
+import Datalist from "./Datalist";
 import { FullCalendar } from "./FullCalendar";
 import Modal from "./Modal";
 import {
@@ -8,6 +9,7 @@ import {
 import Toolbar from "./Toolbar";
 
 export {
+  Datalist,
   FullCalendar,
   Modal,
   Toolbar,

@@ -100,3 +100,7 @@ export const BranchesSchema = Yup.object().shape({
 export const PatientRejectSchema = Yup.object().shape({
   reason: Yup.string().max(250, "Reason too long").required("Required"),
 });
+
+export const DiagnoseSchema = Yup.object().shape({
+  diagnosis: Yup.string().required("Required").max(500, "Diagnosis too long"),
+});

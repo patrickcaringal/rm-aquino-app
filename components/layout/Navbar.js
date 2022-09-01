@@ -110,6 +110,11 @@ const ResponsiveAppBar = () => {
             },
           ],
         },
+        {
+          text: "Consultation",
+          icon: null,
+          onClick: () => router.push(PATHS.ADMIN.CONSULTATION),
+        },
       ]
     : [
         {

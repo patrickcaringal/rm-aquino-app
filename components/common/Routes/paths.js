@@ -16,6 +16,7 @@ export const PATHS = {
     DOCTOR_SCHEDULE_NEXT_WEEK: "/admin/doctor-schedule/next-week",
     APPOINTMENT_MANAGEMENT: "/admin/appointments",
     APPOINTMENT_APPROVAL: "/admin/appointments/approval",
+    CONSULTATION: "/admin/consultation",
   },
   // STAFF: {
   //   DASHBOARD: "/staff/dashboard",

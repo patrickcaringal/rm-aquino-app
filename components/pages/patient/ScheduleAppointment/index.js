@@ -27,6 +27,7 @@ import {
   startOfToday,
   subBusinessDays,
 } from "date-fns";
+import faker from "faker";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useFormik } from "formik";
 import lodash from "lodash";
@@ -38,6 +39,7 @@ import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
+import { isMockDataEnabled } from "../../../../modules/env";
 import { addAppointmentReq, db } from "../../../../modules/firebase";
 import { formatTimeStamp, today } from "../../../../modules/helper";
 import PlaceholderComponent from "./Placeholder";
@@ -77,7 +79,7 @@ const ScheduleAppointmentPage = () => {
     initialValues: {
       date: "",
       startTime: "",
-      reasonAppointment: "",
+      reasonAppointment: faker.lorem.paragraph(2),
     },
     validateOnChange: false,
     onSubmit: async (values, { setFieldValue }) => {
@@ -123,8 +125,15 @@ const ScheduleAppointmentPage = () => {
     },
   });
 
-  const { values, setFieldValue, handleBlur, submitForm, touched, errors } =
-    formik;
+  const {
+    values,
+    setFieldValue,
+    handleChange,
+    handleBlur,
+    submitForm,
+    touched,
+    errors,
+  } = formik;
 
   const selectedDate = values.date;
   const selectedTimeslot = values.startTime;
@@ -252,7 +261,10 @@ const ScheduleAppointmentPage = () => {
   const handleSelectDate = (value) => {
     setFieldValue("date", formatTimeStamp(value));
     setFieldValue("startTime", null);
-    setFieldValue("reasonAppointment", "");
+    setFieldValue(
+      "reasonAppointment",
+      isMockDataEnabled ? faker.lorem.paragraph(2) : ""
+    );
   };
 
   const handleSelectTimeslot = (event) => {
@@ -353,9 +365,7 @@ const ScheduleAppointmentPage = () => {
           required
           label="Reason for appointment"
           name="reasonAppointment"
-          onChange={(e) =>
-            setFieldValue("reasonAppointment", e.target.value.toUpperCase())
-          }
+          onChange={handleChange}
           onBlur={handleBlur}
           error={touched.reasonAppointment && errors.reasonAppointment}
         />

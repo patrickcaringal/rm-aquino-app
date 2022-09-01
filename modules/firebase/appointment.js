@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 
 import { REQUEST_STATUS } from "../../components/shared";
-import { pluralize, sortBy } from "../helper";
+import { formatTimeStamp, pluralize, sortBy } from "../helper";
 import { getErrorMsg } from "./auth";
 import { db, timestampFields } from "./config";
 
@@ -28,6 +28,29 @@ export const getAppointmentReq = async () => {
         ...doc.data(),
       }))
       .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const getAppointmentByDateReq = async ({ date }) => {
+  try {
+    const q = query(
+      collRef,
+      where("date", "==", date),
+      where("status", "==", REQUEST_STATUS.approved),
+      where("deleted", "==", false)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    // .sort(sortBy("dateCreated", "desc"));
 
     return { data, success: true };
   } catch (error) {
@@ -146,5 +169,28 @@ export const rejectAppointmentReq = async ({ document }) => {
     console.log(error);
     const errMsg = getErrorMsg(error.code);
     return { error: errMsg || error.message };
+  }
+};
+
+export const diagnosePatientReq = async ({ document }) => {
+  try {
+    const batch = writeBatch(db);
+
+    // Create Medical Record
+    const docRef = doc(collection(db, "medicalRecords"));
+    const data = {
+      id: docRef.id,
+      ...document,
+      deleted: false,
+      ...timestampFields({ dateCreated: true, dateUpdated: true }),
+    };
+    batch.set(docRef, data);
+
+    await batch.commit();
+
+    return { success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
   }
 };
