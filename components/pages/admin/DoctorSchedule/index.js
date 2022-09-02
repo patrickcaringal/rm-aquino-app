@@ -1,19 +1,28 @@
 import React, { useEffect, useState } from "react";
 
-import { Box, Button, Typography } from "@mui/material";
-import { format, getWeek, isBefore } from "date-fns";
+import { Box, Button, Chip, Typography } from "@mui/material";
+import { format, getWeek, isBefore, isWithinInterval } from "date-fns";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import lodash from "lodash";
 
 import { FullCalendar, successMessage } from "../../../../components/common";
+import { REQUEST_STATUS, RequestStatus } from "../../../../components/shared";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import {
   addSchedulesReq,
+  db,
   getScheduleReq,
   updateSchedulesReq,
 } from "../../../../modules/firebase";
-import { days, getDayOfWeek, today } from "../../../../modules/helper";
+import {
+  days,
+  formatTimeStamp,
+  getDayOfWeek,
+  today,
+} from "../../../../modules/helper";
+import { getRangeId, getSlots } from "./utils";
 
 const DoctorSchedulePage = () => {
   const { openResponseDialog, openErrorDialog, closeDialog } =
@@ -28,6 +37,9 @@ const DoctorSchedulePage = () => {
   // Local States
   const [scheduleDoc, setScheduleDoc] = useState([]);
   const [schedules, setSchedules] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+
+  const slots = getSlots({ schedules, appointments });
 
   useEffect(() => {
     const fetch = async () => {
@@ -48,6 +60,30 @@ const DoctorSchedulePage = () => {
     };
 
     fetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, "appointments"),
+      where("weekNo", "==", today.weekNo),
+      where("status", "in", [
+        REQUEST_STATUS.approved,
+        REQUEST_STATUS.forapproval,
+      ])
+    );
+
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      if (querySnapshot.docs.length > 0) {
+        const appointmentList = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }));
+
+        setAppointments(appointmentList);
+      }
+    });
+
+    return () => unsub();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -214,6 +250,32 @@ const DoctorSchedulePage = () => {
     });
   };
 
+  const renderEventContent = (arg) => {
+    const rangeId = getRangeId({ start: arg.event.start, end: arg.event.end });
+    const forApproval = slots.forApproval?.[rangeId]?.length;
+    const approved = slots.approved?.[rangeId]?.length;
+
+    return (
+      <Box sx={{ px: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+        <Box>{arg.timeText}</Box>
+        {!!approved && (
+          <Box>
+            <Chip label={`${approved} Approved`} size="small" color="primary" />
+          </Box>
+        )}
+        {!!forApproval && (
+          <Box>
+            <Chip
+              label={`${forApproval} For Approval`}
+              size="small"
+              color="warning"
+            />
+          </Box>
+        )}
+      </Box>
+    );
+  };
+
   const businessHours = [
     {
       daysOfWeek: remainingBusinessDay,
@@ -238,6 +300,7 @@ const DoctorSchedulePage = () => {
           businessHours={businessHours}
           onTimeSelect={handleTimeSelect}
           onEventClick={handleEventClick}
+          renderEventContent={renderEventContent}
         />
       </Box>
     </Box>

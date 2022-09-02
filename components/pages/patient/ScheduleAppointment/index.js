@@ -213,17 +213,11 @@ const ScheduleAppointmentPage = () => {
     const dateHasAvailableSched = availalbeSchedulesDates.includes(
       formatTimeStamp(date)
     );
-    // const dateNotAvailableSched = notAvailalbeSchedulesDates.includes(
-    //   formatTimeStamp(date)
-    // );
 
-    // return <PickersDay {...pickersDayProps} />;
     return (
       <CustomPickersDay
         {...pickersDayProps}
         availSched={dateHasAvailableSched}
-        // notAvailSched={dateNotAvailableSched}
-        // isSelected={isSelected}
       />
     );
   };
