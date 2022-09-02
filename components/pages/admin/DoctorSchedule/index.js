@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { Box, Button, Chip, Typography } from "@mui/material";
-import { format, getWeek, isBefore, isWithinInterval } from "date-fns";
+import { format, getWeek, isBefore } from "date-fns";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import lodash from "lodash";
 
 import { FullCalendar, successMessage } from "../../../../components/common";
-import { REQUEST_STATUS, RequestStatus } from "../../../../components/shared";
+import { REQUEST_STATUS } from "../../../../components/shared";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
@@ -250,31 +250,41 @@ const DoctorSchedulePage = () => {
     });
   };
 
-  const renderEventContent = (arg) => {
-    const rangeId = getRangeId({ start: arg.event.start, end: arg.event.end });
-    const forApproval = slots.forApproval?.[rangeId]?.length;
-    const approved = slots.approved?.[rangeId]?.length;
+  const renderEventContent = useCallback(
+    (arg) => {
+      const rangeId = getRangeId({
+        start: arg.event.start,
+        end: arg.event.end,
+      });
+      const forApproval = slots.forApproval?.[rangeId]?.length;
+      const approved = slots.approved?.[rangeId]?.length;
 
-    return (
-      <Box sx={{ px: 1, display: "flex", flexDirection: "column", gap: 1 }}>
-        <Box>{arg.timeText}</Box>
-        {!!approved && (
-          <Box>
-            <Chip label={`${approved} Approved`} size="small" color="primary" />
-          </Box>
-        )}
-        {!!forApproval && (
-          <Box>
-            <Chip
-              label={`${forApproval} For Approval`}
-              size="small"
-              color="warning"
-            />
-          </Box>
-        )}
-      </Box>
-    );
-  };
+      return (
+        <Box sx={{ px: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+          <Box>{arg.timeText}</Box>
+          {!!approved && (
+            <Box>
+              <Chip
+                label={`${approved} Approved`}
+                size="small"
+                color="primary"
+              />
+            </Box>
+          )}
+          {!!forApproval && (
+            <Box>
+              <Chip
+                label={`${forApproval} For Approval`}
+                size="small"
+                color="warning"
+              />
+            </Box>
+          )}
+        </Box>
+      );
+    },
+    [slots]
+  );
 
   const businessHours = [
     {

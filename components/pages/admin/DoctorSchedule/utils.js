@@ -44,3 +44,10 @@ export const getRangeId = ({ start, end }) => {
   const rangeId = `${date} ${startD} - ${endD}`;
   return rangeId;
 };
+
+export const checkSlotAppointment = ({ start, end, slots }) => {
+  const rangeId = getRangeId({ start, end });
+  const forApproval = slots.forApproval?.[rangeId]?.length;
+  const approved = slots.approved?.[rangeId]?.length;
+  return forApproval || approved;
+};
