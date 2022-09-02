@@ -16,12 +16,12 @@ import {
 } from "@mui/material";
 import { addBusinessDays } from "date-fns";
 
-import { RequestStatus } from "../../../../components/shared";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import { getAppointmentByDateReq } from "../../../../modules/firebase";
 import { formatTimeStamp, today } from "../../../../modules/helper";
+import { TablePlaceholder } from "../../../common";
 import AppointmentDetailModal from "./AppointmentDetailModal";
 import ConsultModal from "./ConsultModal";
 import Filters from "./Filters";
@@ -58,7 +58,7 @@ const AppointmentsPage = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const payload = { date: formatTimeStamp(addBusinessDays(new Date(), 1)) }; //today.dateStr
+      const payload = { date: formatTimeStamp(addBusinessDays(new Date(), 0)) }; //today.dateStr
       const { data, error: getError } = await getAppointments(payload);
       if (getError) return openErrorDialog(getError);
 
@@ -174,18 +174,7 @@ const AppointmentsPage = () => {
                   </TableRow>
                 );
               })}
-              {filtered.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    sx={{ textAlign: "center", height: 200 }}
-                  >
-                    <Typography color="text.secondary" fontWeight="medium">
-                      No Data to display
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              )}
+              <TablePlaceholder visible={filtered.length === 0} colSpan={6} />
             </TableBody>
           </Table>
         </TableContainer>

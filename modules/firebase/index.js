@@ -27,6 +27,7 @@ import { getPatientRecordReq } from "./medicalRecords";
 import {
   approvePatientReq,
   createPatientAccountReq,
+  getPatientReq,
   getPatientsAccountApprovalReq,
   getPatientsReq,
   rejectPatientReq,
@@ -55,6 +56,7 @@ export {
   // patient
   approvePatientReq,
   createPatientAccountReq,
+  getPatientReq,
   getPatientsAccountApprovalReq,
   getPatientsReq,
   rejectPatientReq,

@@ -1,9 +1,7 @@
 import React from "react";
 
-import AssignmentIcon from "@mui/icons-material/Assignment";
 import {
   Box,
-  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -14,6 +12,7 @@ import {
 } from "@mui/material";
 
 import { formatTimeStamp } from "../../../../modules/helper";
+import { TablePlaceholder } from "../../../common";
 
 const PatientRecord = ({ data = [], onRecordClick }) => {
   return (
@@ -65,6 +64,7 @@ const PatientRecord = ({ data = [], onRecordClick }) => {
                 </TableRow>
               );
             })}
+            <TablePlaceholder visible={data.length === 0} colSpan={3} />
           </TableBody>
         </Table>
       </TableContainer>

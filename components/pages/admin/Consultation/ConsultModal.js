@@ -12,8 +12,9 @@ import { isMockDataEnabled } from "../../../../modules/env";
 import {
   diagnosePatientReq,
   getPatientRecordReq,
+  getPatientReq,
 } from "../../../../modules/firebase";
-import { formatTimeStamp, today } from "../../../../modules/helper";
+import { calculateAge, formatTimeStamp } from "../../../../modules/helper";
 import { DiagnoseSchema } from "../../../../modules/validation";
 import { Datalist, Modal, successMessage } from "../../../common";
 import { Input } from "../../../common/Form";
@@ -21,7 +22,7 @@ import PatientRecord from "./PatientRecord";
 
 const defaultValues = isMockDataEnabled
   ? {
-      diagnosis: faker.lorem.paragraph(2),
+      diagnosis: faker.lorem.sentences(1),
     }
   : { diagnosis: "" };
 
@@ -30,7 +31,7 @@ const ConsultModal = ({ open = false, data, onClose }) => {
   const { setBackdropLoader } = useBackdropLoader();
 
   // Requests
-  // const [getPatient] = useRequest(getPatientReq, setBackdropLoader);
+  const [getPatient] = useRequest(getPatientReq, setBackdropLoader);
   const [getPatientRecord] = useRequest(getPatientRecordReq, setBackdropLoader);
   const [diagnosePatient] = useRequest(diagnosePatientReq, setBackdropLoader);
 
@@ -48,10 +49,24 @@ const ConsultModal = ({ open = false, data, onClose }) => {
     patientId,
   } = data;
 
+  const { birthdate, gender } = patient;
+
   const appointmentData = [
     {
       label: "Patient Name",
       value: patientName,
+    },
+    {
+      label: "Age",
+      value: birthdate ? calculateAge(formatTimeStamp(birthdate)) : "-",
+    },
+    {
+      label: "Birthdate",
+      value: birthdate ? formatTimeStamp(birthdate, "MMM-dd-yyyy") : "-",
+    },
+    {
+      label: "Gender",
+      value: gender ? gender : "-",
     },
     {
       label: "Appointment Date",
@@ -115,6 +130,15 @@ const ConsultModal = ({ open = false, data, onClose }) => {
   });
 
   useEffect(() => {
+    const fetchPatient = async () => {
+      // Get Patient
+      const payload = { id: patientId };
+      const { data, error: getError } = await getPatient(payload);
+      if (getError) return openErrorDialog(getError);
+
+      setPatient(data);
+    };
+
     const fetchMedicalRecord = async () => {
       // Get Medical Record
       const payload = { id: patientId };
@@ -124,7 +148,7 @@ const ConsultModal = ({ open = false, data, onClose }) => {
       setMedicalRecords(data);
     };
 
-    // fetchPatient();
+    fetchPatient();
     fetchMedicalRecord();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -157,21 +181,21 @@ const ConsultModal = ({ open = false, data, onClose }) => {
     >
       <Box
         sx={{
-          display: "grid",
-          grid: "auto-flow / 552px 1fr",
-          gap: 3,
+          display: "flex",
+          flexDirection: "row",
         }}
       >
+        {/* Patient Details */}
         <Box>
-          <Box>
+          <Box sx={{ pr: 3, width: 506 }}>
             <Datalist
               data={appointmentData}
               labelWidth={180}
               labelAlignment="right"
             />
           </Box>
-          <Divider sx={{ my: 2 }} />
-          <Box>
+          <Divider sx={{ my: 3 }} />
+          <Box sx={{ pr: 3 }}>
             <Input
               multiline
               rows={3}
@@ -185,11 +209,10 @@ const ConsultModal = ({ open = false, data, onClose }) => {
             />
           </Box>
         </Box>
-        <Box>
-          <PatientRecord
-            data={medicalRecords}
-            // onRecordClick={handlePatientRecordModalOpen}
-          />
+        <Divider orientation="vertical" flexItem />
+        {/* Patient Record */}
+        <Box sx={{ pl: 3, flex: 1 }}>
+          <PatientRecord data={medicalRecords} />
         </Box>
       </Box>
     </Modal>

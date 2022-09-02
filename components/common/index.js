@@ -6,6 +6,7 @@ import {
   duplicateMessage,
   successMessage,
 } from "./ResponseDialog";
+import { TablePlaceholder } from "./Table";
 import Toolbar from "./Toolbar";
 
 export {
@@ -17,4 +18,6 @@ export {
   ResponseDialog,
   successMessage,
   duplicateMessage,
+  // Table
+  TablePlaceholder,
 };
