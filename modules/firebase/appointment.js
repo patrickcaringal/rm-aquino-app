@@ -59,6 +59,29 @@ export const getAppointmentByDateReq = async ({ date }) => {
   }
 };
 
+export const getAppointmentsByWeekReq = async ({ weekNo }) => {
+  try {
+    const q = query(
+      collection(db, "appointments"),
+      where("weekNo", "==", weekNo),
+      where("status", "in", [
+        REQUEST_STATUS.approved,
+        REQUEST_STATUS.forapproval,
+      ])
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({ ...doc.data() }))
+      .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
 export const getAppointmentForApprovalReq = async () => {
   try {
     const q = query(

@@ -6,6 +6,12 @@ import {
   duplicateMessage,
   successMessage,
 } from "./ResponseDialog";
+import {
+  LOGGED_IN_INACCESSIBLE_ROUTES,
+  PATHS,
+  PROTECTED_ROUTES,
+  getRoleRoutes,
+} from "./Routes";
 import { TablePlaceholder } from "./Table";
 import Toolbar from "./Toolbar";
 
@@ -20,4 +26,9 @@ export {
   duplicateMessage,
   // Table
   TablePlaceholder,
+  // routes
+  LOGGED_IN_INACCESSIBLE_ROUTES,
+  PATHS,
+  PROTECTED_ROUTES,
+  getRoleRoutes,
 };
