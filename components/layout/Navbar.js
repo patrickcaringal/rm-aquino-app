@@ -106,9 +106,18 @@ const ResponsiveAppBar = () => {
             },
             {
               text: "Appointment Approval",
-              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_APPROVAL),
+              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
             },
+            // {
+            //   text: "Old Approval",
+            //   onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_APPROVAL),
+            // },
           ],
+        },
+        {
+          text: "Consultation",
+          icon: null,
+          onClick: () => router.push(PATHS.ADMIN.CONSULTATION),
         },
       ]
     : [

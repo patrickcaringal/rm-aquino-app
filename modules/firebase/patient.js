@@ -7,6 +7,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   query,
   setDoc,
@@ -87,6 +88,25 @@ export const createPatientAccountReq = async ({ document }) => {
 
     // Create Document
     await setDoc(docRef, data);
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const getPatientReq = async ({ id }) => {
+  try {
+    // Get Patient
+    const q = doc(db, "patients", id);
+    const querySnapshot = await getDoc(q);
+
+    if (!querySnapshot.exists()) {
+      throw new Error("Unable to get Patient doc");
+    }
+
+    const data = querySnapshot.data();
 
     return { data, success: true };
   } catch (error) {

@@ -1,4 +1,10 @@
-import { differenceInYears, format, getWeek } from "date-fns";
+import {
+  addBusinessDays,
+  differenceInYears,
+  format,
+  getWeek,
+  isWeekend,
+} from "date-fns";
 import { Timestamp } from "firebase/firestore";
 import lodash from "lodash";
 
@@ -39,10 +45,10 @@ export const getDayOfWeek = (day = 0, today = new Date()) => {
   return new Date(today.setDate(first + day));
 };
 
-// export const getDayOfNextWeek = (today = new Date(), day = 0) => {
-//   const first = today.getDate() - today.getDay() + 1;
-//   return new Date(today.setDate(first + day));
-// };
+export const getNearestBusinessDay = (date = new Date()) => {
+  const businessDay = isWeekend(date) ? addBusinessDays(date, 1) : date;
+  return formatTimeStamp(businessDay);
+};
 
 // export const today = formatTimeStamp(new Date());
 export const today = {

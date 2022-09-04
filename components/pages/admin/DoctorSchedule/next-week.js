@@ -1,25 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Chip, Typography } from "@mui/material";
 import { addWeeks, format, getWeek, isBefore } from "date-fns";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import lodash from "lodash";
 
+import { REQUEST_STATUS } from "../../../../components/shared";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import {
   addSchedulesReq,
+  db,
   getScheduleReq,
   updateSchedulesReq,
 } from "../../../../modules/firebase";
-import { days, getDayOfWeek, today } from "../../../../modules/helper";
+import {
+  days,
+  formatTimeStamp,
+  getDayOfWeek,
+  today,
+} from "../../../../modules/helper";
 import { FullCalendar, successMessage } from "../../../common";
+import { checkSlotAppointment, getRangeId, getSlots } from "./utils";
 
 const DoctorSchedulePage = () => {
   const { openResponseDialog, openErrorDialog, closeDialog } =
     useResponseDialog();
   const { setBackdropLoader } = useBackdropLoader();
   const baseDay = addWeeks(new Date(), 1);
+  const weekNo = today.weekNo + 1;
 
   // Requests
   const [getSchedule] = useRequest(getScheduleReq, setBackdropLoader);
@@ -29,12 +39,15 @@ const DoctorSchedulePage = () => {
   // Local States
   const [scheduleDoc, setScheduleDoc] = useState([]);
   const [schedules, setSchedules] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+
+  const slots = getSlots({ schedules, appointments });
 
   useEffect(() => {
     const fetch = async () => {
       // Get Schedule
       const { data, error: getScheduleError } = await getSchedule({
-        weekNo: today.weekNo + 1,
+        weekNo,
       });
       if (getScheduleError) return openErrorDialog(getScheduleError);
 
@@ -49,6 +62,30 @@ const DoctorSchedulePage = () => {
     };
 
     fetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, "appointments"),
+      where("weekNo", "==", weekNo),
+      where("status", "in", [
+        REQUEST_STATUS.approved,
+        REQUEST_STATUS.forapproval,
+      ])
+    );
+
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      if (querySnapshot.docs.length > 0) {
+        const appointmentList = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }));
+
+        setAppointments(appointmentList);
+      }
+    });
+
+    return () => unsub();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -118,6 +155,16 @@ const DoctorSchedulePage = () => {
     if (isPastTime) {
       openResponseDialog({
         content: "Cannot remove schedule past current time.",
+        type: "WARNING",
+        autoClose: true,
+      });
+      return;
+    }
+
+    const hasAppointment = checkSlotAppointment({ start, end, slots });
+    if (hasAppointment) {
+      openResponseDialog({
+        content: "Cannot remove schedule with an Appointment.",
         type: "WARNING",
         autoClose: true,
       });
@@ -211,6 +258,42 @@ const DoctorSchedulePage = () => {
     });
   };
 
+  const renderEventContent = useCallback(
+    (arg) => {
+      const rangeId = getRangeId({
+        start: arg.event.start,
+        end: arg.event.end,
+      });
+      const forApproval = slots.forApproval?.[rangeId]?.length;
+      const approved = slots.approved?.[rangeId]?.length;
+
+      return (
+        <Box sx={{ px: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+          <Box>{arg.timeText}</Box>
+          {!!approved && (
+            <Box>
+              <Chip
+                label={`${approved} Approved`}
+                size="small"
+                color="primary"
+              />
+            </Box>
+          )}
+          {!!forApproval && (
+            <Box>
+              <Chip
+                label={`${forApproval} For Approval`}
+                size="small"
+                color="warning"
+              />
+            </Box>
+          )}
+        </Box>
+      );
+    },
+    [slots]
+  );
+
   const businessHours = [
     {
       daysOfWeek: remainingBusinessDay,
@@ -236,6 +319,7 @@ const DoctorSchedulePage = () => {
           businessHours={businessHours}
           onTimeSelect={handleTimeSelect}
           onEventClick={handleEventClick}
+          renderEventContent={renderEventContent}
         />
       </Box>
     </Box>

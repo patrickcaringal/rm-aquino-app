@@ -20,6 +20,7 @@ const Calendar = ({
   events,
   onTimeSelect,
   onEventClick,
+  renderEventContent,
 }) => {
   return (
     <FullCalendar
@@ -54,6 +55,8 @@ const Calendar = ({
       events={events}
       eventClick={onEventClick}
       select={onTimeSelect}
+      {...(renderEventContent && { eventContent: renderEventContent })}
+      // eventContent={renderEventContent}
     />
   );
 };

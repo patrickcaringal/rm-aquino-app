@@ -15,7 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { useRouter } from "next/router";
 
 import { ResponseDialog, successMessage } from "../../../../components/common";
 import { Input } from "../../../../components/common/Form";
@@ -29,10 +28,7 @@ import {
   getAppointmentForApprovalReq,
   rejectAppointmentReq,
 } from "../../../../modules/firebase";
-import {
-  formatTimeStamp,
-  getNearestBusinessDay,
-} from "../../../../modules/helper";
+import { formatTimeStamp } from "../../../../modules/helper";
 import Filters from "./Filters";
 import useFilter from "./useFilter";
 
@@ -42,7 +38,6 @@ const defaultModal = {
 };
 
 const AppointmentsPage = () => {
-  const router = useRouter();
   const { user } = useAuth();
   const { openResponseDialog, openErrorDialog, closeDialog } =
     useResponseDialog();
@@ -66,11 +61,9 @@ const AppointmentsPage = () => {
   const [appointments, setAppointments] = useState([]);
   const [rejectModal, setRejectModal] = useState(defaultModal);
 
-  const baseDay = getNearestBusinessDay(router.query?.date);
   const { filtered, setData, filters, onStatusChange, onDateChange } =
     useFilter({
       defaultStatus: "all",
-      defaultDate: baseDay,
     });
 
   useEffect(() => {

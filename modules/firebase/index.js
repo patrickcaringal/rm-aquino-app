@@ -7,8 +7,11 @@ import {
 import {
   addAppointmentReq,
   approveAppointmentReq,
+  diagnosePatientReq,
+  getAppointmentByDateReq,
   getAppointmentForApprovalReq,
   getAppointmentReq,
+  getAppointmentsByWeekReq,
   getPatientAppointmentReq,
   rejectAppointmentReq,
 } from "./appointment";
@@ -21,9 +24,11 @@ import {
   signUpReq,
 } from "./auth";
 import { auth, db } from "./config";
+import { getPatientRecordReq } from "./medicalRecords";
 import {
   approvePatientReq,
   createPatientAccountReq,
+  getPatientReq,
   getPatientsAccountApprovalReq,
   getPatientsReq,
   rejectPatientReq,
@@ -52,6 +57,7 @@ export {
   // patient
   approvePatientReq,
   createPatientAccountReq,
+  getPatientReq,
   getPatientsAccountApprovalReq,
   getPatientsReq,
   rejectPatientReq,
@@ -68,8 +74,13 @@ export {
   // appointment
   addAppointmentReq,
   approveAppointmentReq,
+  diagnosePatientReq,
+  getAppointmentByDateReq,
   getAppointmentForApprovalReq,
   getAppointmentReq,
+  getAppointmentsByWeekReq,
   getPatientAppointmentReq,
   rejectAppointmentReq,
+  // medical record
+  getPatientRecordReq,
 };
