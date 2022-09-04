@@ -79,7 +79,7 @@ const ScheduleAppointmentPage = () => {
     initialValues: {
       date: "",
       startTime: "",
-      reasonAppointment: faker.lorem.sentences(1),
+      reasonAppointment: "",
     },
     validateOnChange: false,
     onSubmit: async (values, { setFieldValue }) => {

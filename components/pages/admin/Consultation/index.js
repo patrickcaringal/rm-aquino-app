@@ -58,7 +58,7 @@ const AppointmentsPage = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const payload = { date: formatTimeStamp(addBusinessDays(new Date(), 0)) }; //today.dateStr
+      const payload = { date: formatTimeStamp(addBusinessDays(new Date(), 1)) }; //today.dateStr
       const { data, error: getError } = await getAppointments(payload);
       if (getError) return openErrorDialog(getError);
 

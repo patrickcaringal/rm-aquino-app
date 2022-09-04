@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 
 import { Box, Button, Chip, Typography } from "@mui/material";
-import { format, getWeek, isBefore } from "date-fns";
+import { format, getWeek, isBefore, isSunday } from "date-fns";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import lodash from "lodash";
 
@@ -22,7 +22,7 @@ import {
   getDayOfWeek,
   today,
 } from "../../../../modules/helper";
-import { getRangeId, getSlots } from "./utils";
+import { checkSlotAppointment, getRangeId, getSlots } from "./utils";
 
 const DoctorSchedulePage = () => {
   const { openResponseDialog, openErrorDialog, closeDialog } =
@@ -88,7 +88,7 @@ const DoctorSchedulePage = () => {
   }, []);
 
   const remainingBusinessDay = lodash.range(
-    today.dayOfWeek,
+    isSunday(new Date()) ? 1 : today.dayOfWeek,
     days.businessDays.length + 1,
     1
   );
@@ -157,6 +157,16 @@ const DoctorSchedulePage = () => {
     if (isPastTime) {
       openResponseDialog({
         content: "Cannot remove schedule past current time.",
+        type: "WARNING",
+        autoClose: true,
+      });
+      return;
+    }
+
+    const hasAppointment = checkSlotAppointment({ start, end, slots });
+    if (hasAppointment) {
+      openResponseDialog({
+        content: "Cannot remove schedule with an Appointment.",
         type: "WARNING",
         autoClose: true,
       });
