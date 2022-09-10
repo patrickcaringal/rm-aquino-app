@@ -122,6 +122,11 @@ const ResponsiveAppBar = () => {
       ]
     : [
         {
+          text: "Medical Record",
+          icon: null,
+          onClick: () => router.push(PATHS.PATIENT.MEDICAL_RECORD),
+        },
+        {
           text: "Appointments",
           icon: null,
           onClick: () => router.push(PATHS.PATIENT.APPOINTMENT),
