@@ -14,7 +14,7 @@ import {
 import { formatTimeStamp } from "../../../../modules/helper";
 import { TablePlaceholder } from "../../../common";
 
-const PatientRecord = ({ data = [], onRecordClick }) => {
+const PatientRecord = ({ data = [] }) => {
   return (
     <Box>
       <TableContainer>

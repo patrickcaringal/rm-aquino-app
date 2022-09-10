@@ -16,7 +16,10 @@ import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import { getAppointmentReq } from "../../../../modules/firebase";
-import { formatTimeStamp } from "../../../../modules/helper";
+import {
+  formatTimeStamp,
+  getNearestBusinessDay,
+} from "../../../../modules/helper";
 import Filters from "./Filters";
 import useFilter from "./useFilter";
 
@@ -32,6 +35,7 @@ const AppointmentsPage = () => {
   const { filtered, setData, filters, onStatusChange, onDateChange } =
     useFilter({
       defaultStatus: "all",
+      defaultDate: getNearestBusinessDay(new Date()),
     });
 
   useEffect(() => {

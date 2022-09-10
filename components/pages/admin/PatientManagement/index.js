@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import {
   Box,
   Button,
@@ -15,37 +13,33 @@ import {
   Typography,
 } from "@mui/material";
 
-import { successMessage } from "../../../../components/common";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
-import {
-  addStaffReq,
-  approvePatientReq,
-  getPatientsAccountApprovalReq,
-  getPatientsReq,
-  rejectPatientReq,
-  updateStaffReq,
-} from "../../../../modules/firebase";
+import { getPatientsReq } from "../../../../modules/firebase";
 import { calculateAge, formatTimeStamp } from "../../../../modules/helper";
-import CollapsibleRow from "./CollapsibleRow";
-import RejectModal from "./rejectModal";
+import {
+  ACTION_BUTTONS,
+  LongTypography,
+  getActionButtons,
+  successMessage,
+} from "../../../common";
+import PatientRecordModal from "./PatientRecordModal";
 
 const defaultModal = {
   open: false,
   data: {},
 };
 
-const PatientApprovalPage = () => {
+const PatientListPage = () => {
   const { user } = useAuth();
   const { setBackdropLoader } = useBackdropLoader();
   const { openResponseDialog, openErrorDialog } = useResponseDialog();
 
   // Requests
   const [getPatients] = useRequest(getPatientsReq, setBackdropLoader);
-  const [approvePatient] = useRequest(approvePatientReq, setBackdropLoader);
-  const [rejectPatient] = useRequest(rejectPatientReq, setBackdropLoader);
+  const [patientRecordModal, setpatientRecordModal] = useState(defaultModal);
 
   // Local States
   const [patients, setPatients] = useState([]);
@@ -64,54 +58,15 @@ const PatientApprovalPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleApprove = async (document) => {
-    // Approve
-    const payload = { document: { ...document, approvedBy: user.id } };
-    const { error: approveError } = await approvePatient(payload);
-    if (approveError) return openErrorDialog(approveError);
-
-    // Success
-    setPatients((prev) => prev.filter((i) => i.id !== document.id));
-    openResponseDialog({
-      autoClose: true,
-      content: successMessage({
-        noun: "Patient",
-        verb: "approved",
-      }),
-      type: "SUCCESS",
-    });
-  };
-
-  const handleReject = async (document) => {
-    // Reject
-    const payload = { document };
-    const { error: rejectError } = await rejectPatient(payload);
-    if (rejectError) return openErrorDialog(rejectError);
-
-    // Success
-    setPatients((prev) => prev.filter((i) => i.id !== document.id));
-    openResponseDialog({
-      autoClose: true,
-      content: successMessage({
-        noun: "Patient",
-        verb: "rejected",
-      }),
-      type: "SUCCESS",
-      closeCb() {
-        setRejectModal(defaultModal);
-      },
-    });
-  };
-
-  const handleRejectModalOpen = (data) => {
-    setRejectModal({
+  const handlePatientRecordOpen = (data) => {
+    setpatientRecordModal({
       open: true,
       data,
     });
   };
 
-  const handleStaffModalClose = () => {
-    setRejectModal(defaultModal);
+  const handlePatientRecordClose = (data) => {
+    setpatientRecordModal(defaultModal);
   };
 
   return (
@@ -133,8 +88,9 @@ const PatientApprovalPage = () => {
                   { text: "Birthdate", sx: { width: 140 } },
                   { text: "Gender", sx: { width: 100 } },
                   { text: "Contact No.", sx: { width: 140 } },
-                  { text: "Email", sx: { width: 140 } },
-                  { text: "Address" },
+                  { text: "Email", sx: { width: 260 } },
+                  { text: "Address", sx: { width: 400 } },
+                  { text: "Actions", sx: { width: 100 }, align: "center" },
                 ].map(({ text, align, sx = {} }) => (
                   <TableCell
                     key={text}
@@ -174,19 +130,17 @@ const PatientApprovalPage = () => {
                     </TableCell>
                     <TableCell>{contactNo}</TableCell>
                     <TableCell>{email}</TableCell>
-                    <TableCell sx={{ maxWidth: 300, height: 53 }}>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: "2",
-                          overflow: "hidden",
-                        }}
-                        component="div"
-                      >
-                        {address}
-                      </Typography>
+                    <TableCell>
+                      <LongTypography text={address} displayedLines={2} />
+                    </TableCell>
+                    <TableCell align="center">
+                      {getActionButtons([
+                        {
+                          action: ACTION_BUTTONS.DETAILS,
+                          color: "success",
+                          onClick: () => handlePatientRecordOpen(i),
+                        },
+                      ])}
                     </TableCell>
                   </TableRow>
                 );
@@ -196,16 +150,15 @@ const PatientApprovalPage = () => {
         </TableContainer>
       </Box>
 
-      {rejectModal.open && (
-        <RejectModal
-          open={rejectModal.open}
-          data={rejectModal.data}
-          onClose={handleStaffModalClose}
-          onReject={handleReject}
+      {patientRecordModal.open && (
+        <PatientRecordModal
+          open={patientRecordModal.open}
+          data={patientRecordModal.data}
+          onClose={handlePatientRecordClose}
         />
       )}
     </Box>
   );
 };
 
-export default PatientApprovalPage;
+export default PatientListPage;
