@@ -13,6 +13,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import { isAfter, isBefore } from "date-fns";
 
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
@@ -36,6 +37,9 @@ const MedicalRecordPage = () => {
   // Local States
   const [medicalRecords, setMedicalRecords] = useState([]);
 
+  // { filtered, setData, filters,  onStartDateChange }
+  const filtering = useFilter({});
+
   useEffect(() => {
     const fetchMedicalRecord = async () => {
       // Get Medical Record
@@ -44,14 +48,58 @@ const MedicalRecordPage = () => {
       if (getError) return openErrorDialog(getError);
 
       setMedicalRecords(data);
+      filtering.setData(data);
     };
 
     fetchMedicalRecord();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleStartateChange = (value) => {
+    const v = value ? formatTimeStamp(value) : "";
+
+    if (
+      filtering.filters.endDate &&
+      isAfter(new Date(v), new Date(filtering.filters.endDate))
+    ) {
+      return filtering.onEndDateChange(v);
+    }
+
+    filtering.onStartDateChange(v);
+  };
+
+  const handleEndDateChange = (value) => {
+    const v = value ? formatTimeStamp(value) : "";
+
+    if (
+      filtering.filters.startDate &&
+      isBefore(new Date(v), new Date(filtering.filters.startDate))
+    ) {
+      return filtering.onStartDateChange(v);
+    }
+
+    filtering.onEndDateChange(v);
+  };
+
   return (
     <Box sx={{ pt: 2 }}>
+      <Box sx={{ mb: 2, display: "flex", flexDirection: "row", gap: 2 }}>
+        <Box sx={{ width: 200 }}>
+          <DatePicker
+            label="Start Date"
+            value={filtering.filters.startDate}
+            onChange={handleStartateChange}
+          />
+        </Box>
+        <Box sx={{ width: 200 }}>
+          <DatePicker
+            label="End Date"
+            value={filtering.filters.endDate}
+            onChange={handleEndDateChange}
+          />
+        </Box>
+      </Box>
+
       <Box>
         <TableContainer>
           <Table size="small">
@@ -74,7 +122,7 @@ const MedicalRecordPage = () => {
             </TableHead>
 
             <TableBody>
-              {medicalRecords.map((i, index) => {
+              {filtering.filtered.map((i, index) => {
                 const { date, reasonAppointment, diagnosis } = i;
                 return (
                   <TableRow key={index}>
