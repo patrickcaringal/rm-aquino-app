@@ -7,7 +7,7 @@ import { useAuth } from "../../contexts/AuthContext";
 const drawerWidth = 240;
 
 const MainContainer = ({ children }) => {
-  const { isAdminPanel } = useAuth();
+  const { isAdminPanel, isLoggedIn } = useAuth();
 
   return (
     <Box
@@ -19,7 +19,7 @@ const MainContainer = ({ children }) => {
     >
       <Container
         component="main"
-        maxWidth={isAdminPanel ? "none" : "lg"}
+        maxWidth={isLoggedIn && isAdminPanel ? "none" : "lg"}
         sx={{
           display: "flex",
           flexDirection: "column",

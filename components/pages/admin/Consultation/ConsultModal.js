@@ -26,7 +26,7 @@ const defaultValues = isMockDataEnabled
     }
   : { diagnosis: "" };
 
-const ConsultModal = ({ open = false, data, onClose }) => {
+const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
   const { openErrorDialog, openResponseDialog } = useResponseDialog();
   const { setBackdropLoader } = useBackdropLoader();
 
@@ -113,6 +113,7 @@ const ConsultModal = ({ open = false, data, onClose }) => {
       if (diganoseError) return openErrorDialog(diganoseError);
 
       // Successful
+      setAppointments((prev) => prev.filter((i) => i.id !== id));
       openResponseDialog({
         autoClose: true,
         content: successMessage({
