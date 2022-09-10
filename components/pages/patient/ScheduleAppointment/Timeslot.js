@@ -92,7 +92,8 @@ const Timeslot = ({
             sx={{
               display: "flex",
               flexDirection: "column",
-              flexGrow: 1,
+              // flexGrow: 1,
+              width: 360,
             }}
           >
             {AMTimeslot.map((slot) => {
@@ -113,7 +114,8 @@ const Timeslot = ({
             sx={{
               display: "flex",
               flexDirection: "column",
-              flexGrow: 1,
+              // flexGrow: 1,
+              width: 360,
             }}
           >
             {PMTimeslot.map((slot) => {

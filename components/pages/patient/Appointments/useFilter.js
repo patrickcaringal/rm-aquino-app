@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { REQUEST_STATUS } from "../../../shared";
+
 const useFilter = ({ data = [], defaultStatus = "all", defaultDate = "" }) => {
   const [initialData, setInitialData] = useState(data);
   const [status, setStatus] = useState(defaultStatus);
@@ -15,9 +17,12 @@ const useFilter = ({ data = [], defaultStatus = "all", defaultDate = "" }) => {
 
     if (status) {
       filtered = filtered.filter((i) => {
-        if (status === "approved") return i.approved;
-        if (status === "rejected") return i.rejected;
-        if (status === "for approval") return !i.approved && !i.rejected;
+        if (status === "done") return i.status === REQUEST_STATUS.done;
+        if (status === "approved") return i.status === REQUEST_STATUS.approved;
+        if (status === "rejected") return i.status === REQUEST_STATUS.rejected;
+        if (status === "for approval")
+          return i.status === REQUEST_STATUS.forapproval;
+
         return true;
       });
     }

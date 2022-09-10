@@ -39,9 +39,7 @@ const AppointmentsPage = () => {
   // Local States
   const [appointments, setAppointments] = useState([]);
   const { filtered, setData, filters, onStatusChange, onDateChange } =
-    useFilter({
-      defaultStatus: "all",
-    });
+    useFilter({ defaultStatus: "all" });
 
   useEffect(() => {
     setData(appointments);
@@ -77,6 +75,9 @@ const AppointmentsPage = () => {
           >
             <MenuItem value="all" dense>
               All
+            </MenuItem>
+            <MenuItem value="done" dense>
+              Done
             </MenuItem>
             <MenuItem value="for approval" dense>
               For Approval

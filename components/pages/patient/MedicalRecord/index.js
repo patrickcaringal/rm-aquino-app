@@ -22,8 +22,7 @@ import useRequest from "../../../../hooks/useRequest";
 import { getPatientRecordReq } from "../../../../modules/firebase";
 import { formatTimeStamp } from "../../../../modules/helper";
 import { LongTypography } from "../../../common";
-import { DatePicker, Select } from "../../../common/Form";
-import { RequestStatus } from "../../../shared";
+import { DatePicker } from "../../../common/Form";
 import useFilter from "./useFilter";
 
 const MedicalRecordPage = () => {
@@ -37,7 +36,6 @@ const MedicalRecordPage = () => {
   // Local States
   const [medicalRecords, setMedicalRecords] = useState([]);
 
-  // { filtered, setData, filters,  onStartDateChange }
   const filtering = useFilter({});
 
   useEffect(() => {
@@ -120,7 +118,6 @@ const MedicalRecordPage = () => {
                 ))}
               </TableRow>
             </TableHead>
-
             <TableBody>
               {filtering.filtered.map((i, index) => {
                 const { date, reasonAppointment, diagnosis } = i;
@@ -130,22 +127,13 @@ const MedicalRecordPage = () => {
                       {formatTimeStamp(date, "MMM dd, yyyy")}
                     </TableCell>
                     <TableCell>
-                      <Typography
-                        variant="caption"
-                        sx={{ whiteSpace: "pre-line" }}
-                        component="div"
-                      >
-                        {reasonAppointment}
-                      </Typography>
+                      <LongTypography
+                        text={reasonAppointment}
+                        whiteSpace="pre-line"
+                      />
                     </TableCell>
                     <TableCell>
-                      <Typography
-                        variant="caption"
-                        sx={{ whiteSpace: "pre-line" }}
-                        component="div"
-                      >
-                        {diagnosis}
-                      </Typography>
+                      <LongTypography text={diagnosis} whiteSpace="pre-line" />
                     </TableCell>
                   </TableRow>
                 );
