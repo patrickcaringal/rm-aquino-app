@@ -8,15 +8,18 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
 
+import { LongTypography } from "../../../../components/common";
 import { RequestStatus } from "../../../../components/shared";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import { getAppointmentReq } from "../../../../modules/firebase";
-import { formatTimeStamp } from "../../../../modules/helper";
+import {
+  formatTimeStamp,
+  getNearestBusinessDay,
+} from "../../../../modules/helper";
 import Filters from "./Filters";
 import useFilter from "./useFilter";
 
@@ -32,6 +35,7 @@ const AppointmentsPage = () => {
   const { filtered, setData, filters, onStatusChange, onDateChange } =
     useFilter({
       defaultStatus: "all",
+      defaultDate: getNearestBusinessDay(new Date()),
     });
 
   useEffect(() => {
@@ -69,7 +73,7 @@ const AppointmentsPage = () => {
                   { text: "Appointment Date", sx: { width: 210 } },
                   { text: "Appointment Time", sx: { width: 180 } },
                   { text: "Status", sx: { width: 160 } },
-                  { text: "Reason for Appointment" },
+                  { text: "Reason for Appointment", sx: { width: 500 } },
                   // { text: "Actions", align: "center", sx: { width: 110 } },
                 ].map(({ text, align, sx }) => (
                   <TableCell
@@ -109,18 +113,10 @@ const AppointmentsPage = () => {
                       <RequestStatus status={status} />
                     </TableCell>
                     <TableCell>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: "1",
-                          overflow: "hidden",
-                        }}
-                        component="div"
-                      >
-                        {reasonAppointment}
-                      </Typography>
+                      <LongTypography
+                        text={reasonAppointment}
+                        displayedLines={2}
+                      />
                     </TableCell>
                     {/* <TableCell sx={{ width: 110 }} align="center"></TableCell> */}
                   </TableRow>

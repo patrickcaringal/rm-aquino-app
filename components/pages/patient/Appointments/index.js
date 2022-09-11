@@ -2,11 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import {
   Box,
-  Button,
-  FormControlLabel,
   MenuItem,
-  Radio,
-  RadioGroup,
   Table,
   TableBody,
   TableCell,
@@ -15,38 +11,16 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { PickersDay } from "@mui/x-date-pickers/PickersDay";
-import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
-import {
-  addBusinessDays,
-  addDays,
-  addMinutes,
-  eachMinuteOfInterval,
-  format,
-  getWeek,
-  isAfter,
-  isBefore,
-  isSameDay,
-  isWeekend,
-  startOfToday,
-  subBusinessDays,
-} from "date-fns";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { useFormik } from "formik";
-import lodash from "lodash";
 
-import { successMessage } from "../../../../components/common";
+import { LongTypography } from "../../../../components/common";
 import { DatePicker, Select } from "../../../../components/common/Form";
 import { RequestStatus } from "../../../../components/shared";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
-import { db, getPatientAppointmentReq } from "../../../../modules/firebase";
-import { formatTimeStamp, today } from "../../../../modules/helper";
+import { getPatientAppointmentReq } from "../../../../modules/firebase";
+import { formatTimeStamp } from "../../../../modules/helper";
 import useFilter from "./useFilter";
 
 const AppointmentsPage = () => {
@@ -63,9 +37,7 @@ const AppointmentsPage = () => {
   // Local States
   const [appointments, setAppointments] = useState([]);
   const { filtered, setData, filters, onStatusChange, onDateChange } =
-    useFilter({
-      defaultStatus: "all",
-    });
+    useFilter({ defaultStatus: "all" });
 
   useEffect(() => {
     setData(appointments);
@@ -102,6 +74,9 @@ const AppointmentsPage = () => {
             <MenuItem value="all" dense>
               All
             </MenuItem>
+            <MenuItem value="done" dense>
+              Done
+            </MenuItem>
             <MenuItem value="for approval" dense>
               For Approval
             </MenuItem>
@@ -130,13 +105,13 @@ const AppointmentsPage = () => {
             <TableHead>
               <TableRow>
                 {[
-                  { text: "id", sx: { width: 210 } },
-                  { text: "Date Requested", sx: { width: 210 } },
-                  { text: "Appointment Date", sx: { width: 220 } },
-                  { text: "Appointment Time", sx: { width: 200 } },
+                  // { text: "id", sx: { width: 210 } },
+                  // { text: "Date Requested", sx: { width: 180 } },
+                  { text: "Appointment Date", sx: { width: 180 } },
+                  { text: "Appointment Time", sx: { width: 180 } },
                   { text: "Status", sx: { width: 200 } },
                   { text: "Reason for Appointment" },
-                  // { text: "Actions", align: "center", sx: { width: 110 } },
+                  { text: "Actions", align: "center", sx: { width: 110 } },
                 ].map(({ text, align, sx }) => (
                   <TableCell
                     key={text}
@@ -163,13 +138,13 @@ const AppointmentsPage = () => {
 
                 return (
                   <TableRow key={id}>
-                    <TableCell>{id}</TableCell>
-                    <TableCell>
-                      {formatTimeStamp(dateCreated, "MMM dd, yyyy (EEEE)")}
-                    </TableCell>
+                    {/* <TableCell>{id}</TableCell> */}
+                    {/* <TableCell>
+                      {formatTimeStamp(dateCreated, "MMM dd, yyyy (EEE)")}
+                    </TableCell> */}
                     <TableCell>
                       <Typography variant="body2">
-                        {formatTimeStamp(date, "MMM dd, yyyy (EEEE)")}
+                        {formatTimeStamp(date, "MMM dd, yyyy (EEE)")}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -181,20 +156,12 @@ const AppointmentsPage = () => {
                       <RequestStatus status={status} />
                     </TableCell>
                     <TableCell>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: "1",
-                          overflow: "hidden",
-                        }}
-                        component="div"
-                      >
-                        {reasonAppointment}
-                      </Typography>
+                      <LongTypography
+                        text={reasonAppointment}
+                        displayedLines={2}
+                      />
                     </TableCell>
-                    {/* <TableCell sx={{ width: 110 }} align="center"></TableCell> */}
+                    <TableCell align="center"></TableCell>
                   </TableRow>
                 );
               })}

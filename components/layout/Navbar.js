@@ -122,6 +122,11 @@ const ResponsiveAppBar = () => {
       ]
     : [
         {
+          text: "Medical Record",
+          icon: null,
+          onClick: () => router.push(PATHS.PATIENT.MEDICAL_RECORD),
+        },
+        {
           text: "Appointments",
           icon: null,
           onClick: () => router.push(PATHS.PATIENT.APPOINTMENT),
@@ -168,7 +173,7 @@ const ResponsiveAppBar = () => {
         }}
       >
         {/* maxWidth={isAdminPanel ? "none" : "lg"} */}
-        <Container maxWidth={isAdminPanel ? "none" : "lg"}>
+        <Container maxWidth={isLoggedIn && isAdminPanel ? "none" : "lg"}>
           <Toolbar
             disableGutters
             sx={{ height: "80px !important", minHeight: "80px !important" }}

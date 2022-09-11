@@ -193,6 +193,7 @@ const AppointmentsPage = () => {
           open={consultModal.open}
           data={consultModal.data}
           onClose={handleConsultModalClose}
+          setAppointments={setAppointments}
         />
       )}
     </Box>

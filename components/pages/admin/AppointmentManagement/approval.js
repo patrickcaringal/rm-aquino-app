@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
@@ -14,11 +14,9 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { useFormik } from "formik";
 import { useRouter } from "next/router";
 
-import { ResponseDialog, successMessage } from "../../../../components/common";
-import { Input } from "../../../../components/common/Form";
+import { LongTypography, successMessage } from "../../../../components/common";
 import { RejectModal, RequestStatus } from "../../../../components/shared";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
@@ -212,7 +210,7 @@ const AppointmentsPage = () => {
                   { text: "Appointment Date", sx: { width: 210 } },
                   { text: "Appointment Time", sx: { width: 180 } },
                   { text: "Status", sx: { width: 160 } },
-                  { text: "Reason for Appointment" },
+                  { text: "Reason for Appointment", sx: { width: 400 } },
                   { text: "Actions", align: "center", sx: { width: 110 } },
                 ].map(({ text, align, sx }) => (
                   <TableCell
@@ -255,20 +253,12 @@ const AppointmentsPage = () => {
                       <RequestStatus status={status} />
                     </TableCell>
                     <TableCell>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: "1",
-                          overflow: "hidden",
-                        }}
-                        component="div"
-                      >
-                        {reasonAppointment}
-                      </Typography>
+                      <LongTypography
+                        text={reasonAppointment}
+                        displayedLines={2}
+                      />
                     </TableCell>
-                    <TableCell sx={{ width: 110 }} align="center">
+                    <TableCell align="center">
                       <IconButton
                         size="small"
                         color="primary"

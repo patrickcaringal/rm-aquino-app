@@ -12,9 +12,9 @@ import {
 } from "@mui/material";
 
 import { formatTimeStamp } from "../../../../modules/helper";
-import { TablePlaceholder } from "../../../common";
+import { LongTypography, TablePlaceholder } from "../../../common";
 
-const PatientRecord = ({ data = [], onRecordClick }) => {
+const PatientRecord = ({ data = [] }) => {
   return (
     <Box>
       <TableContainer>
@@ -22,9 +22,9 @@ const PatientRecord = ({ data = [], onRecordClick }) => {
           <TableHead>
             <TableRow>
               {[
-                { text: "Date of Visit", sx: { width: 140 } },
-                { text: "Reason for Visit" },
-                { text: "Doctor Diagnosis" },
+                { text: "Date of Visit" },
+                { text: "Reason for Visit", sx: { width: 500 } },
+                { text: "Doctor Diagnosis", sx: { width: 500 } },
               ].map(({ text, align, sx }) => (
                 <TableCell
                   key={text}
@@ -44,22 +44,13 @@ const PatientRecord = ({ data = [], onRecordClick }) => {
                 <TableRow key={index}>
                   <TableCell>{formatTimeStamp(date, "MMM dd, yyyy")}</TableCell>
                   <TableCell>
-                    <Typography
-                      variant="caption"
-                      sx={{ whiteSpace: "pre-line" }}
-                      component="div"
-                    >
-                      {reasonAppointment}
-                    </Typography>
+                    <LongTypography
+                      text={reasonAppointment}
+                      whiteSpace="pre-line"
+                    />
                   </TableCell>
                   <TableCell>
-                    <Typography
-                      variant="caption"
-                      sx={{ whiteSpace: "pre-line" }}
-                      component="div"
-                    >
-                      {diagnosis}
-                    </Typography>
+                    <LongTypography text={diagnosis} whiteSpace="pre-line" />
                   </TableCell>
                 </TableRow>
               );

@@ -199,15 +199,22 @@ export const diagnosePatientReq = async ({ document }) => {
   try {
     const batch = writeBatch(db);
 
+    // Update appointmnet
+    const docRef1 = doc(db, "appointments", document.appointmentId);
+    batch.update(docRef1, {
+      status: REQUEST_STATUS.done,
+      ...timestampFields({ dateUpdated: true }),
+    });
+
     // Create Medical Record
-    const docRef = doc(collection(db, "medicalRecords"));
+    const docRef2 = doc(collection(db, "medicalRecords"));
     const data = {
-      id: docRef.id,
+      id: docRef2.id,
       ...document,
       deleted: false,
       ...timestampFields({ dateCreated: true, dateUpdated: true }),
     };
-    batch.set(docRef, data);
+    batch.set(docRef2, data);
 
     await batch.commit();
 
