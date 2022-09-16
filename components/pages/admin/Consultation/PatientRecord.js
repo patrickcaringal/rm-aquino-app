@@ -23,8 +23,8 @@ const PatientRecord = ({ data = [] }) => {
             <TableRow>
               {[
                 { text: "Date of Visit" },
-                { text: "Reason for Visit", sx: { width: 500 } },
-                { text: "Doctor Diagnosis", sx: { width: 500 } },
+                { text: "Reason for Visit", sx: { width: 400 } },
+                { text: "Doctor Diagnosis", sx: { width: 400 } },
               ].map(({ text, align, sx }) => (
                 <TableCell
                   key={text}

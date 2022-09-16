@@ -16,6 +16,7 @@ const SelectComponent = ({
   onBlur = () => {},
   error = null,
   children,
+  sx,
   ...rest
 }) => {
   return (
@@ -26,6 +27,7 @@ const SelectComponent = ({
       size="small"
       required={required}
       error={!!error}
+      sx={sx}
     >
       <InputLabel>{label}</InputLabel>
       <Select value={value} label={label} onChange={onChange} onBlur={onBlur}>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Button, Divider, MenuItem, Typography } from "@mui/material";
 import faker from "faker";
-import { FormikProvider, useFormik } from "formik";
+import { useFormik } from "formik";
 import lodash from "lodash";
 
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
@@ -15,16 +15,36 @@ import {
   getPatientReq,
 } from "../../../../modules/firebase";
 import { calculateAge, formatTimeStamp } from "../../../../modules/helper";
-import { DiagnoseSchema } from "../../../../modules/validation";
+import { DiagnoseSchema, ReferSchema } from "../../../../modules/validation";
 import { Datalist, Modal, successMessage } from "../../../common";
-import { Input } from "../../../common/Form";
+import { Input, Select } from "../../../common/Form";
 import PatientRecord from "./PatientRecord";
+import ReferralForm from "./ReferralForm";
 
 const defaultValues = isMockDataEnabled
   ? {
       diagnosis: faker.lorem.sentences(1),
     }
   : { diagnosis: "" };
+
+const referralDefaultValue = isMockDataEnabled
+  ? {
+      date: formatTimeStamp(new Date()),
+      address: `Dr.${faker.name.firstName()}\n${faker.lorem.words(
+        3
+      )}\n${faker.lorem.words(3)}`,
+      content: faker.lorem.paragraphs(2),
+    }
+  : {
+      date: "",
+      address: "",
+      content: "",
+    };
+
+const SERVICE_TYPE = {
+  DIAGNOSE: "DIAGNOSE",
+  REFER: "REFER",
+};
 
 const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
   const { openErrorDialog, openResponseDialog } = useResponseDialog();
@@ -38,6 +58,7 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
   // Local States
   const [patient, setPatient] = useState({});
   const [medicalRecords, setMedicalRecords] = useState([]);
+  const [serviceType, setServiceType] = useState(SERVICE_TYPE.DIAGNOSE);
 
   const {
     id,
@@ -130,6 +151,15 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
     },
   });
 
+  const referralFormik = useFormik({
+    initialValues: referralDefaultValue,
+    validationSchema: ReferSchema,
+    validateOnChange: false,
+    onSubmit: async (values, { resetForm }) => {
+      console.log(values);
+    },
+  });
+
   useEffect(() => {
     const fetchPatient = async () => {
       // Get Patient
@@ -167,13 +197,24 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
       // maxWidth="100%"
       dialogActions={
         <>
-          <Button
-            variant="contained"
-            size="small"
-            onClick={() => formik.submitForm()}
-          >
-            diagnose patient
-          </Button>
+          {serviceType === SERVICE_TYPE.DIAGNOSE && (
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => formik.submitForm()}
+            >
+              save diagnosis
+            </Button>
+          )}
+          {serviceType === SERVICE_TYPE.REFER && (
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => referralFormik.submitForm()}
+            >
+              save referral
+            </Button>
+          )}
           <Button color="inherit" size="small" onClick={handleClose}>
             Close
           </Button>
@@ -195,25 +236,42 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
               labelAlignment="right"
             />
           </Box>
+
           <Divider sx={{ my: 3 }} />
           <Box sx={{ pr: 3 }}>
-            <Input
-              multiline
-              rows={3}
+            <Select
               required
-              label="Doctor Diagnosis"
-              name="diagnosis"
-              value={formik.values.diagnosis}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.diagnosis && formik.errors.diagnosis}
-            />
+              label="Service"
+              onChange={(e) => setServiceType(e.target.value)}
+              value={serviceType}
+              sx={{ mb: 2 }}
+            >
+              <MenuItem value={SERVICE_TYPE.DIAGNOSE}>Diagnose</MenuItem>
+              <MenuItem value={SERVICE_TYPE.REFER}>Referral</MenuItem>
+            </Select>
+            {serviceType === SERVICE_TYPE.DIAGNOSE && (
+              <Input
+                multiline
+                rows={3}
+                required
+                label="Doctor Diagnosis"
+                name="diagnosis"
+                value={formik.values.diagnosis}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.diagnosis && formik.errors.diagnosis}
+              />
+            )}
           </Box>
         </Box>
         <Divider orientation="vertical" flexItem />
         {/* Patient Record */}
         <Box sx={{ pl: 3, flex: 1 }}>
-          <PatientRecord data={medicalRecords} />
+          {serviceType === SERVICE_TYPE.DIAGNOSE ? (
+            <PatientRecord data={medicalRecords} />
+          ) : (
+            <ReferralForm onSave={() => {}} {...referralFormik} />
+          )}
         </Box>
       </Box>
     </Modal>

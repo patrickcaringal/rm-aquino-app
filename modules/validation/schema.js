@@ -104,3 +104,9 @@ export const PatientRejectSchema = Yup.object().shape({
 export const DiagnoseSchema = Yup.object().shape({
   diagnosis: Yup.string().required("Required").max(500, "Diagnosis too long"),
 });
+
+export const ReferSchema = Yup.object().shape({
+  date: Yup.string().nullable().required("Required"),
+  address: Yup.string().max(250, "Address too long").required("Required"),
+  content: Yup.string().required("Required"),
+});
