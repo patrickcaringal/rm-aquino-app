@@ -9,18 +9,18 @@ import lodash from "lodash";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
-import { isMockDataEnabled } from "../../../../modules/env";
+import { getBaseApi, isMockDataEnabled } from "../../../../modules/env";
 import {
+  SERVICE_TYPE,
   diagnosePatientReq,
   getPatientRecordReq,
   getPatientReq,
 } from "../../../../modules/firebase";
 import { calculateAge, formatTimeStamp } from "../../../../modules/helper";
 import { DiagnoseSchema, ReferSchema } from "../../../../modules/validation";
-import { Datalist, Modal, successMessage } from "../../../common";
+import { Datalist, Modal, PdfFrame, successMessage } from "../../../common";
 import { Input, Select } from "../../../common/Form";
 import PatientRecord from "./PatientRecord";
-import PdfFrame from "./PdfFrame";
 import ReferralForm from "./ReferralForm";
 
 const defaultValues = isMockDataEnabled
@@ -44,11 +44,6 @@ const referralDefaultValue = isMockDataEnabled
       address: "",
       content: "",
     };
-
-const SERVICE_TYPE = {
-  DIAGNOSE: "DIAGNOSE",
-  REFER: "REFER",
-};
 
 const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
   const { openErrorDialog, openResponseDialog } = useResponseDialog();
@@ -122,6 +117,7 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
       const payload = {
         document: {
           diagnosis: values.diagnosis,
+          service: SERVICE_TYPE.DIAGNOSE,
           ...lodash.pick(data, [
             "patientName",
             "patientId",
@@ -165,13 +161,11 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
       const payload = {
         ...values,
         date: formatTimeStamp(values.date, "MMMM dd, yyyy"),
+        // referrer: "Dr. RM Aquino",
       };
 
       try {
-        const res = await generateReferral(
-          "http://localhost:3007/api/pdf",
-          payload
-        );
+        const res = await generateReferral(getBaseApi("/pdf"), payload);
         setPdfFile(res?.data);
       } catch (error) {
         setBackdropLoader(false);
@@ -213,6 +207,45 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
     setPdfFile(null);
   };
 
+  const handleSaveReferral = async () => {
+    const payload = {
+      document: {
+        referral: referralFormik.values,
+        service: SERVICE_TYPE.REFER,
+        ...lodash.pick(data, [
+          "patientName",
+          "patientId",
+          "patientEmail",
+          "reasonAppointment",
+          "date",
+          "startTime",
+          "endTimeEstimate",
+          "weekNo",
+        ]),
+        appointmentId: id,
+        diagnosis: "",
+      },
+    };
+
+    const { error: diganoseError } = await diagnosePatient(payload);
+    if (diganoseError) return openErrorDialog(diganoseError);
+
+    // Successful
+    setAppointments((prev) => prev.filter((i) => i.id !== id));
+    openResponseDialog({
+      autoClose: true,
+      content: successMessage({
+        noun: "Referral",
+        verb: "saved",
+      }),
+      type: "SUCCESS",
+      closeCb() {
+        handleClose();
+        referralFormik.resetForm();
+      },
+    });
+  };
+
   return (
     <Modal
       open={open}
@@ -245,7 +278,7 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
                 <Button
                   variant="contained"
                   size="small"
-                  // onClick={() => referralFormik.submitForm()}
+                  onClick={handleSaveReferral}
                 >
                   save referral
                 </Button>

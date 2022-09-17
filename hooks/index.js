@@ -1,3 +1,4 @@
 import useLocalStorage from "./useLocalStorage";
+import useRequest from "./useRequest";
 
-export { useLocalStorage };
+export { useLocalStorage, useRequest };
