@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import {
   Box,
   Button,
-  FormControlLabel,
-  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -13,17 +12,25 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 import { isAfter, isBefore } from "date-fns";
 
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
-import useRequest from "../../../../hooks/useRequest";
+import { useRequest } from "../../../../hooks";
+import { getBaseApi } from "../../../../modules/env";
 import { getPatientRecordReq } from "../../../../modules/firebase";
 import { formatTimeStamp } from "../../../../modules/helper";
 import { LongTypography } from "../../../common";
 import { DatePicker } from "../../../common/Form";
+import ReferralModal from "./ReferralModal";
 import useFilter from "./useFilter";
+
+const defaultModal = {
+  open: false,
+  data: "",
+};
 
 const MedicalRecordPage = () => {
   const { user } = useAuth();
@@ -32,9 +39,11 @@ const MedicalRecordPage = () => {
 
   // Requests
   const [getPatientRecord] = useRequest(getPatientRecordReq, setBackdropLoader);
+  const [generateReferral] = useRequest(axios.post, setBackdropLoader);
 
   // Local States
   const [medicalRecords, setMedicalRecords] = useState([]);
+  const [referralModal, setReferralModal] = useState(defaultModal);
 
   const filtering = useFilter({});
 
@@ -77,6 +86,29 @@ const MedicalRecordPage = () => {
     }
 
     filtering.onEndDateChange(v);
+  };
+
+  const handleViewReferral = async (patient) => {
+    try {
+      const payload = {
+        ...patient.referral,
+        date: formatTimeStamp(patient.referral?.date, "MMMM dd, yyyy"),
+      };
+      const res = await generateReferral(getBaseApi("/pdf"), payload);
+      // setPdfFile(res?.data);
+
+      setReferralModal({
+        open: true,
+        data: res?.data,
+      });
+    } catch (error) {
+      setBackdropLoader(false);
+      openErrorDialog(error?.message);
+    }
+  };
+
+  const handleReferralModal = () => {
+    setReferralModal(defaultModal);
   };
 
   return (
@@ -133,7 +165,21 @@ const MedicalRecordPage = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      <LongTypography text={diagnosis} whiteSpace="pre-line" />
+                      {diagnosis ? (
+                        <LongTypography
+                          text={diagnosis}
+                          whiteSpace="pre-line"
+                        />
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<PictureAsPdfIcon />}
+                          onClick={() => handleViewReferral(i)}
+                        >
+                          view referral
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
@@ -142,6 +188,14 @@ const MedicalRecordPage = () => {
           </Table>
         </TableContainer>
       </Box>
+
+      {referralModal.open && (
+        <ReferralModal
+          open={referralModal.open}
+          data={referralModal.data}
+          onClose={handleReferralModal}
+        />
+      )}
     </Box>
   );
 };
