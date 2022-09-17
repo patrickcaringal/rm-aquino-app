@@ -35,9 +35,7 @@ const ReferralForm = ({
             value={values.address}
             required
             label="Specialist Address"
-            onChange={(e) =>
-              setFieldValue("address", e.target.value.toUpperCase())
-            }
+            onChange={(e) => setFieldValue("address", e.target.value)}
             onBlur={handleBlur}
             error={touched.address && errors.address}
           />
@@ -49,9 +47,7 @@ const ReferralForm = ({
             value={values.content}
             required
             label="Letter Content"
-            onChange={(e) =>
-              setFieldValue("content", e.target.value.toUpperCase())
-            }
+            onChange={(e) => setFieldValue("content", e.target.value)}
             onBlur={handleBlur}
             error={touched.content && errors.content}
           />
