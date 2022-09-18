@@ -2,6 +2,7 @@ import { ACTION_BUTTONS, ACTION_ICONS, getActionButtons } from "./ActionButton";
 import Datalist from "./Datalist";
 import { FullCalendar } from "./FullCalendar";
 import Modal from "./Modal";
+import PdfFrame from "./PdfFrame";
 import {
   ResponseDialog,
   duplicateMessage,
@@ -39,4 +40,6 @@ export {
   ACTION_BUTTONS,
   ACTION_ICONS,
   getActionButtons,
+  // PdfFrame
+  PdfFrame,
 };

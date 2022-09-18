@@ -23,7 +23,6 @@ import {
   ACTION_BUTTONS,
   LongTypography,
   getActionButtons,
-  successMessage,
 } from "../../../common";
 import PatientRecordModal from "./PatientRecordModal";
 
@@ -33,9 +32,8 @@ const defaultModal = {
 };
 
 const PatientListPage = () => {
-  const { user } = useAuth();
   const { setBackdropLoader } = useBackdropLoader();
-  const { openResponseDialog, openErrorDialog } = useResponseDialog();
+  const { openErrorDialog } = useResponseDialog();
 
   // Requests
   const [getPatients] = useRequest(getPatientsReq, setBackdropLoader);
@@ -43,7 +41,6 @@ const PatientListPage = () => {
 
   // Local States
   const [patients, setPatients] = useState([]);
-  const [rejectModal, setRejectModal] = useState(defaultModal);
 
   useEffect(() => {
     const fetch = async () => {
@@ -71,12 +68,6 @@ const PatientListPage = () => {
 
   return (
     <Box sx={{ pt: 2 }}>
-      {/* <Box sx={{ mb: 2 }}>
-        <Button variant="contained" size="small" onClick={handleAddModalOpen}>
-          add staff
-        </Button>
-      </Box> */}
-
       <Box>
         <TableContainer>
           <Table size="small">

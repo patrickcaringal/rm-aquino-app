@@ -15,6 +15,11 @@ import { formatTimeStamp, pluralize, sortBy } from "../helper";
 import { getErrorMsg } from "./auth";
 import { db, timestampFields } from "./config";
 
+export const SERVICE_TYPE = {
+  DIAGNOSE: "DIAGNOSE",
+  REFER: "REFER",
+};
+
 const collRef = collection(db, "appointments");
 
 export const getAppointmentReq = async () => {
@@ -199,13 +204,6 @@ export const diagnosePatientReq = async ({ document }) => {
   try {
     const batch = writeBatch(db);
 
-    // Update appointmnet
-    const docRef1 = doc(db, "appointments", document.appointmentId);
-    batch.update(docRef1, {
-      status: REQUEST_STATUS.done,
-      ...timestampFields({ dateUpdated: true }),
-    });
-
     // Create Medical Record
     const docRef2 = doc(collection(db, "medicalRecords"));
     const data = {
@@ -215,6 +213,14 @@ export const diagnosePatientReq = async ({ document }) => {
       ...timestampFields({ dateCreated: true, dateUpdated: true }),
     };
     batch.set(docRef2, data);
+
+    // Update appointmnet
+    const docRef1 = doc(db, "appointments", document.appointmentId);
+    batch.update(docRef1, {
+      medicalRecordId: docRef2.id,
+      status: REQUEST_STATUS.done,
+      ...timestampFields({ dateUpdated: true }),
+    });
 
     await batch.commit();
 

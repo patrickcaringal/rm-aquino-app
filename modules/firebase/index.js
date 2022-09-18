@@ -5,6 +5,7 @@ import {
   updateStaffReq,
 } from "./admin";
 import {
+  SERVICE_TYPE,
   addAppointmentReq,
   approveAppointmentReq,
   diagnosePatientReq,
@@ -72,6 +73,7 @@ export {
   getScheduleReq,
   updateSchedulesReq,
   // appointment
+  SERVICE_TYPE,
   addAppointmentReq,
   approveAppointmentReq,
   diagnosePatientReq,
