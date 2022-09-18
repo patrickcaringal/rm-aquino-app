@@ -21,6 +21,10 @@ const ReferralForm = ({
             label="Date"
             value={values.date}
             onChange={(value) => {
+              if (!value || value == "Invalid Date") {
+                return setFieldValue("date", "", false);
+              }
+
               setFieldValue("date", formatTimeStamp(value), false);
             }}
             onBlur={handleBlur}
