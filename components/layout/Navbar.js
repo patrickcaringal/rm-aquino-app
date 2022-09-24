@@ -62,11 +62,15 @@ const ResponsiveAppBar = () => {
 
   const menuItems = isAdmin
     ? [
-        {
-          text: "Staffs",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
-        },
+        ...(!isStaff
+          ? [
+              {
+                text: "Staffs",
+                icon: null,
+                onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
+              },
+            ]
+          : []),
         {
           text: "Patients",
           icon: null,
@@ -114,11 +118,16 @@ const ResponsiveAppBar = () => {
             // },
           ],
         },
-        {
-          text: "Consultation",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.CONSULTATION),
-        },
+        ...(!isStaff
+          ? [
+              {
+                text: "Staffs",
+                icon: null,
+                onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
+              },
+            ]
+          : []),
+        ,
       ]
     : [
         {

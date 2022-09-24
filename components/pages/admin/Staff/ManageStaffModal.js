@@ -46,15 +46,15 @@ export default function ManageStaffModal({
       title={`${isCreate ? "Add" : "Edit"} Staff`}
       dialogActions={
         <>
+          <Button color="inherit" onClick={handleClose}>
+            Cancel
+          </Button>
           <Button
             sx={{ mr: 2 }}
             disabled={values.staffs.length === 0 || !dirty}
             onClick={submitForm}
           >
             save
-          </Button>
-          <Button color="inherit" onClick={handleClose}>
-            Cancel
           </Button>
         </>
       }

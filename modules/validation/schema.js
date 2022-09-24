@@ -2,7 +2,7 @@ import * as Yup from "yup";
 
 export const SignupSchema = Yup.object().shape({
   firstName: Yup.string().max(50, "First Name too long").required("Required"),
-  middleName: Yup.string().max(50, "Middle Name too long").required("Required"),
+  middleName: Yup.string().max(50, "Middle Name too long"),
   lastName: Yup.string().max(50, "Last Name too long").required("Required"),
   suffix: Yup.string().max(5, "Suffix too long"),
   birthdate: Yup.string().nullable().required("Required"),
@@ -40,9 +40,7 @@ export const FamilyMemberSchema = Yup.object().shape({
       firstName: Yup.string()
         .max(50, "First Name too long")
         .required("Required"),
-      middleName: Yup.string()
-        .max(50, "Middle Name too long")
-        .required("Required"),
+      middleName: Yup.string().max(50, "Middle Name too long"),
       lastName: Yup.string().max(50, "Last Name too long").required("Required"),
       suffix: Yup.string().max(5, "Suffix too long"),
       birthdate: Yup.string().nullable().required("Required"),
@@ -58,9 +56,7 @@ export const StaffSchema = Yup.object().shape({
       firstName: Yup.string()
         .max(50, "First Name too long")
         .required("Required"),
-      middleName: Yup.string()
-        .max(50, "Middle Name too long")
-        .required("Required"),
+      middleName: Yup.string().max(50, "Middle Name too long"),
       lastName: Yup.string().max(50, "Last Name too long").required("Required"),
       suffix: Yup.string().max(5, "Suffix too long"),
       birthdate: Yup.string().nullable().required("Required"),
