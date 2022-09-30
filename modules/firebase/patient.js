@@ -1,3 +1,4 @@
+import axios from "axios";
 import bcrypt from "bcryptjs";
 import {
   createUserWithEmailAndPassword,
@@ -16,6 +17,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 
+import { getBaseApi } from "../env";
 import {
   formatFirebasetimeStamp,
   getFullName,
@@ -81,13 +83,20 @@ export const createPatientAccountReq = async ({ document }) => {
     const data = {
       id: docRef.id,
       ...document,
-      password: hashPassword(document.password),
+      // password: hashPassword(document.password),
       deleted: false,
       ...timestampFields({ dateCreated: true, dateUpdated: true }),
     };
 
     // Create Document
-    await setDoc(docRef, data);
+    // await setDoc(docRef, data);
+
+    const payload = {
+      to: data.email,
+      name: data.name,
+      link: data.id,
+    };
+    const res = await axios.post(getBaseApi("/verification-email"), payload);
 
     return { data, success: true };
   } catch (error) {
@@ -143,6 +152,7 @@ export const getPatientsAccountApprovalReq = async () => {
     const q = query(
       collRef,
       where("approved", "==", false),
+      // where("verified", "==", true),
       where("deleted", "==", false)
     );
     const querySnapshot = await getDocs(q);

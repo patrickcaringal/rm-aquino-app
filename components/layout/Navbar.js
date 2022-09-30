@@ -121,9 +121,9 @@ const ResponsiveAppBar = () => {
         ...(!isStaff
           ? [
               {
-                text: "Staffs",
+                text: "Consultation",
                 icon: null,
-                onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
+                onClick: () => router.push(PATHS.ADMIN.CONSULTATION),
               },
             ]
           : []),

@@ -162,10 +162,11 @@ const PatientApprovalPage = () => {
                   contactNo,
                   email,
                   address,
+                  verified = true,
                 } = i;
 
                 return (
-                  <TableRow key={id}>
+                  <TableRow key={id} id={id}>
                     <TableCell>{name}</TableCell>
                     <TableCell>
                       {formatTimeStamp(dateCreated, "MMM-dd-yyyy")}
@@ -197,20 +198,24 @@ const PatientApprovalPage = () => {
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ width: 110 }} align="center">
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() => handleApprove(i)}
-                      >
-                        <ThumbUpIcon />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => handleRejectModalOpen(i)}
-                      >
-                        <ThumbDownIcon />
-                      </IconButton>
+                      {verified && (
+                        <>
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => handleApprove(i)}
+                          >
+                            <ThumbUpIcon />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleRejectModalOpen(i)}
+                          >
+                            <ThumbDownIcon />
+                          </IconButton>
+                        </>
+                      )}
                     </TableCell>
                   </TableRow>
                 );

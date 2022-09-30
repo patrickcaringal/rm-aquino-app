@@ -12,9 +12,9 @@ export const SignupSchema = Yup.object().shape({
   contactNo: Yup.string()
     .matches(/^(09)\d{9}$/, "Invalid Contact Number")
     .required("Required"),
-  password: Yup.string()
-    .min(8, "Must be 8 characters long")
-    .required("Required"),
+  // password: Yup.string()
+  //   .min(8, "Must be 8 characters long")
+  //   .required("Required"),
 });
 
 export const VerificationCodeSchema = Yup.object().shape({
