@@ -3,8 +3,8 @@ export const isMockDataEnabled =
   isDevEnv && process.env.NEXT_PUBLIC_MOCK_DATA === "true";
 
 const baseURL = isDevEnv
-  ? "http://localhost:3006/"
-  : "https://rm-aquino-app.vercel.app/";
+  ? "http://localhost:3006"
+  : "https://rm-aquino-app.vercel.app";
 
 const baseAPI = isDevEnv
   ? "http://localhost:3007/api/rm-aquino"
