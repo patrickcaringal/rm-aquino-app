@@ -41,6 +41,14 @@ import {
   getScheduleReq,
   updateSchedulesReq,
 } from "./schedules";
+import {
+  addServiceReq,
+  deleteServiceReq,
+  getDeletedServicesReq,
+  getServicesReq,
+  restoreServiceReq,
+  updateServiceReq,
+} from "./services";
 import { deleteImageReq, uploadImageReq } from "./storage";
 
 export {
@@ -56,6 +64,13 @@ export {
   // storage
   uploadImageReq,
   deleteImageReq,
+  // services
+  addServiceReq,
+  deleteServiceReq,
+  getDeletedServicesReq,
+  getServicesReq,
+  restoreServiceReq,
+  updateServiceReq,
   // patient
   approvePatientReq,
   createPatientAccountReq,
