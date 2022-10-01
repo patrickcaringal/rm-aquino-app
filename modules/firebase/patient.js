@@ -17,7 +17,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 
-import { getBaseApi } from "../env";
+import { getBaseApi, getBaseUrl } from "../env";
 import {
   formatFirebasetimeStamp,
   getFullName,
@@ -84,19 +84,24 @@ export const createPatientAccountReq = async ({ document }) => {
       id: docRef.id,
       ...document,
       // password: hashPassword(document.password),
+      role: "patient",
       deleted: false,
+      verified: false,
+      approved: false,
       ...timestampFields({ dateCreated: true, dateUpdated: true }),
     };
 
     // Create Document
-    // await setDoc(docRef, data);
+    await setDoc(docRef, data);
 
     const payload = {
       to: data.email,
       name: data.name,
-      link: data.id,
+      link: getBaseUrl(`/email-verification/${data.id}`),
     };
-    const res = await axios.post(getBaseApi("/verification-email"), payload);
+
+    // send verification email
+    await axios.post(getBaseApi("/verification-email"), payload);
 
     return { data, success: true };
   } catch (error) {
@@ -165,6 +170,36 @@ export const getPatientsAccountApprovalReq = async () => {
       .sort(sortBy("dateCreated"));
 
     return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const verifyPatientEmailReq = async ({ id }) => {
+  try {
+    console.log(id);
+    // Get Patient
+    const q = doc(db, "patients", id);
+    const querySnapshot = await getDoc(q);
+
+    if (!querySnapshot.exists()) {
+      throw new Error("Unable to get Patient doc");
+    }
+
+    const p = querySnapshot.data();
+
+    if (!!p.verified) {
+      throw new Error("Patient email already verified");
+    }
+
+    // update to verified
+    const docRef = doc(db, "patients", id);
+    await updateDoc(docRef, {
+      verified: true,
+    });
+
+    return { data: p, success: true };
   } catch (error) {
     console.log(error);
     return { error: error.message };

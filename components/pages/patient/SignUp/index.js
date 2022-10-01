@@ -60,9 +60,7 @@ const SignUpPage = () => {
     onSubmit: async (values, { resetForm }) => {
       const document = {
         ...values,
-        role: "patient",
-        approved: false,
-        verified: false,
+
         ...personBuiltInFields(values),
       };
 

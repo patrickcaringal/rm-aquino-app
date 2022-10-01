@@ -34,6 +34,7 @@ import {
   getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
+  verifyPatientEmailReq,
 } from "./patient";
 import {
   addSchedulesReq,
@@ -63,6 +64,7 @@ export {
   getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
+  verifyPatientEmailReq,
   // admin
   signInAdminReq,
   getStaffsReq,
