@@ -8,7 +8,7 @@ const baseURL = isDevEnv
 
 const baseAPI = isDevEnv
   ? "http://localhost:3007/api/rm-aquino"
-  : "https://rm-aquino-app-be.onrender.com/api/rm-aquino";
+  : "https://rm-aquino-app-be.herokuapp.com/api/rm-aquino";
 
 export const getBaseApi = (path) => {
   return `${baseAPI}${path}`;
