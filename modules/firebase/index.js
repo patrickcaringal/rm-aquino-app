@@ -1,7 +1,10 @@
 import {
+  addDoctorReq,
   addStaffReq,
+  getDoctorsReq,
   getStaffsReq,
   signInAdminReq,
+  updateDoctorReq,
   updateStaffReq,
 } from "./admin";
 import {
@@ -81,9 +84,12 @@ export {
   signInPatientReq,
   verifyPatientEmailReq,
   // admin
-  signInAdminReq,
-  getStaffsReq,
+  addDoctorReq,
   addStaffReq,
+  getDoctorsReq,
+  getStaffsReq,
+  signInAdminReq,
+  updateDoctorReq,
   updateStaffReq,
   // schedules
   addSchedulesReq,

@@ -65,6 +65,11 @@ const ResponsiveAppBar = () => {
   const menuItems = isAdmin
     ? [
         ...authorizeFeat({
+          text: "Doctors",
+          icon: null,
+          onClick: () => router.push(PATHS.ADMIN.DOCTORS_MANAGEMENT),
+        }),
+        ...authorizeFeat({
           text: "Staffs",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),

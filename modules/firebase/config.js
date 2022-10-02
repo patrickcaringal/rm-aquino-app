@@ -23,6 +23,15 @@ const firebaseConfig = isDevEnv
       appId: "1:18450122125:web:76122b654ee3a3e62e69c4",
     };
 
+// admin.initializeApp({
+//   credential: admin.credential.cert({
+//     projectId: process.env.PROJECT_ID,
+//     privateKey: process.env.PRIVATE_KEY?.replace(/\\n/g, "\n"),
+//     clientEmail: process.env.CLIENT_EMAIL,
+//   }),
+//   databaseURL: process.env.DATABASE_URL,
+// });
+
 const app = initializeApp(firebaseConfig);
 const secondaryApp = initializeApp(firebaseConfig, "Secondary");
 
