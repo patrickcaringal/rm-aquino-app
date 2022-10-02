@@ -1,38 +1,46 @@
-import React from "react";
+import React, { useEffect } from "react";
 
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import { FormikProvider, useFormik } from "formik";
 
-import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
-import { StaffSchema } from "../../../../modules/validation";
+import { ServicesSchema } from "../../../../modules/validation";
 import { Modal } from "../../../common";
 import Form from "./Form";
 
 const defaultValues = {
-  staffs: [],
+  services: [
+    {
+      name: "",
+      description: "",
+    },
+  ],
 };
 
-export default function ManageStaffModal({
+export default function ManageServiceModal({
   open = false,
   data,
   onClose,
   onSave,
 }) {
   const isCreate = !data;
-  const initialValues = isCreate ? defaultValues : { staffs: [data] };
+  const initialValues = isCreate ? defaultValues : { services: [data] };
 
   const formik = useFormik({
-    initialValues,
-    validationSchema: StaffSchema,
+    initialValues: initialValues,
+    validationSchema: ServicesSchema,
     validateOnChange: false,
     enableReinitialize: true,
     onSubmit: async (values) => {
-      const { staffs } = values;
-      onSave(staffs);
+      const { services } = values;
+      onSave(services);
     },
   });
 
-  const { values, submitForm, resetForm, dirty } = formik;
+  const { submitForm, resetForm } = formik;
+
+  useEffect(() => {
+    if (!open) resetForm();
+  }, [open, resetForm]);
 
   const handleClose = () => {
     onClose();
@@ -43,17 +51,13 @@ export default function ManageStaffModal({
     <Modal
       open={open}
       onClose={handleClose}
-      title={`${isCreate ? "Add" : "Edit"} Staff`}
+      title={`${isCreate ? "Add" : "Edit"} Service`}
       dialogActions={
         <>
           <Button color="inherit" onClick={handleClose}>
-            Cancel
+            cancel
           </Button>
-          <Button
-            sx={{ mr: 2 }}
-            disabled={values.staffs.length === 0 || !dirty}
-            onClick={submitForm}
-          >
+          <Button color="inherit" sx={{ mr: 2 }} onClick={submitForm}>
             save
           </Button>
         </>

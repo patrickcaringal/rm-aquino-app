@@ -6,9 +6,9 @@ import { Box, Divider, Fab, Grid, IconButton, MenuItem } from "@mui/material";
 import faker from "faker";
 import { FieldArray } from "formik";
 
-import { DatePicker, Input, Select } from "../../../../components/common/Form";
 import { isMockDataEnabled } from "../../../../modules/env";
 import { formatTimeStamp } from "../../../../modules/helper";
+import { DatePicker, Input, Select } from "../../../common/Form";
 
 const defaultItem = {
   firstName: "",
@@ -31,6 +31,8 @@ const Form = ({
   handleBlur,
   setFieldValue,
 }) => {
+  isCreate = false;
+
   return (
     <FieldArray
       name="staffs"
@@ -202,7 +204,7 @@ const Form = ({
                       </Grid>
                       <Grid item xs={12} sm={4}>
                         <Input
-                          disabled={!isCreate}
+                          // disabled={!isCreate}
                           required
                           label="Email"
                           name={getFieldName("email")}

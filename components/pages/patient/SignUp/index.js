@@ -16,13 +16,13 @@ import Form from "./Form";
 
 const defaultValue = isMockDataEnabled
   ? {
-      firstName: faker.name.firstName(),
+      firstName: faker.name.firstName().toUpperCase(),
       suffix: "",
-      lastName: faker.name.lastName(),
-      middleName: faker.name.lastName(),
-      email: faker.internet.email(),
+      lastName: faker.name.lastName().toUpperCase(),
+      middleName: faker.name.lastName().toUpperCase(),
+      email: "patrickangelo.caringal@gmail.com", // faker.internet.email()
       contactNo: faker.phone.phoneNumber("09#########"),
-      address: faker.lorem.paragraph(),
+      address: faker.lorem.paragraph().toUpperCase(),
       birthdate: faker.date.past(
         faker.datatype.number({
           min: 10,
@@ -30,7 +30,7 @@ const defaultValue = isMockDataEnabled
         })
       ),
       gender: faker.random.arrayElement(["male", "female"]),
-      password: "12345678",
+      // password: "12345678",
     }
   : {
       firstName: "",
@@ -42,7 +42,7 @@ const defaultValue = isMockDataEnabled
       address: "",
       email: "",
       contactNo: "",
-      password: "",
+      // password: "",
     };
 
 const SignUpPage = () => {
@@ -60,8 +60,7 @@ const SignUpPage = () => {
     onSubmit: async (values, { resetForm }) => {
       const document = {
         ...values,
-        role: "patient",
-        approved: false,
+
         ...personBuiltInFields(values),
       };
 
@@ -72,20 +71,39 @@ const SignUpPage = () => {
 
       // Success
       openResponseDialog({
-        type: "SUCCESS",
-        autoClose: true,
+        title: "Verify Account",
+        type: "CONFIRM",
+        autoClose: false,
         content: (
           <>
-            <Typography variant="body1">
-              Patient account registration successful.
+            <Typography variant="body1" gutterBottom>
+              Veirfication link is sent to {values.email}
             </Typography>
-            <Typography variant="body2">For Admin approval.</Typography>
+            <Typography variant="body2">
+              Click or Visit the link sent to you email to verify your account.
+            </Typography>
           </>
         ),
         closeCb() {
           resetForm();
         },
       });
+
+      // openResponseDialog({
+      //   type: "SUCCESS",
+      //   autoClose: true,
+      //   content: (
+      //     <>
+      //       <Typography variant="body1">
+      //         Patient account registration successful.
+      //       </Typography>
+      //       <Typography variant="body2">For Admin approval.</Typography>
+      //     </>
+      //   ),
+      //   closeCb() {
+      //     resetForm();
+      //   },
+      // });
     },
   });
 

@@ -60,13 +60,25 @@ const ResponsiveAppBar = () => {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [itemEl, setItemElUser] = React.useState(null);
 
+  const authorizeFeat = (feat) => (!isStaff ? [feat] : []);
+
   const menuItems = isAdmin
     ? [
-        {
+        ...authorizeFeat({
+          text: "Doctors",
+          icon: null,
+          onClick: () => router.push(PATHS.ADMIN.DOCTORS_MANAGEMENT),
+        }),
+        ...authorizeFeat({
           text: "Staffs",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
-        },
+        }),
+        ...authorizeFeat({
+          text: "Services",
+          icon: null,
+          onClick: () => router.push(PATHS.ADMIN.SERVICES_MANAGEMENT),
+        }),
         {
           text: "Patients",
           icon: null,
@@ -114,11 +126,11 @@ const ResponsiveAppBar = () => {
             // },
           ],
         },
-        {
+        ...authorizeFeat({
           text: "Consultation",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.CONSULTATION),
-        },
+        }),
       ]
     : [
         {

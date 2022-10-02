@@ -255,6 +255,9 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
       // maxWidth="100%"
       dialogActions={
         <>
+          <Button color="inherit" size="small" onClick={handleClose}>
+            Close
+          </Button>
           {serviceType === SERVICE_TYPE.DIAGNOSE && (
             <Button
               variant="contained"
@@ -285,9 +288,6 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
               )}
             </>
           )}
-          <Button color="inherit" size="small" onClick={handleClose}>
-            Close
-          </Button>
         </>
       }
     >

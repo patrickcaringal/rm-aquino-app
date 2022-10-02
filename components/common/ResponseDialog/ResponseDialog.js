@@ -92,10 +92,10 @@ export default function AlertDialog({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        {actions}
         <Button onClick={handleClose} size="small">
           close
         </Button>
+        {actions}
       </DialogActions>
     </Dialog>
   );

@@ -1,4 +1,6 @@
+import axios from "axios";
 import bcrypt from "bcryptjs";
+import faker from "faker";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -16,6 +18,8 @@ import {
   writeBatch,
 } from "firebase/firestore";
 
+import { sendEmail } from "../email";
+import { getBaseApi, getBaseUrl } from "../env";
 import {
   formatFirebasetimeStamp,
   getFullName,
@@ -81,13 +85,25 @@ export const createPatientAccountReq = async ({ document }) => {
     const data = {
       id: docRef.id,
       ...document,
-      password: hashPassword(document.password),
+      // password: hashPassword(document.password),
+      role: "patient",
       deleted: false,
+      verified: false,
+      approved: false,
       ...timestampFields({ dateCreated: true, dateUpdated: true }),
     };
 
     // Create Document
     await setDoc(docRef, data);
+
+    const payload = {
+      to: data.email,
+      name: data.name,
+      link: getBaseUrl(`/email-verification/${data.id}`),
+    };
+
+    // send verification email
+    await axios.post(getBaseApi("/verification-email"), payload);
 
     return { data, success: true };
   } catch (error) {
@@ -143,6 +159,7 @@ export const getPatientsAccountApprovalReq = async () => {
     const q = query(
       collRef,
       where("approved", "==", false),
+      // where("verified", "==", true),
       where("deleted", "==", false)
     );
     const querySnapshot = await getDocs(q);
@@ -161,18 +178,46 @@ export const getPatientsAccountApprovalReq = async () => {
   }
 };
 
+export const verifyPatientEmailReq = async ({ id }) => {
+  try {
+    // Get Patient
+    const q = doc(db, "patients", id);
+    const querySnapshot = await getDoc(q);
+
+    if (!querySnapshot.exists()) {
+      throw new Error("Unable to get Patient doc");
+    }
+
+    const p = querySnapshot.data();
+
+    if (!!p.verified) {
+      throw new Error("Patient email already verified");
+    }
+
+    // update to verified
+    const docRef = doc(db, "patients", id);
+    await updateDoc(docRef, {
+      verified: true,
+    });
+
+    return { data: p, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
 export const approvePatientReq = async ({ document }) => {
   try {
+    const password = faker.internet.password(8, false, /[a-z]/);
     // Create Auth Account
     const {
       user: { uid },
     } = await createUserWithEmailAndPassword(
       secondaryAuth,
       document.email,
-      "12345678" // TODO: auto generate
+      password
     );
-
-    // TODO: add send email
 
     // Update to approved
     const batch = writeBatch(db);
@@ -194,6 +239,15 @@ export const approvePatientReq = async ({ document }) => {
 
     await batch.commit();
 
+    // send email
+    const payload = {
+      name: document.name,
+      email: document.email,
+      password,
+      link: getBaseUrl("/signin"),
+    };
+    await sendEmail("/approve-patient", payload);
+
     return { data, success: true };
   } catch (error) {
     console.log(error);
@@ -203,11 +257,17 @@ export const approvePatientReq = async ({ document }) => {
 
 export const rejectPatientReq = async ({ document }) => {
   try {
-    // TODO: add send email
-
     // Delete
     const docRef = doc(db, "patients", document.id);
     await deleteDoc(docRef);
+
+    // send email
+    const payload = {
+      name: document.name,
+      email: document.email,
+      reason: document.reason,
+    };
+    await sendEmail("/reject-patient", payload);
 
     return { data: document, success: true };
   } catch (error) {

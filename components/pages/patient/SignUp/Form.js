@@ -40,7 +40,7 @@ const Form = ({
         <Grid item xs={12}>
           <Input
             value={values.middleName}
-            required
+            // required
             label="Middle Name"
             name="middleName"
             onChange={(e) =>
@@ -142,7 +142,7 @@ const Form = ({
             error={touched.email && errors.email}
           />
         </Grid>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <Input
             type="password"
             value={values.password}
@@ -153,7 +153,7 @@ const Form = ({
             onBlur={handleBlur}
             error={touched.password && errors.password}
           />
-        </Grid>
+        </Grid> */}
       </Grid>
       <LoadingButton
         type="submit"

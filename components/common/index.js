@@ -2,9 +2,11 @@ import { ACTION_BUTTONS, ACTION_ICONS, getActionButtons } from "./ActionButton";
 import Datalist from "./Datalist";
 import { FullCalendar } from "./FullCalendar";
 import Modal from "./Modal";
+import Pagination from "./Pagination";
 import PdfFrame from "./PdfFrame";
 import {
   ResponseDialog,
+  confirmMessage,
   duplicateMessage,
   successMessage,
 } from "./ResponseDialog";
@@ -26,6 +28,7 @@ export {
   // ResponseDialog
   ResponseDialog,
   successMessage,
+  confirmMessage,
   duplicateMessage,
   // Table
   TablePlaceholder,
@@ -42,4 +45,6 @@ export {
   getActionButtons,
   // PdfFrame
   PdfFrame,
+  // Pagination
+  Pagination,
 };

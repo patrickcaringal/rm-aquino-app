@@ -1,7 +1,10 @@
 import {
+  addDoctorReq,
   addStaffReq,
+  getDoctorsReq,
   getStaffsReq,
   signInAdminReq,
+  updateDoctorReq,
   updateStaffReq,
 } from "./admin";
 import {
@@ -34,12 +37,21 @@ import {
   getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
+  verifyPatientEmailReq,
 } from "./patient";
 import {
   addSchedulesReq,
   getScheduleReq,
   updateSchedulesReq,
 } from "./schedules";
+import {
+  addServiceReq,
+  deleteServiceReq,
+  getDeletedServicesReq,
+  getServicesReq,
+  restoreServiceReq,
+  updateServiceReq,
+} from "./services";
 import { deleteImageReq, uploadImageReq } from "./storage";
 
 export {
@@ -55,6 +67,13 @@ export {
   // storage
   uploadImageReq,
   deleteImageReq,
+  // services
+  addServiceReq,
+  deleteServiceReq,
+  getDeletedServicesReq,
+  getServicesReq,
+  restoreServiceReq,
+  updateServiceReq,
   // patient
   approvePatientReq,
   createPatientAccountReq,
@@ -63,10 +82,14 @@ export {
   getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
+  verifyPatientEmailReq,
   // admin
-  signInAdminReq,
-  getStaffsReq,
+  addDoctorReq,
   addStaffReq,
+  getDoctorsReq,
+  getStaffsReq,
+  signInAdminReq,
+  updateDoctorReq,
   updateStaffReq,
   // schedules
   addSchedulesReq,

@@ -49,6 +49,9 @@ export default function ManageStaffModal({
       maxWidth="sm"
       dialogActions={
         <>
+          <Button color="inherit" size="small" onClick={handleClose}>
+            Cancel
+          </Button>
           <Button
             sx={{ mr: 2 }}
             color="error"
@@ -57,9 +60,6 @@ export default function ManageStaffModal({
             onClick={submitForm}
           >
             reject
-          </Button>
-          <Button color="inherit" size="small" onClick={handleClose}>
-            Cancel
           </Button>
         </>
       }
