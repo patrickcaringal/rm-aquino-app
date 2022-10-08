@@ -25,6 +25,7 @@ import {
   updateDoctorReq,
 } from "../../../../modules/firebase";
 import {
+  arrayStringify,
   formatTimeStamp,
   localUpdateDocs,
   personBuiltInFields,
@@ -69,7 +70,6 @@ const DoctorsPage = () => {
       ...i,
       ...personBuiltInFields(i),
     }));
-
     // Add Doctor
     const payload = { docs };
     const { data: newDocs, error: addError } = await addDoctor(payload);
@@ -95,11 +95,11 @@ const DoctorsPage = () => {
       ...updatedDocs[0],
       ...personBuiltInFields(updatedDocs[0]),
     };
+
     const { latestDocs, updates } = localUpdateDocs({
       updatedDoc: updated,
       oldDocs: [...doctors],
     });
-    console.log(updates);
 
     // TODO: change email
     // const isEmailUpdated = !lodash.isEqual(
@@ -107,6 +107,7 @@ const DoctorsPage = () => {
     //   updated.email
     // );
 
+    console.log(JSON.stringify(updates, null, 4));
     // Update
     const { error: updateError } = await updateDoctor({
       doctor: updates,
@@ -184,27 +185,28 @@ const DoctorsPage = () => {
 
             <TableBody>
               {doctors.map((i) => {
-                const { id, name, gender, email, birthdate, address } = i;
+                const {
+                  id,
+                  name,
+                  gender,
+                  email,
+                  birthdate,
+                  specialty,
+                  services = [],
+                } = i;
 
                 return (
                   <TableRow key={id} id={id}>
                     <TableCell>{name}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>-</TableCell>
+                    <TableCell>{specialty}</TableCell>
+                    <TableCell>{arrayStringify(services)}</TableCell>
                     <TableCell>{email}</TableCell>
                     <TableCell>
                       {formatTimeStamp(birthdate, "MMM-dd-yyyy")}
                     </TableCell>
-                    {/* <TableCell align="center">
-                      {calculateAge(formatTimeStamp(birthdate))}
-                    </TableCell> */}
                     <TableCell sx={{ textTransform: "capitalize" }}>
                       {gender}
                     </TableCell>
-                    {/* <TableCell>{contactNo}</TableCell> */}
-                    {/* <TableCell>
-                      <LongTypography text={address} displayedLines={1} />
-                    </TableCell> */}
                     <TableCell align="center">
                       <IconButton
                         size="small"
@@ -213,6 +215,7 @@ const DoctorsPage = () => {
                           handleEditModalOpen({
                             ...i,
                             birthdate: formatTimeStamp(birthdate),
+                            services,
                           })
                         }
                       >

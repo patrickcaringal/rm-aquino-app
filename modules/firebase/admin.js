@@ -20,6 +20,7 @@ import {
   getFullName,
   getUniquePersonId,
   pluralize,
+  sortBy,
 } from "../helper";
 import { getErrorMsg } from "./auth";
 import { auth, db, secondaryAuth, timestampFields } from "./config";
@@ -95,10 +96,12 @@ export const getDoctorsReq = async () => {
     );
     const querySnapshot = await getDocs(q);
 
-    const data = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const data = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort(sortBy("dateCreated", "desc"));
 
     return { data, success: true };
   } catch (error) {
@@ -308,6 +311,7 @@ export const updateDoctorReq = async ({ doctor }) => {
 
     return { success: true };
   } catch (error) {
+    console.log(error);
     const errMsg = getErrorMsg(error.code);
     return { error: errMsg || error.message };
   }

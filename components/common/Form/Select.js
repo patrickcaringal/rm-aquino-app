@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 
 const SelectComponent = ({
+  multiple = false,
   required = false,
   label = "",
   value = "",
@@ -30,7 +31,14 @@ const SelectComponent = ({
       sx={sx}
     >
       <InputLabel>{label}</InputLabel>
-      <Select value={value} label={label} onChange={onChange} onBlur={onBlur}>
+      <Select
+        value={value}
+        label={label}
+        multiple={multiple}
+        onChange={onChange}
+        onBlur={onBlur}
+        {...rest}
+      >
         {children}
       </Select>
       {error && <FormHelperText>{error}</FormHelperText>}

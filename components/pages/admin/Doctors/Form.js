@@ -2,7 +2,17 @@ import React from "react";
 
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Box, Divider, Fab, Grid, IconButton, MenuItem } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  Divider,
+  Fab,
+  FilledInput,
+  Grid,
+  IconButton,
+  ListItemText,
+  MenuItem,
+} from "@mui/material";
 import faker from "faker";
 import { FieldArray } from "formik";
 
@@ -22,6 +32,7 @@ const defaultItem = {
 };
 
 const Form = ({
+  services,
   isCreate,
   // formik
   values,
@@ -56,8 +67,8 @@ const Form = ({
                           address: faker.lorem.paragraph(),
                           birthdate: faker.date.past(
                             faker.datatype.number({
-                              min: 10,
-                              max: 50,
+                              min: 500_000,
+                              max: 1_00_000,
                             })
                           ),
                           gender: faker.random.arrayElement(["male", "female"]),
@@ -204,7 +215,59 @@ const Form = ({
                       </Grid>
                       <Grid item xs={12} sm={4}>
                         <Input
-                          // disabled={!isCreate}
+                          required
+                          label="Contact No."
+                          name={getFieldName("contactNo")}
+                          value={valueArr.contactNo}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={getError("contactNo")}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Input
+                          required
+                          label="Specialty"
+                          name={getFieldName("specialty")}
+                          value={valueArr.specialty}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={getError("specialty")}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Select
+                          multiple
+                          required
+                          label="Services"
+                          value={valueArr.services}
+                          input={<FilledInput label="Services" />}
+                          renderValue={(selected) => selected.join(", ")}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setFieldValue(
+                              getFieldName("services"),
+                              typeof value === "string"
+                                ? value.split(",")
+                                : value
+                            );
+                          }}
+                          onBlur={handleBlur}
+                          error={getError("services")}
+                        >
+                          {services.map(({ id, name }) => (
+                            <MenuItem key={id} value={name}>
+                              <Checkbox
+                                checked={valueArr?.services?.includes(name)}
+                              />
+                              <ListItemText primary={name} />
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Input
+                          disabled={!!valueArr.email}
                           required
                           label="Email"
                           name={getFieldName("email")}
