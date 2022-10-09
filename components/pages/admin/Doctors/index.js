@@ -15,7 +15,12 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 
-import { successMessage } from "../../../../components/common";
+import {
+  ACTION_BUTTONS,
+  PATHS,
+  getActionButtons,
+  successMessage,
+} from "../../../../components/common";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
@@ -147,6 +152,13 @@ const DoctorsPage = () => {
     });
   };
 
+  const handleViewSched = (i) => {
+    router.push({
+      pathname: PATHS.ADMIN.DOCTORS_SCHEDULE,
+      query: { id: i.id },
+    });
+  };
+
   return (
     <Box sx={{ pt: 2 }}>
       <Box sx={{ mb: 2 }}>
@@ -170,7 +182,7 @@ const DoctorsPage = () => {
                   { text: "Gender", sx: { width: 100 } },
                   // { text: "Contact No.", sx: { width: 140 } },
                   // { text: "Address", sx: { width: 400 } },
-                  { text: "Actions", sx: { width: 80 }, align: "center" },
+                  { text: "Actions", sx: { width: 110 }, align: "center" },
                 ].map(({ text, align, sx }) => (
                   <TableCell
                     key={text}
@@ -208,19 +220,23 @@ const DoctorsPage = () => {
                       {gender}
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() =>
-                          handleEditModalOpen({
-                            ...i,
-                            birthdate: formatTimeStamp(birthdate),
-                            services,
-                          })
-                        }
-                      >
-                        <EditIcon />
-                      </IconButton>
+                      {getActionButtons([
+                        {
+                          action: ACTION_BUTTONS.EDIT,
+                          color: "success",
+                          onClick: () =>
+                            handleEditModalOpen({
+                              ...i,
+                              birthdate: formatTimeStamp(birthdate),
+                              services,
+                            }),
+                        },
+                        {
+                          action: ACTION_BUTTONS.SCHEDULE,
+                          color: "success",
+                          onClick: () => handleViewSched(i),
+                        },
+                      ])}
                     </TableCell>
                   </TableRow>
                 );

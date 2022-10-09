@@ -14,7 +14,7 @@ const DatePickerComponent = ({
   onChange = () => {},
   onBlur = () => {},
   error = null,
-  //   ...rest
+  ...rest
 }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -27,6 +27,7 @@ const DatePickerComponent = ({
         renderInput={(params) => (
           <Input {...params} required={required} name={name} error={error} />
         )}
+        {...rest}
       />
     </LocalizationProvider>
   );

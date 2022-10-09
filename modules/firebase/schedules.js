@@ -32,6 +32,27 @@ export const getScheduleReq = async ({ weekNo }) => {
   }
 };
 
+export const getScheduleByDoctorReq = async ({ id, weekNo }) => {
+  try {
+    const q = query(
+      collRef,
+      where("doctorId", "==", id),
+      where("weekNo", "==", weekNo)
+    );
+    const querySnapshot = await getDocs(q);
+
+    let data = {};
+    if (querySnapshot.docs.length >= 1) {
+      data = querySnapshot.docs[0].data();
+    }
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
 export const addSchedulesReq = async ({ document }) => {
   try {
     const docRef = doc(collRef);

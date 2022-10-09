@@ -1,6 +1,7 @@
 import React from "react";
 
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import FolderSharedIcon from "@mui/icons-material/FolderShared";
@@ -12,6 +13,8 @@ export const ACTION_BUTTONS = {
   EDIT: "EDIT",
   DELETE: "DELETE",
   RESTORE: "RESTORE",
+  // specific
+  SCHEDULE: "SCHEDULE",
 };
 
 export const ACTION_ICONS = {
@@ -19,6 +22,7 @@ export const ACTION_ICONS = {
   EDIT: <EditIcon />,
   DELETE: <DeleteIcon />,
   RESTORE: <RestoreIcon />,
+  SCHEDULE: <CalendarMonthIcon />,
 };
 
 const getButton = ({

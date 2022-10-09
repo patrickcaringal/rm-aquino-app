@@ -13,6 +13,7 @@ export const PATHS = {
     SERVICES_MANAGEMENT: "/admin/services",
     SERVICES_RESTORE: "/admin/services/restore",
     DOCTORS_MANAGEMENT: "/admin/doctors",
+    DOCTORS_SCHEDULE: "/admin/doctors/[id]/schedule",
     DOCTORS_RESTORE: "/admin/doctors/restore",
     PATIENT_MANAGEMENT: "/admin/patients",
     PATIENT_APPROVAL: "/admin/patients/approval",
