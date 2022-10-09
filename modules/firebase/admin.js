@@ -6,6 +6,7 @@ import {
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   query,
   updateDoc,
@@ -20,12 +21,14 @@ import {
   getFullName,
   getUniquePersonId,
   pluralize,
+  sortBy,
 } from "../helper";
 import { getErrorMsg } from "./auth";
 import { auth, db, secondaryAuth, timestampFields } from "./config";
 import { checkDuplicate, registerNames } from "./helpers";
 
-const collRef = collection(db, "admins");
+const collectionName = "admins";
+const collRef = collection(db, collectionName);
 
 const transformedFields = (doc) => ({
   name: getFullName(doc),
@@ -95,10 +98,30 @@ export const getDoctorsReq = async () => {
     );
     const querySnapshot = await getDocs(q);
 
-    const data = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const data = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const getDoctorReq = async ({ id }) => {
+  try {
+    const q = doc(db, collectionName, id);
+    const querySnapshot = await getDoc(q);
+
+    if (!querySnapshot.exists()) {
+      throw new Error("Unable to get Doctor doc");
+    }
+
+    const data = querySnapshot.data();
 
     return { data, success: true };
   } catch (error) {
@@ -308,6 +331,7 @@ export const updateDoctorReq = async ({ doctor }) => {
 
     return { success: true };
   } catch (error) {
+    console.log(error);
     const errMsg = getErrorMsg(error.code);
     return { error: errMsg || error.message };
   }

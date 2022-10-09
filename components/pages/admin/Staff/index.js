@@ -96,6 +96,7 @@ const DashboardPage = () => {
       ...updatedDocs[0],
       ...personBuiltInFields(updatedDocs[0]),
     };
+
     const { latestDocs, updates } = localUpdateDocs({
       updatedDoc: updatedStaff,
       oldDocs: [...staffs],

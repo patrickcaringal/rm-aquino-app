@@ -1,6 +1,7 @@
 import {
   BranchesSchema,
   DiagnoseSchema,
+  DoctorSchema,
   DoctorSigninSchema,
   FamilyMemberSchema,
   PatientRejectSchema,
@@ -15,6 +16,7 @@ import {
 export {
   BranchesSchema,
   DiagnoseSchema,
+  DoctorSchema,
   DoctorSigninSchema,
   FamilyMemberSchema,
   PatientRejectSchema,

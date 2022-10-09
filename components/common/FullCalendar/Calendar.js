@@ -21,11 +21,12 @@ const Calendar = ({
   onTimeSelect,
   onEventClick,
   renderEventContent,
+  height = 504,
 }) => {
   return (
     <FullCalendar
       initialDate={initialDate}
-      height={504}
+      height={height}
       // plugins={[dayGridPlugin, interactionPlugin]}
       // initialView="timeGridWeek"
       plugins={[timeGridPlugin, interactionPlugin]}
