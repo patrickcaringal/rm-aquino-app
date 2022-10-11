@@ -63,7 +63,7 @@ const DoctorSchedulePage = () => {
 
   // Local States
   const [doctor, setDoctor] = useState({});
-  const [scheduleDoc, setScheduleDoc] = useState([]);
+  const [scheduleDoc, setScheduleDoc] = useState({});
   const [schedules, setSchedules] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -74,16 +74,6 @@ const DoctorSchedulePage = () => {
   // const slots = getSlots({ schedules, appointments });
 
   const calendarLoading = schedLoading || doctorLoading;
-
-  const formik = useFormik({
-    initialValues: {
-      date: "",
-      startTime: "",
-      reasonAppointment: "",
-    },
-    validateOnChange: false,
-    onSubmit: async (values, { setFieldValue }) => {},
-  });
 
   useLayoutEffect(() => {
     const fetch = async () => {
@@ -106,14 +96,21 @@ const DoctorSchedulePage = () => {
       const { data, error } = await getSchedule(payload);
       if (error) return openErrorDialog(error);
 
-      if (data?.schedules) {
-        setScheduleDoc(data);
-        setSchedules(
-          data.schedules.reduce((acc, i) => {
-            return [...acc, ...i.schedules];
-          }, [])
-        );
-      }
+      // console.log({ data });
+      // if (data?.schedules) {
+      //   setScheduleDoc(data);
+      //   setSchedules(
+      //     data.schedules.reduce((acc, i) => {
+      //       return [...acc, ...i.schedules];
+      //     }, [])
+      //   );
+      // }
+      setScheduleDoc(data);
+      setSchedules(
+        data?.schedules?.reduce((acc, i) => {
+          return [...acc, ...i.schedules];
+        }, []) || []
+      );
     };
 
     fetch();
@@ -290,19 +287,21 @@ const DoctorSchedulePage = () => {
       schedules: v,
     }));
 
-    const start = getDayOfWeek(0, selectedDate);
-    const end = getDayOfWeek(4, selectedDate);
+    // const start = getDayOfWeek(0, selectedDate);
+    // const end = getDayOfWeek(4, selectedDate);
 
     const document = {
       doctorId,
-      start: format(start, "yyyy-MM-dd"),
-      end: format(end, "yyyy-MM-dd"),
-      weekNo: getWeek(new Date(start)),
-      monthNo: getMonthNo(new Date(start)),
-      monthNo: getMonthNo(new Date(start)),
-      year: getYear(new Date(start)),
+      // start: format(start, "yyyy-MM-dd"),
+      // end: format(end, "yyyy-MM-dd"),
+      // weekNo: getWeek(new Date(start)),
+      monthNo: getMonthNo(new Date(selectedDate)),
+      year: getYear(new Date(selectedDate)),
       schedules: schedArray,
     };
+
+    console.log(scheduleDoc.id, document);
+    // return;
 
     if (scheduleDoc.id) {
       const payload = { document: { ...document, id: scheduleDoc.id } };

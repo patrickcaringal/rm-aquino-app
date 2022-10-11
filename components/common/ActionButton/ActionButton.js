@@ -5,6 +5,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import FolderSharedIcon from "@mui/icons-material/FolderShared";
+import InfoIcon from "@mui/icons-material/Info";
 import RestoreIcon from "@mui/icons-material/Restore";
 import { IconButton, Tooltip } from "@mui/material";
 
@@ -23,6 +24,7 @@ export const ACTION_ICONS = {
   DELETE: <DeleteIcon />,
   RESTORE: <RestoreIcon />,
   SCHEDULE: <CalendarMonthIcon />,
+  INFO: <InfoIcon />,
 };
 
 const getButton = ({
