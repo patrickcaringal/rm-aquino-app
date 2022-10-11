@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import faker from "faker";
 import { FormikProvider, useFormik } from "formik";
 
-import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
-import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
-import { useRequest } from "../../../../hooks";
 import { isMockDataEnabled } from "../../../../modules/env";
-import { getServicesReq } from "../../../../modules/firebase";
 import { DoctorSchema } from "../../../../modules/validation";
 import { Modal } from "../../../common";
 import Form from "./Form";
@@ -53,36 +49,16 @@ const defaultValues = {
 export default function ManageDoctorModal({
   open = false,
   data,
+  services,
   onClose,
   onSave,
 }) {
   const isCreate = !data;
   const initialValues = isCreate ? defaultValues : { staffs: [data] };
 
-  const { setBackdropLoader } = useBackdropLoader();
-  const { openErrorDialog } = useResponseDialog();
-
-  // Requests
-  const [getServices] = useRequest(getServicesReq, setBackdropLoader);
-
-  // Local States
-  const [services, setServices] = useState([]);
-
   const servicesMap = services.reduce((acc, i) => {
     return { ...acc, [i.name]: i.id };
   }, {});
-
-  useEffect(() => {
-    const fetch = async () => {
-      // Get Services
-      const { data, error } = await getServices();
-      if (error) return openErrorDialog(error);
-
-      setServices(data);
-    };
-    fetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const formik = useFormik({
     initialValues,
