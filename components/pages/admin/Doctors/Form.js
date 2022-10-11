@@ -267,7 +267,7 @@ const Form = ({
                       </Grid>
                       <Grid item xs={12} sm={4}>
                         <Input
-                          disabled={!!valueArr.email}
+                          // disabled={!!valueArr.email}
                           required
                           label="Email"
                           name={getFieldName("email")}

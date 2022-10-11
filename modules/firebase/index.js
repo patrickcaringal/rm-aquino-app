@@ -2,6 +2,7 @@ import {
   addDoctorReq,
   addStaffReq,
   getDoctorReq,
+  getDoctorsByServiceReq,
   getDoctorsReq,
   getStaffsReq,
   signInAdminReq,
@@ -42,6 +43,7 @@ import {
 } from "./patient";
 import {
   addSchedulesReq,
+  getDoctorsScheduleReq,
   getScheduleByDoctorReq,
   getScheduleReq,
   updateSchedulesReq,
@@ -89,6 +91,7 @@ export {
   addDoctorReq,
   addStaffReq,
   getDoctorReq,
+  getDoctorsByServiceReq,
   getDoctorsReq,
   getStaffsReq,
   signInAdminReq,
@@ -96,6 +99,7 @@ export {
   updateStaffReq,
   // schedules
   addSchedulesReq,
+  getDoctorsScheduleReq,
   getScheduleByDoctorReq,
   getScheduleReq,
   updateSchedulesReq,

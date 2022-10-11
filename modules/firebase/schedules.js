@@ -9,7 +9,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 
-import { pluralize } from "../helper";
+import { pluralize, sortBy } from "../helper";
 import { getErrorMsg } from "./auth";
 import { db, timestampFields } from "./config";
 
@@ -32,12 +32,35 @@ export const getScheduleReq = async ({ weekNo }) => {
   }
 };
 
-export const getScheduleByDoctorReq = async ({ id, weekNo }) => {
+export const getDoctorsScheduleReq = async ({ ids, monthNo }) => {
+  try {
+    const q = query(
+      collRef,
+      where("doctorId", "in", ids),
+      where("monthNo", "==", monthNo)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort(sortBy("dateCreated"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const getScheduleByDoctorReq = async ({ id, monthNo }) => {
   try {
     const q = query(
       collRef,
       where("doctorId", "==", id),
-      where("weekNo", "==", weekNo)
+      where("monthNo", "==", monthNo)
     );
     const querySnapshot = await getDocs(q);
 

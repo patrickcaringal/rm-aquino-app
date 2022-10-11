@@ -112,6 +112,29 @@ export const getDoctorsReq = async () => {
   }
 };
 
+export const getDoctorsByServiceReq = async ({ services }) => {
+  try {
+    const q = query(
+      collRef,
+      where("role", "==", "doctor"),
+      where("servicesId", "array-contains-any", services)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
 export const getDoctorReq = async ({ id }) => {
   try {
     const q = doc(db, collectionName, id);

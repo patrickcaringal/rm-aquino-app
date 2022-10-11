@@ -27,6 +27,7 @@ import useRequest from "../../../../hooks/useRequest";
 import {
   addDoctorReq,
   getDoctorsReq,
+  getServicesReq,
   updateDoctorReq,
 } from "../../../../modules/firebase";
 import {
@@ -50,11 +51,14 @@ const DoctorsPage = () => {
 
   // Requests
   const [getDoctors] = useRequest(getDoctorsReq, setBackdropLoader);
+  const [getServices] = useRequest(getServicesReq, setBackdropLoader);
   const [addDoctor] = useRequest(addDoctorReq, setBackdropLoader);
   const [updateDoctor] = useRequest(updateDoctorReq, setBackdropLoader);
 
   // Local States
   const [doctors, setDoctors] = useState([]);
+  const [services, setServices] = useState([]);
+  const [servicesMap, setServicesMap] = useState({});
   const [doctorModal, setDoctorModal] = useState(defaultModal);
 
   useEffect(() => {
@@ -66,7 +70,17 @@ const DoctorsPage = () => {
       setDoctors(data);
     };
 
+    const fetchServices = async () => {
+      // Get Services
+      const { data, map, error } = await getServices();
+      if (error) return openErrorDialog(error);
+
+      setServices(data);
+      setServicesMap(map);
+    };
+
     fetch();
+    fetchServices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -112,7 +126,6 @@ const DoctorsPage = () => {
     //   updated.email
     // );
 
-    console.log(JSON.stringify(updates, null, 4));
     // Update
     const { error: updateError } = await updateDoctor({
       doctor: updates,
@@ -173,11 +186,11 @@ const DoctorsPage = () => {
             <TableHead>
               <TableRow>
                 {[
-                  { text: "Name" },
+                  { text: "Name", sx: { width: 400 } },
                   { text: "Specialty", sx: { width: 200 } },
-                  { text: "Services", sx: { width: 300 } },
+                  { text: "Services" },
                   { text: "Email", sx: { width: 200 } },
-                  { text: "Birthdate", sx: { width: 140 } },
+                  // { text: "Birthdate", sx: { width: 140 } },
                   // { text: "Age", sx: { width: 40 }, align: "center" },
                   { text: "Gender", sx: { width: 100 } },
                   // { text: "Contact No.", sx: { width: 140 } },
@@ -206,16 +219,20 @@ const DoctorsPage = () => {
                   specialty,
                   services = [],
                 } = i;
+                const data = {
+                  ...i,
+                  services: i.servicesId.map((s) => servicesMap[s]),
+                };
 
                 return (
                   <TableRow key={id} id={id}>
                     <TableCell>{name}</TableCell>
                     <TableCell>{specialty}</TableCell>
-                    <TableCell>{arrayStringify(services)}</TableCell>
+                    <TableCell>{arrayStringify(data.services)}</TableCell>
                     <TableCell>{email}</TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       {formatTimeStamp(birthdate, "MMM-dd-yyyy")}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell sx={{ textTransform: "capitalize" }}>
                       {gender}
                     </TableCell>
@@ -226,9 +243,8 @@ const DoctorsPage = () => {
                           color: "success",
                           onClick: () =>
                             handleEditModalOpen({
-                              ...i,
+                              ...data,
                               birthdate: formatTimeStamp(birthdate),
-                              services,
                             }),
                         },
                         {
@@ -250,6 +266,7 @@ const DoctorsPage = () => {
         <ManageDoctorModal
           open={doctorModal.open}
           data={doctorModal.data}
+          services={services}
           onClose={handleDoctorModalClose}
           onSave={!doctorModal.data ? handleAddDoctor : handleEditDoctor}
         />
