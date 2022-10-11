@@ -2,6 +2,7 @@ import {
   addBusinessDays,
   differenceInYears,
   format,
+  getMonth,
   getWeek,
   isWeekend,
 } from "date-fns";
@@ -45,12 +46,22 @@ export const getDayOfWeek = (day = 0, today = new Date()) => {
   return new Date(today.setDate(first + day));
 };
 
+export const getMonthNo = (date = new Date()) => {
+  return getMonth(new Date(date)) + 1;
+};
+
 export const getNearestBusinessDay = (date = new Date()) => {
   const businessDay = isWeekend(date) ? addBusinessDays(date, 1) : date;
   return formatTimeStamp(businessDay);
 };
 
 // export const today = formatTimeStamp(new Date());
+export const DATE_FORMAT = {
+  long: "MMM dd, yyyy (EEEE)",
+  med: "MMM dd, yyyy",
+  monthyear: "MMMM yyyy",
+  monthyearshort: "MM-yyyy",
+};
 export const today = {
   dateStr: formatTimeStamp(new Date()),
   dayOfWeek: format(new Date(), "i"),

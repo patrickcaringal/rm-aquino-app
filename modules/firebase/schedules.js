@@ -32,12 +32,12 @@ export const getScheduleReq = async ({ weekNo }) => {
   }
 };
 
-export const getScheduleByDoctorReq = async ({ id, weekNo }) => {
+export const getScheduleByDoctorReq = async ({ id, monthNo }) => {
   try {
     const q = query(
       collRef,
       where("doctorId", "==", id),
-      where("weekNo", "==", weekNo)
+      where("monthNo", "==", monthNo)
     );
     const querySnapshot = await getDocs(q);
 

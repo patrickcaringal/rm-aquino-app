@@ -70,7 +70,13 @@ a {
 }
 
 // fullcalendar overrides
-table.fc-scrollgrid > tbody > tr:nth-child(1),
-table.fc-scrollgrid > tbody > tr:nth-child(2) {
-  display: none;
+// table.fc-scrollgrid > tbody > tr:nth-child(1),
+// table.fc-scrollgrid > tbody > tr:nth-child(2) {
+//   display: none;
+// }
+#doc-sched-timegrid {
+  table.fc-scrollgrid > tbody > tr:nth-child(1),
+  table.fc-scrollgrid > tbody > tr:nth-child(2) {
+    display: none;
+  }
 }

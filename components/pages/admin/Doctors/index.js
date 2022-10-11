@@ -112,7 +112,6 @@ const DoctorsPage = () => {
     //   updated.email
     // );
 
-    console.log(JSON.stringify(updates, null, 4));
     // Update
     const { error: updateError } = await updateDoctor({
       doctor: updates,
