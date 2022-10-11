@@ -93,21 +93,21 @@ const ResponsiveAppBar = () => {
             },
           ],
         },
-        {
-          text: "Doctor Schedule",
-          icon: null,
-          menuItems: [
-            {
-              text: "Schedule This Week",
-              onClick: () =>
-                router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_CURRENT_WEEK),
-            },
-            {
-              text: "Schedule Next Week",
-              onClick: () => router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_NEXT_WEEK),
-            },
-          ],
-        },
+        // {
+        //   text: "Doctor Schedule",
+        //   icon: null,
+        //   menuItems: [
+        //     {
+        //       text: "Schedule This Week",
+        //       onClick: () =>
+        //         router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_CURRENT_WEEK),
+        //     },
+        //     {
+        //       text: "Schedule Next Week",
+        //       onClick: () => router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_NEXT_WEEK),
+        //     },
+        //   ],
+        // },
         {
           text: "Appointments",
           icon: null,
