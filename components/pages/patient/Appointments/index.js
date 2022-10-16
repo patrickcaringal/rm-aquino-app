@@ -137,7 +137,7 @@ const AppointmentsPage = () => {
                 } = i;
 
                 return (
-                  <TableRow key={id}>
+                  <TableRow key={id} id={id}>
                     {/* <TableCell>{id}</TableCell> */}
                     {/* <TableCell>
                       {formatTimeStamp(dateCreated, "MMM dd, yyyy (EEE)")}
