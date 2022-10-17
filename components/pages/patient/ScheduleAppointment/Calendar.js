@@ -38,6 +38,7 @@ const Calendar = ({
     .map((i) => ({
       ...i,
       title: `DR. ${doctorsMap[i.id]}`,
+      // backgroundColor: "khaki",
     }));
 
   return (

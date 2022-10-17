@@ -56,7 +56,6 @@ import Calendar from "./Calendar";
 import PlaceholderComponent from "./Placeholder";
 import TimePicker from "./TimePicker";
 import TimeslotComponent from "./Timeslot";
-import { getMyAppointments } from "./utils";
 
 const ScheduleAppointmentPage = () => {
   const { user } = useAuth();
@@ -84,15 +83,8 @@ const ScheduleAppointmentPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [timeslots, setTimeslots] = useState([]);
 
-  const servicesMap = services.reduce((a, i) => {
-    a[i.id] = i.name;
-    return a;
-  }, {});
-
-  const doctorsMap = doctors.reduce((a, i) => {
-    a[i.id] = i.name;
-    return a;
-  }, {});
+  const servicesMap = services.reduce(idNameMap, {});
+  const doctorsMap = doctors.reduce(idNameMap, {});
 
   const formik = useFormik({
     initialValues: {
@@ -147,10 +139,13 @@ const ScheduleAppointmentPage = () => {
   });
 
   const calendarLoading = schedLoading || doctorLoading;
+  const currMonth = getMonth(new Date(selectedDate)) + 1;
 
   const displayCalendar = formik.values.serviceId && !calendarLoading;
   const displayTimepicker = displayCalendar && formik.values.doctorId;
   const disabledSave = !(displayTimepicker && formik.values.startTime);
+
+  // const x = getMyAppointments(user.id, appointments);
 
   useLayoutEffect(() => {
     const fetchServices = async () => {
@@ -207,36 +202,28 @@ const ScheduleAppointmentPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.serviceId]);
 
-  // useLayoutEffect(() => {
-  //   if (doctors.length > 0) {
-  //     const fetch = async () => {
-  //       // Get Sched
-  //       const payload = {
-  //         ids: doctors.map((i) => i.id),
-  //         monthNo: getMonthNo(),
-  //       };
-  //       const { data, error: getError } = await getSchedule(payload);
-  //       if (getError) return openErrorDialog(getError);
+  useEffect(() => {
+    console.log("currMonth");
+    const q = query(
+      collection(db, "appointments"),
+      where("month", "==", currMonth),
+      where("rejected", "==", false)
+    );
 
-  //       // Combine schedules
-  //       const sched = data.reduce((a, i) => {
-  //         const s = i.schedules.reduce((b, j) => {
-  //           return [...b, ...j.schedules];
-  //         }, []);
-  //         return [...a, ...s];
-  //       }, []);
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      if (querySnapshot.docs.length > 0) {
+        const data = querySnapshot.docs.map((doc) => ({ ...doc.data() }));
+        const a = data.map((i) => ({
+          ...i,
+          type: i.patientId === user.id ? i.status : "others",
+        }));
+        setAppointments(a);
+      }
+    });
 
-  //       setSchedules(sched);
-  //       // data?.schedules?.reduce((acc, i) => {
-  //       //   return [...acc, ...i.schedules];
-  //       // }, []) || []
-  //       // setDoctors(data);
-  //     };
-
-  //     fetch();
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [doctors]);
+    return () => unsub();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currMonth, user.id]);
 
   const handleDoctorClick = (info) => {
     const date = formatTimeStamp(info.event.start);
@@ -296,6 +283,7 @@ const ScheduleAppointmentPage = () => {
             date={selectedDate}
             data={timeslots}
             doctor={doctorsMap[formik.values.doctorId]}
+            appointments={appointments}
             selected={formik.values.startTime}
             onTimeselect={handleTimeSelect}
           />
@@ -331,3 +319,38 @@ const ScheduleAppointmentPage = () => {
 };
 
 export default ScheduleAppointmentPage;
+
+const idNameMap = (a, i) => {
+  a[i.id] = i.name;
+  return a;
+};
+
+// const getMyAppointments = (id, data) => {
+//   data = data.filter((i) => !i.rejected);
+
+//   // const forApproval = data.filter((i) => {
+//   //   const a = i.patientId === id;
+//   //   const b = i.status === REQUEST_STATUS.forapproval;
+//   //   return a && b;
+//   // });
+
+//   // const approved = data.filter((i) => {
+//   //   const a = i.patientId === id;
+//   //   const b = i.status === REQUEST_STATUS.approved;
+//   //   return a && b;
+//   // });
+
+//   // const others = data.filter((i) => {
+//   //   const a = i.patientId !== id;
+//   //   return a && b;
+//   // });
+
+//   // console.log({ forApproval, approved, others });
+//   data = data.filter((i) => !i.rejected);
+//   const res = data.map((i) => {
+//     let type = i.patientId === id ? i.status : "others";
+//     return { ...i, type };
+//   });
+
+//   return res;
+// };
