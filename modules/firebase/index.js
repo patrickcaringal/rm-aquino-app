@@ -19,6 +19,8 @@ import {
   getAppointmentForApprovalReq,
   getAppointmentReq,
   getAppointmentsByWeekReq,
+  getDoctorAppointmentByDateReq,
+  getDoctorAppointmentByMonthReq,
   getPatientAppointmentReq,
   rejectAppointmentReq,
 } from "./appointment";
@@ -114,6 +116,8 @@ export {
   getAppointmentForApprovalReq,
   getAppointmentReq,
   getAppointmentsByWeekReq,
+  getDoctorAppointmentByDateReq,
+  getDoctorAppointmentByMonthReq,
   getPatientAppointmentReq,
   rejectAppointmentReq,
   // medical record

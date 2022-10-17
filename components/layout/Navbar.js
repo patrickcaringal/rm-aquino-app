@@ -34,21 +34,15 @@ import { useResponseDialog } from "../../contexts/ResponseDialogContext";
 import useRequest from "../../hooks/useRequest";
 import { signOutAnonymouslyReq, signOutReq } from "../../modules/firebase";
 import { getFullName, getInitials } from "../../modules/helper";
+import { getNavbarItems } from "./menuItems";
 import NavbarItem from "./NavbarItem";
 
 const pages = ["Products", "Pricing", "Blog"];
 
 const ResponsiveAppBar = () => {
   const router = useRouter();
-  const {
-    userSession,
-    user,
-    manualSetUser,
-    isAdmin,
-    isStaff,
-    isLoggedIn,
-    isAdminPanel,
-  } = useAuth();
+  const { userSession, user, manualSetUser, isAdmin, isStaff, isLoggedIn } =
+    useAuth();
   const { setBackdropLoader } = useBackdropLoader();
   const { openErrorDialog } = useResponseDialog();
   const [signOutAnonymously] = useRequest(
@@ -60,95 +54,7 @@ const ResponsiveAppBar = () => {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [itemEl, setItemElUser] = React.useState(null);
 
-  const authorizeFeat = (feat) => (!isStaff ? [feat] : []);
-
-  const menuItems = isAdmin
-    ? [
-        ...authorizeFeat({
-          text: "Doctors",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.DOCTORS_MANAGEMENT),
-        }),
-        ...authorizeFeat({
-          text: "Staffs",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
-        }),
-        ...authorizeFeat({
-          text: "Services",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.SERVICES_MANAGEMENT),
-        }),
-        {
-          text: "Patients",
-          icon: null,
-          menuItems: [
-            {
-              text: "Patient List",
-              onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
-            },
-            {
-              text: "Patient Approval",
-              onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
-            },
-          ],
-        },
-        // {
-        //   text: "Doctor Schedule",
-        //   icon: null,
-        //   menuItems: [
-        //     {
-        //       text: "Schedule This Week",
-        //       onClick: () =>
-        //         router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_CURRENT_WEEK),
-        //     },
-        //     {
-        //       text: "Schedule Next Week",
-        //       onClick: () => router.push(PATHS.ADMIN.DOCTOR_SCHEDULE_NEXT_WEEK),
-        //     },
-        //   ],
-        // },
-        {
-          text: "Appointments",
-          icon: null,
-          menuItems: [
-            {
-              text: "Appointment List",
-              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_MANAGEMENT),
-            },
-            {
-              text: "Appointment Approval",
-              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
-            },
-            // {
-            //   text: "Old Approval",
-            //   onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_APPROVAL),
-            // },
-          ],
-        },
-        ...authorizeFeat({
-          text: "Consultation",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.CONSULTATION),
-        }),
-      ]
-    : [
-        {
-          text: "Medical Record",
-          icon: null,
-          onClick: () => router.push(PATHS.PATIENT.MEDICAL_RECORD),
-        },
-        {
-          text: "Appointments",
-          icon: null,
-          onClick: () => router.push(PATHS.PATIENT.APPOINTMENT),
-        },
-        {
-          text: "Schedule Appointment",
-          icon: null,
-          onClick: () => router.push(PATHS.PATIENT.SCHEDULE_APPOINTMENT),
-        },
-      ];
+  const menuItems = getNavbarItems(user?.id, user?.role, router);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -184,8 +90,8 @@ const ResponsiveAppBar = () => {
           //   "0px 2px 4px -1px rgb(0, 0, 0, 0.05), 0px 4px 5px 0px rgb(0, 0, 0, 0.05), 0px 1px 10px 0px rgb(0, 0, 0, 0.05)",
         }}
       >
-        {/* maxWidth={isAdminPanel ? "none" : "lg"} */}
-        <Container maxWidth={isLoggedIn && isAdminPanel ? "none" : "lg"}>
+        {/* maxWidth={isAdmin ? "none" : "lg"} */}
+        <Container maxWidth={isLoggedIn && isAdmin ? "none" : "lg"}>
           <Toolbar
             disableGutters
             sx={{ height: "80px !important", minHeight: "80px !important" }}
@@ -353,7 +259,7 @@ const ResponsiveAppBar = () => {
             minHeight: "40px !important",
           }}
         >
-          <Container maxWidth={isAdminPanel ? "none" : "lg"}>
+          <Container maxWidth={isAdmin ? "none" : "lg"}>
             {isLoggedIn &&
               menuItems.map(({ text, icon, onClick, menuItems }) => {
                 if (!menuItems) {
