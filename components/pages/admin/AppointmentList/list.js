@@ -22,7 +22,7 @@ import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import {
   approveAppointmentReq,
-  getAppointmentApprovedByDateReq,
+  getAppointmentByDateStatusReq,
   rejectAppointmentReq,
 } from "../../../../modules/firebase";
 import {
@@ -30,7 +30,7 @@ import {
   getNearestBusinessDay,
 } from "../../../../modules/helper";
 import { LongTypography, successMessage } from "../../../common";
-import { RejectModal, RequestStatus } from "../../../shared";
+import { REQUEST_STATUS, RejectModal, RequestStatus } from "../../../shared";
 import Filters from "./Filters";
 import useFilter from "./useFilter";
 
@@ -48,7 +48,7 @@ const AppointmentsPage = () => {
 
   // Requests
   const [getAppointments] = useRequest(
-    getAppointmentApprovedByDateReq,
+    getAppointmentByDateStatusReq,
     setBackdropLoader
   );
   const [approveAppointment] = useRequest(
@@ -79,7 +79,10 @@ const AppointmentsPage = () => {
   useEffect(() => {
     // Get
     const fetch = async () => {
-      const payload = { date: filters.date };
+      const payload = {
+        date: filters.date,
+        status: [REQUEST_STATUS.approved],
+      };
       const { data, error } = await getAppointments(payload);
       if (error) return openErrorDialog(error);
 
@@ -89,107 +92,6 @@ const AppointmentsPage = () => {
     fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.date]);
-
-  const handleApproveConfirmation = (document) => {
-    const { patientName, date, startTime, endTimeEstimate } = document;
-
-    openResponseDialog({
-      title: "Approve Appointment",
-      content: (
-        <>
-          <Typography variant="body1" gutterBottom>
-            Are you sure you want to approve?
-          </Typography>
-          <Typography variant="body2">{`${patientName}`}</Typography>
-          <Typography variant="body2">
-            {formatTimeStamp(date, "MMM dd, yyyy (EEEE)")} {startTime} -{" "}
-            {endTimeEstimate}
-          </Typography>
-        </>
-      ),
-      type: "CONFIRM",
-      actions: (
-        <Button
-          variant="contained"
-          onClick={() => {
-            closeDialog();
-            setTimeout(() => {
-              handleApprove(document);
-            }, 500);
-          }}
-          size="small"
-        >
-          Approve
-        </Button>
-      ),
-    });
-  };
-
-  const handleRejectConfirmation = (data) => {
-    setRejectModal({
-      open: true,
-      data,
-    });
-  };
-
-  const handleApprove = async (document) => {
-    // Approve
-    const payload = { document: { ...document, approvedBy: user.id } };
-    const { error: approveError } = await approveAppointment(payload);
-    if (approveError) return openErrorDialog(approveError);
-
-    // Success
-    setAppointments((prev) => prev.filter((i) => i.id !== document.id));
-    openResponseDialog({
-      autoClose: true,
-      content: successMessage({
-        noun: "Appointment",
-        verb: "approved",
-      }),
-      type: "SUCCESS",
-    });
-  };
-
-  const handleReject = async (document) => {
-    // Reject
-    const payload = { document: { ...document, rejectedBy: user.id } };
-    const { error: rejectError } = await rejectAppointment(payload);
-    if (rejectError) return openErrorDialog(rejectError);
-
-    // Success
-    setAppointments((prev) => prev.filter((i) => i.id !== document.id));
-    openResponseDialog({
-      autoClose: true,
-      content: successMessage({
-        noun: "Appointment",
-        verb: "rejected",
-      }),
-      type: "SUCCESS",
-      closeCb() {
-        setRejectModal(defaultModal);
-      },
-    });
-  };
-
-  const handleRejectModalClose = () => {
-    setRejectModal(defaultModal);
-  };
-
-  const rejectModalContent = () => {
-    const { patientName, date, startTime, endTimeEstimate } = rejectModal.data;
-    return (
-      <>
-        <Typography variant="body1" gutterBottom>
-          Are you sure you want to reject?
-        </Typography>
-        <Typography variant="body2">{`${patientName}`}</Typography>
-        <Typography variant="body2" sx={{ mb: 2 }}>
-          {formatTimeStamp(date, "MMM dd, yyyy (EEEE)")} {startTime} -{" "}
-          {endTimeEstimate}
-        </Typography>
-      </>
-    );
-  };
 
   return (
     <Box sx={{ pt: 2 }}>
@@ -261,22 +163,7 @@ const AppointmentsPage = () => {
                         displayedLines={2}
                       />
                     </TableCell> */}
-                    <TableCell align="center">
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() => handleApproveConfirmation(i)}
-                      >
-                        <ThumbUpIcon />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => handleRejectConfirmation(i)}
-                      >
-                        <ThumbDownIcon />
-                      </IconButton>
-                    </TableCell>
+                    <TableCell align="center"></TableCell>
                   </TableRow>
                 );
               })}

@@ -6,6 +6,7 @@ import FullCalendar from "@fullcalendar/react"; // must go before plugins
 import lodash from "lodash";
 
 import { formatTimeStamp, pluralize } from "../../../../modules/helper";
+import { REQUEST_STATUS } from "../../../shared";
 
 const Calendar = ({
   date,
@@ -14,15 +15,36 @@ const Calendar = ({
   onEventClick,
   height = "calc(100vh - 300px)",
 }) => {
-  const groupedByDate = lodash.chain(events).groupBy("date").value();
+  let approved = events.filter((i) => i.status === REQUEST_STATUS.approved);
+  let forapproval = events.filter(
+    (i) => i.status === REQUEST_STATUS.forapproval
+  );
 
-  events = lodash.toPairs(groupedByDate).map(([k, v]) => {
-    return {
-      start: k,
-      end: k,
-      title: `${v.length} ${pluralize("Appointment", v.length)}`,
-    };
-  });
+  const a = lodash
+    .toPairs(lodash.chain(approved).groupBy("date").value())
+    .map(([k, v]) => {
+      return {
+        start: k,
+        end: k,
+        title: `${v.length} Approved`,
+        backgroundColor: "#15a446",
+        borderColor: "#rgb(14, 114, 49)",
+      };
+    });
+
+  const b = lodash
+    .toPairs(lodash.chain(forapproval).groupBy("date").value())
+    .map(([k, v]) => {
+      return {
+        start: k,
+        end: k,
+        title: `${v.length} For Approval`,
+        backgroundColor: "#ff9800",
+        borderColor: "#ed6c02",
+      };
+    });
+
+  events = [...a, ...b];
 
   return (
     <>
@@ -39,8 +61,6 @@ const Calendar = ({
         }}
         fixedWeekCount={false}
         dayMaxEvents={1}
-        eventBackgroundColor="#15a446"
-        eventBorderColor="rgb(14, 114, 49)"
         // dynamic
         initialDate={date}
         events={events}

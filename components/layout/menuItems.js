@@ -85,17 +85,21 @@ export const getNavbarItems = (id, role, router) => {
               text: "Appointment List",
               onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_MANAGEMENT),
             },
-            {
-              text: "Appointment Approval",
-              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
-            },
+            // {
+            //   text: "Appointment List",
+            //   onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_MANAGEMENT),
+            // },
+            // {
+            //   text: "Appointment Approval",
+            //   onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
+            // },
           ],
         },
-        {
-          text: "Consultation",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.CONSULTATION),
-        },
+        // {
+        //   text: "Consultation",
+        //   icon: null,
+        //   onClick: () => router.push(PATHS.ADMIN.CONSULTATION),
+        // },
       ];
 
     case "doctor":

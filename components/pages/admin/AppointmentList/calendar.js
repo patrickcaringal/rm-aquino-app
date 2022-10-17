@@ -67,8 +67,10 @@ const AppointmentsCalendar = () => {
     const q = query(
       collection(db, "appointments"),
       where("month", "==", currMonth),
-      where("status", "==", REQUEST_STATUS.approved),
-      where("rejected", "==", false)
+      where("status", "in", [
+        REQUEST_STATUS.forapproval,
+        REQUEST_STATUS.approved,
+      ])
     );
 
     const unsub = onSnapshot(q, (querySnapshot) => {
@@ -86,6 +88,14 @@ const AppointmentsCalendar = () => {
   }, [currMonth]);
 
   const handleEventClick = (info) => {
+    if (info.event.title.includes("For Approval")) {
+      router.push({
+        pathname: PATHS.ADMIN.APPOINTMENT_APPROVAL,
+        query: { date: info.event.startStr },
+      });
+      return;
+    }
+
     router.push({
       pathname: PATHS.ADMIN.APPOINTMENT_APPROVED,
       query: { date: info.event.startStr },
@@ -117,7 +127,7 @@ const AppointmentsCalendar = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        pt: 3,
+        pt: 2,
         // gap: 10,
         // border: "1px solid red",
       }}
@@ -128,7 +138,7 @@ const AppointmentsCalendar = () => {
         handleCalendarNext={handleCalendarNext}
       />
       <Calendar
-        height="calc(100vh - 240px)"
+        height="calc(100vh - 180px)"
         date={selectedDate}
         events={appointments}
         onEventClick={handleEventClick}

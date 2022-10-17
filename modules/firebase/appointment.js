@@ -110,13 +110,12 @@ export const getAppointmentForApprovalReq = async () => {
   }
 };
 
-export const getAppointmentApprovedByDateReq = async ({ date }) => {
+export const getAppointmentByDateStatusReq = async ({ date, status }) => {
   try {
     const q = query(
       collRef,
-      where("deleted", "==", false),
-      where("status", "==", REQUEST_STATUS.approved),
-      where("date", "==", date)
+      where("date", "==", date),
+      where("status", "in", status)
     );
     const querySnapshot = await getDocs(q);
 

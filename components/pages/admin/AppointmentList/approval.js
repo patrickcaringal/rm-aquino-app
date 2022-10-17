@@ -17,14 +17,18 @@ import {
 import { useRouter } from "next/router";
 
 import { LongTypography, successMessage } from "../../../../components/common";
-import { RejectModal, RequestStatus } from "../../../../components/shared";
+import {
+  REQUEST_STATUS,
+  RejectModal,
+  RequestStatus,
+} from "../../../../components/shared";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import {
   approveAppointmentReq,
-  getAppointmentForApprovalReq,
+  getAppointmentByDateStatusReq,
   rejectAppointmentReq,
 } from "../../../../modules/firebase";
 import {
@@ -48,7 +52,7 @@ const AppointmentsPage = () => {
 
   // Requests
   const [getAppointments] = useRequest(
-    getAppointmentForApprovalReq,
+    getAppointmentByDateStatusReq,
     setBackdropLoader
   );
   const [approveAppointment] = useRequest(
@@ -79,16 +83,19 @@ const AppointmentsPage = () => {
   useEffect(() => {
     // Get
     const fetch = async () => {
-      const { data: appointmentList, error: getError } =
-        await getAppointments();
-      if (getError) return openErrorDialog(getError);
+      const payload = {
+        date: filters.date,
+        status: [REQUEST_STATUS.forapproval],
+      };
+      const { data, error } = await getAppointments(payload);
+      if (error) return openErrorDialog(error);
 
-      setAppointments(appointmentList);
+      setAppointments(data);
     };
 
     fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [filters.date]);
 
   const handleApproveConfirmation = (document) => {
     const { patientName, date, startTime, endTimeEstimate } = document;
