@@ -22,6 +22,7 @@ export const PATHS = {
     APPOINTMENT_MANAGEMENT: "/admin/appointments",
     APPOINTMENT_CALENDAR: "/admin/appointments/calendar",
     APPOINTMENT_APPROVAL: "/admin/appointments/approval",
+    APPOINTMENT_APPROVED: "/admin/appointments/approved",
     CONSULTATION: "/admin/consultation",
   },
   // STAFF: {

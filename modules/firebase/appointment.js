@@ -110,6 +110,27 @@ export const getAppointmentForApprovalReq = async () => {
   }
 };
 
+export const getAppointmentApprovedByDateReq = async ({ date }) => {
+  try {
+    const q = query(
+      collRef,
+      where("deleted", "==", false),
+      where("status", "==", REQUEST_STATUS.approved),
+      where("date", "==", date)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({ ...doc.data() }))
+      .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
 export const getPatientAppointmentReq = async ({ id }) => {
   try {
     const q = query(

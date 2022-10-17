@@ -20,7 +20,7 @@ const Calendar = ({
     return {
       start: k,
       end: k,
-      title: `${v.length} ${pluralize("Appointment", v.length)} for approval`,
+      title: `${v.length} ${pluralize("Appointment", v.length)}`,
     };
   });
 
@@ -39,8 +39,8 @@ const Calendar = ({
         }}
         fixedWeekCount={false}
         dayMaxEvents={1}
-        eventBackgroundColor="#ff9800"
-        eventBorderColor="#ed6c02"
+        eventBackgroundColor="#15a446"
+        eventBorderColor="rgb(14, 114, 49)"
         // dynamic
         initialDate={date}
         events={events}

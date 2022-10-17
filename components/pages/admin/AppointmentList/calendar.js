@@ -49,7 +49,7 @@ import { getRangeId, getSlots } from "../DoctorSchedule/utils";
 import Calendar from "./CalendarComp";
 import Header from "./Header";
 
-const DoctorSchedulePage = () => {
+const AppointmentsCalendar = () => {
   const router = useRouter();
   const { openResponseDialog, openErrorDialog, closeDialog } =
     useResponseDialog();
@@ -67,7 +67,7 @@ const DoctorSchedulePage = () => {
     const q = query(
       collection(db, "appointments"),
       where("month", "==", currMonth),
-      where("status", "==", REQUEST_STATUS.forapproval),
+      where("status", "==", REQUEST_STATUS.approved),
       where("rejected", "==", false)
     );
 
@@ -87,7 +87,7 @@ const DoctorSchedulePage = () => {
 
   const handleEventClick = (info) => {
     router.push({
-      pathname: PATHS.ADMIN.APPOINTMENT_APPROVAL,
+      pathname: PATHS.ADMIN.APPOINTMENT_APPROVED,
       query: { date: info.event.startStr },
     });
   };
@@ -137,4 +137,4 @@ const DoctorSchedulePage = () => {
   );
 };
 
-export default DoctorSchedulePage;
+export default AppointmentsCalendar;
