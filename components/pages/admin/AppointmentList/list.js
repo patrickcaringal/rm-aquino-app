@@ -108,12 +108,10 @@ const AppointmentsPage = () => {
               <TableRow>
                 {[
                   { text: "Patient Name" },
-                  // { text: "Date Requested", sx: { width: 210 } },
                   { text: "Appointment Date", sx: { width: 210 } },
                   { text: "Appointment Time", sx: { width: 180 } },
                   { text: "Doctor", sx: { width: 360 } },
                   { text: "Status", sx: { width: 160 } },
-                  // { text: "Reason for Appointment", sx: { width: 400 } },
                   { text: "Actions", align: "center", sx: { width: 110 } },
                 ].map(({ text, align, sx }) => (
                   <TableCell
@@ -132,7 +130,6 @@ const AppointmentsPage = () => {
                 const {
                   id,
                   date,
-                  dateCreated,
                   startTime,
                   endTimeEstimate,
                   status,

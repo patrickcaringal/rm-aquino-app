@@ -8,21 +8,7 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import {
-  addBusinessDays,
-  addDays,
-  addMinutes,
-  eachMinuteOfInterval,
-  format,
-  getMonth,
-  getWeek,
-  isAfter,
-  isBefore,
-  isSameDay,
-  isWeekend,
-  startOfToday,
-  subBusinessDays,
-} from "date-fns";
+import { addMonths, getMonth, subMonths } from "date-fns";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import lodash from "lodash";
 import { useRouter } from "next/router";
@@ -60,8 +46,10 @@ const AppointmentsCalendar = () => {
   // Local States
   const [appointments, setAppointments] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [baseDate, setBaseDate] = useState(new Date());
+  const [UILoading, setUILoading] = useState(false);
 
-  const currMonth = getMonth(new Date(selectedDate)) + 1;
+  const currMonth = getMonth(new Date(baseDate)) + 1;
 
   useEffect(() => {
     const q = query(
@@ -102,24 +90,28 @@ const AppointmentsCalendar = () => {
     });
   };
 
+  const loadTimeGrid = () => {
+    setUILoading(true);
+    setBackdropLoader(true);
+
+    setTimeout(() => {
+      setUILoading(false);
+      setBackdropLoader(false);
+    }, 1000);
+  };
+
   const handleCalendarPrev = () => {
-    // setBaseDate((prev) => {
-    //   const v = subMonths(prev, 1);
-    //   const s = startOfMonth(v);
-    //   let d = isWeekend(s) ? addBusinessDays(s, 1) : s;
-    //   setSelectedDate(d);
-    //   return v;
-    // });
+    loadTimeGrid();
+    setBaseDate((prev) => {
+      return subMonths(prev, 1);
+    });
   };
 
   const handleCalendarNext = () => {
-    // setBaseDate((prev) => {
-    //   const v = addMonths(prev, 1);
-    //   const s = startOfMonth(v);
-    //   let d = isWeekend(s) ? addBusinessDays(s, 1) : s;
-    //   setSelectedDate(d);
-    //   return v;
-    // });
+    loadTimeGrid();
+    setBaseDate((prev) => {
+      return addMonths(prev, 1);
+    });
   };
 
   return (
@@ -133,16 +125,18 @@ const AppointmentsCalendar = () => {
       }}
     >
       <Header
-        selectedDate={selectedDate}
+        selectedDate={baseDate}
         handleCalendarPrev={handleCalendarPrev}
         handleCalendarNext={handleCalendarNext}
       />
-      <Calendar
-        height="calc(100vh - 180px)"
-        date={selectedDate}
-        events={appointments}
-        onEventClick={handleEventClick}
-      />
+      {!UILoading && (
+        <Calendar
+          height="calc(100vh - 180px)"
+          date={baseDate}
+          events={appointments}
+          onEventClick={handleEventClick}
+        />
+      )}
     </Box>
   );
 };

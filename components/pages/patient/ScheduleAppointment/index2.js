@@ -20,6 +20,7 @@ import {
   addBusinessDays,
   addDays,
   addMinutes,
+  addMonths,
   eachMinuteOfInterval,
   format,
   getMonth,
@@ -28,8 +29,10 @@ import {
   isBefore,
   isSameDay,
   isWeekend,
+  startOfMonth,
   startOfToday,
   subBusinessDays,
+  subMonths,
 } from "date-fns";
 import faker from "faker";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
@@ -53,6 +56,7 @@ import { ACTION_ICONS, Select, successMessage } from "../../../common";
 import { Input } from "../../../common/Form";
 import { REQUEST_STATUS } from "../../../shared";
 import Calendar from "./Calendar";
+import Header from "./Header";
 import PlaceholderComponent from "./Placeholder";
 import TimePicker from "./TimePicker";
 import TimeslotComponent from "./Timeslot";
@@ -82,6 +86,7 @@ const ScheduleAppointmentPage = () => {
   const [appointments, setAppointments] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [timeslots, setTimeslots] = useState([]);
+  const [baseDate, setBaseDate] = useState(new Date());
 
   const servicesMap = services.reduce(idNameMap, {});
   const doctorsMap = doctors.reduce(idNameMap, {});
@@ -139,7 +144,10 @@ const ScheduleAppointmentPage = () => {
   });
 
   const calendarLoading = schedLoading || doctorLoading;
-  const currMonth = getMonth(new Date(selectedDate)) + 1;
+  const currMonth = getMonth(new Date(baseDate)) + 1;
+
+  const prevDisabled = getMonth(new Date()) + 1 >= currMonth;
+  const nextDisabled = getMonth(new Date()) + 2 <= currMonth;
 
   const displayCalendar = formik.values.serviceId && !calendarLoading;
   const displayTimepicker = displayCalendar && formik.values.doctorId;
@@ -174,7 +182,7 @@ const ScheduleAppointmentPage = () => {
 
       const fetchSchedule = async (d) => {
         // Get Sched
-        const payload = { ids: d.map((i) => i.id), monthNo: getMonthNo() };
+        const payload = { ids: d.map((i) => i.id), monthNo: currMonth };
         const { data, error: getError } = await getSchedule(payload);
         if (getError) return openErrorDialog(getError);
 
@@ -200,10 +208,9 @@ const ScheduleAppointmentPage = () => {
       fetch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formik.values.serviceId]);
+  }, [formik.values.serviceId, currMonth]);
 
   useEffect(() => {
-    console.log("currMonth");
     const q = query(
       collection(db, "appointments"),
       where("month", "==", currMonth),
@@ -255,6 +262,33 @@ const ScheduleAppointmentPage = () => {
     formik.submitForm();
   };
 
+  const handleCalendarPrev = () => {
+    setBaseDate((prev) => {
+      const v = subMonths(prev, 1);
+      const s = startOfMonth(v);
+      let d = isWeekend(s) ? addBusinessDays(s, 1) : s;
+      formik.setFieldValue("doctorId", "", false);
+      formik.setFieldValue("date", "", false);
+      formik.setFieldValue("startTime", "", false);
+      setSelectedDate(d);
+      setTimeslots([]);
+      return v;
+    });
+  };
+
+  const handleCalendarNext = () => {
+    setBaseDate((prev) => {
+      const v = addMonths(prev, 1);
+      const s = startOfMonth(v);
+      let d = isWeekend(s) ? addBusinessDays(s, 1) : s;
+      formik.setFieldValue("doctorId", "", false);
+      formik.setFieldValue("date", "", false);
+      formik.setFieldValue("startTime", "", false);
+      setSelectedDate(d);
+      setTimeslots([]);
+      return v;
+    });
+  };
   return (
     <Box sx={{ pt: 2, display: "flex", flexDirection: "row", gap: 2 }}>
       <Box sx={{ width: 400 }}>
@@ -294,7 +328,7 @@ const ScheduleAppointmentPage = () => {
       <Box sx={{ flex: 1 }}>
         {displayCalendar && (
           <>
-            <Box>
+            {/* <Box>
               <Button
                 variant="contained"
                 size="small"
@@ -303,11 +337,20 @@ const ScheduleAppointmentPage = () => {
               >
                 submit appointment
               </Button>
-            </Box>
+            </Box> */}
+            <Header
+              selectedDate={baseDate}
+              handleCalendarPrev={handleCalendarPrev}
+              handleCalendarNext={handleCalendarNext}
+              prevDisabled={prevDisabled}
+              nextDisabled={nextDisabled}
+              handleSave={handleSave}
+              disabledSave={disabledSave}
+            />
             <Calendar
               height="calc(100vh - 180px)"
               doctorsMap={doctorsMap}
-              date={selectedDate}
+              date={baseDate}
               events={schedules}
               eventClick={handleDoctorClick}
             />
