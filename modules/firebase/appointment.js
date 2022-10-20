@@ -110,6 +110,68 @@ export const getAppointmentForApprovalReq = async () => {
   }
 };
 
+export const getAppointmentByDateStatusReq = async ({ date, status }) => {
+  try {
+    const q = query(
+      collRef,
+      where("date", "==", date),
+      where("status", "in", status)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({ ...doc.data() }))
+      .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const getDoctorAppointmentByDateReq = async ({ id, date, status }) => {
+  try {
+    const q = query(
+      collRef,
+      where("date", "==", date),
+      where("doctorId", "==", id),
+      where("status", "in", status)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({ ...doc.data() }))
+      .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const getDoctorAppointmentByMonthReq = async ({ id, month, status }) => {
+  try {
+    const q = query(
+      collRef,
+      where("month", "==", month),
+      where("doctorId", "==", id),
+      where("status", "in", status)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({ ...doc.data() }))
+      .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
 export const getPatientAppointmentReq = async ({ id }) => {
   try {
     const q = query(

@@ -1,6 +1,6 @@
 import React from "react";
 
-import ScheduleAppointmentPage from "../components/pages/patient/ScheduleAppointment"; // index2
+import ScheduleAppointmentPage from "../components/pages/patient/ScheduleAppointment/index2"; // index2
 
 const ScheduleAppointment = () => <ScheduleAppointmentPage />;
 export default ScheduleAppointment;

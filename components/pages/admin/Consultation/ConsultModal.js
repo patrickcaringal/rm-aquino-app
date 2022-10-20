@@ -263,6 +263,7 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
               variant="contained"
               size="small"
               onClick={() => formik.submitForm()}
+              disabled
             >
               save diagnosis
             </Button>
@@ -274,6 +275,7 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
                   variant="outlined"
                   size="small"
                   onClick={() => referralFormik.submitForm()}
+                  disabled
                 >
                   generate referral
                 </Button>
@@ -282,6 +284,7 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
                   variant="contained"
                   size="small"
                   onClick={handleSaveReferral}
+                  disabled
                 >
                   save referral
                 </Button>

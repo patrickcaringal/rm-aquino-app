@@ -3,6 +3,7 @@ import React from "react";
 import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
 import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
 import FullCalendar from "@fullcalendar/react"; // must go before plugins
+import lodash from "lodash";
 
 import { formatTimeStamp } from "../../../../modules/helper";
 
@@ -12,11 +13,33 @@ const eventTitle = ({ start, end }) => {
   return title;
 };
 
-const Calendar = ({ doctorsMap, date, events, onDateClick }) => {
-  events = events.map((i) => ({
-    ...i,
-    title: `DR. ${doctorsMap[i.doctor]}`,
-  }));
+const Calendar = ({
+  doctorsMap,
+  date,
+  events,
+  height = "calc(100vh - 300px)",
+  onDateClick,
+  eventClick,
+}) => {
+  // events = events.map((i) => ({
+  //   ...i,
+  //   title: `DR. ${doctorsMap[i.id]}`,
+  // }));
+
+  const uniq = new Set();
+  events = events
+    .reduce((a, i) => {
+      const d = `${formatTimeStamp(i.start)}${i.id}`;
+      if (uniq.has(d)) return a;
+
+      uniq.add(d);
+      return [...a, i];
+    }, [])
+    .map((i) => ({
+      ...i,
+      title: `DR. ${doctorsMap[i.id]}`,
+      // backgroundColor: "khaki",
+    }));
 
   return (
     <>
@@ -24,7 +47,7 @@ const Calendar = ({ doctorsMap, date, events, onDateClick }) => {
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         weekends={false}
-        height="calc(100vh - 300px)"
+        height={height}
         displayEventTime={false}
         headerToolbar={{
           start: "", // will normally be on the left. if RTL, will be on the right
@@ -36,9 +59,7 @@ const Calendar = ({ doctorsMap, date, events, onDateClick }) => {
         // dynamic
         initialDate={date}
         events={events}
-        eventClick={(info) => {
-          console.log("eventClick", info.event.id);
-        }}
+        eventClick={eventClick}
         dateClick={onDateClick}
       />
     </>

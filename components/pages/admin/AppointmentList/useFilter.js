@@ -22,10 +22,6 @@ const useFilter = ({ data = [], defaultStatus = "all", defaultDate = "" }) => {
       });
     }
 
-    if (date) {
-      filtered = filtered.filter((i) => i.date === date);
-    }
-
     return filtered;
   };
 

@@ -105,12 +105,10 @@ const AppointmentsPage = () => {
             <TableHead>
               <TableRow>
                 {[
-                  // { text: "id", sx: { width: 210 } },
-                  // { text: "Date Requested", sx: { width: 180 } },
                   { text: "Appointment Date", sx: { width: 180 } },
                   { text: "Appointment Time", sx: { width: 180 } },
-                  { text: "Status", sx: { width: 200 } },
-                  { text: "Reason for Appointment" },
+                  { text: "Doctor", sx: { width: 360 } },
+                  { text: "Status", sx: { width: 160 } },
                   { text: "Actions", align: "center", sx: { width: 110 } },
                 ].map(({ text, align, sx }) => (
                   <TableCell
@@ -133,11 +131,12 @@ const AppointmentsPage = () => {
                   startTime,
                   endTimeEstimate,
                   status,
-                  reasonAppointment,
+                  doctor,
+                  service,
                 } = i;
 
                 return (
-                  <TableRow key={id}>
+                  <TableRow key={id} id={id}>
                     {/* <TableCell>{id}</TableCell> */}
                     {/* <TableCell>
                       {formatTimeStamp(dateCreated, "MMM dd, yyyy (EEE)")}
@@ -153,14 +152,18 @@ const AppointmentsPage = () => {
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <RequestStatus status={status} />
+                      {doctor} <br />
+                      {service}
                     </TableCell>
                     <TableCell>
+                      <RequestStatus status={status} />
+                    </TableCell>
+                    {/* <TableCell>
                       <LongTypography
                         text={reasonAppointment}
                         displayedLines={2}
                       />
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell align="center"></TableCell>
                   </TableRow>
                 );

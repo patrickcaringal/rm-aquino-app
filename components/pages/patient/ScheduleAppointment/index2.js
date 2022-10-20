@@ -20,15 +20,19 @@ import {
   addBusinessDays,
   addDays,
   addMinutes,
+  addMonths,
   eachMinuteOfInterval,
   format,
+  getMonth,
   getWeek,
   isAfter,
   isBefore,
   isSameDay,
   isWeekend,
+  startOfMonth,
   startOfToday,
   subBusinessDays,
+  subMonths,
 } from "date-fns";
 import faker from "faker";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
@@ -52,9 +56,10 @@ import { ACTION_ICONS, Select, successMessage } from "../../../common";
 import { Input } from "../../../common/Form";
 import { REQUEST_STATUS } from "../../../shared";
 import Calendar from "./Calendar";
+import Header from "./Header";
 import PlaceholderComponent from "./Placeholder";
+import TimePicker from "./TimePicker";
 import TimeslotComponent from "./Timeslot";
-import { getMyAppointments } from "./utils";
 
 const ScheduleAppointmentPage = () => {
   const { user } = useAuth();
@@ -80,13 +85,75 @@ const ScheduleAppointmentPage = () => {
   const [schedules, setSchedules] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [timeslots, setTimeslots] = useState([]);
+  const [baseDate, setBaseDate] = useState(new Date());
 
-  const doctorsMap = doctors.reduce((a, i) => {
-    a[i.id] = i.name;
-    return a;
-  }, {});
+  const servicesMap = services.reduce(idNameMap, {});
+  const doctorsMap = doctors.reduce(idNameMap, {});
+
+  const formik = useFormik({
+    initialValues: {
+      doctorId: "",
+      serviceId: "",
+      date: "",
+      startTime: "",
+    },
+    validateOnChange: false,
+    onSubmit: async (values, { setFieldValue }) => {
+      const { date, startTime } = values;
+      const endTimeEstimate = formatTimeStamp(
+        addMinutes(new Date(`${date} ${startTime}`), 30),
+        "hh:mm a"
+      );
+
+      const document = {
+        ...values,
+        endTimeEstimate,
+        weekNo: getWeek(new Date(date)),
+        month: getMonth(new Date(date)) + 1,
+        doctor: `DR. ${doctorsMap[values.doctorId]}`,
+        service: servicesMap[values.serviceId],
+        // user
+        patientId: user.id,
+        patientEmail: user.email,
+        patientName: user.name,
+        status: REQUEST_STATUS.forapproval,
+        approved: false,
+        rejected: false,
+      };
+
+      // Add Appointment
+      const payload = { document };
+      const { data, error: addError } = await addAppointment(payload);
+      if (addError) return openErrorDialog(addError);
+
+      // Successful
+      openResponseDialog({
+        autoClose: true,
+        content: successMessage({
+          noun: "Appointment",
+          verb: "submitted",
+        }),
+        type: "SUCCESS",
+        closeCb() {
+          setFieldValue("startTime", "");
+          setFieldValue("reasonAppointment", "");
+        },
+      });
+    },
+  });
 
   const calendarLoading = schedLoading || doctorLoading;
+  const currMonth = getMonth(new Date(baseDate)) + 1;
+
+  const prevDisabled = getMonth(new Date()) + 1 >= currMonth;
+  const nextDisabled = getMonth(new Date()) + 2 <= currMonth;
+
+  const displayCalendar = formik.values.serviceId && !calendarLoading;
+  const displayTimepicker = displayCalendar && formik.values.doctorId;
+  const disabledSave = !(displayTimepicker && formik.values.startTime);
+
+  // const x = getMyAppointments(user.id, appointments);
 
   useLayoutEffect(() => {
     const fetchServices = async () => {
@@ -101,59 +168,11 @@ const ScheduleAppointmentPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const formik = useFormik({
-    initialValues: {
-      service: "",
-      date: "",
-      startTime: "",
-      reasonAppointment: "",
-    },
-    validateOnChange: false,
-    onSubmit: async (values, { setFieldValue }) => {
-      // const { date, startTime, reasonAppointment } = values;
-      // const endTimeEstimate = formatTimeStamp(
-      //   addMinutes(new Date(`${date} ${startTime}`), 30),
-      //   "hh:mm a"
-      // );
-      // const document = {
-      //   ...values,
-      //   endTimeEstimate,
-      //   weekNo: getWeek(new Date(date)),
-      //   reasonAppointment: reasonAppointment.trim(),
-      //   // user
-      //   patientId: user.id,
-      //   patientEmail: user.email,
-      //   patientName: user.name,
-      //   status: REQUEST_STATUS.forapproval,
-      //   approved: false,
-      //   rejected: false,
-      //   // contactNo
-      // };
-      // // Add Appointment
-      // const payload = { document };
-      // const { data, error: addError } = await addAppointment(payload);
-      // if (addError) return openErrorDialog(addError);
-      // // Successful
-      // openResponseDialog({
-      //   autoClose: true,
-      //   content: successMessage({
-      //     noun: "Appointment",
-      //     verb: "submitted",
-      //   }),
-      //   type: "SUCCESS",
-      //   closeCb() {
-      //     setFieldValue("startTime", "");
-      //     setFieldValue("reasonAppointment", "");
-      //   },
-      // });
-    },
-  });
-
   useLayoutEffect(() => {
-    if (!!formik.values.service) {
+    if (!!formik.values.serviceId) {
       const fetch = async () => {
         // Get Doctors
-        const payload = { services: [formik.values.service] };
+        const payload = { services: [formik.values.serviceId] };
         const { data, error: getError } = await getDoctors(payload);
         if (getError) return openErrorDialog(getError);
 
@@ -163,7 +182,7 @@ const ScheduleAppointmentPage = () => {
 
       const fetchSchedule = async (d) => {
         // Get Sched
-        const payload = { ids: d.map((i) => i.id), monthNo: getMonthNo() };
+        const payload = { ids: d.map((i) => i.id), monthNo: currMonth };
         const { data, error: getError } = await getSchedule(payload);
         if (getError) return openErrorDialog(getError);
 
@@ -171,12 +190,12 @@ const ScheduleAppointmentPage = () => {
         const sched = data.reduce((a, i) => {
           // combine per time slot
           const s = i.schedules.reduce((b, j) => {
-            // get only 1 sched from the day, need only 1 for display in calendar
             const c =
               j.schedules.length > 0
-                ? { ...j.schedules[0], doctor: i.doctorId } // insert doctor name on sched
+                ? j.schedules.map((k) => ({ ...k, id: i.doctorId })) // insert doctor name on sched
                 : null;
-            return c ? [...b, c] : b;
+
+            return c ? [...b, ...c] : b;
           }, []);
 
           // combine per doctor
@@ -189,49 +208,97 @@ const ScheduleAppointmentPage = () => {
       fetch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formik.values.service]);
+  }, [formik.values.serviceId, currMonth]);
 
-  // useLayoutEffect(() => {
-  //   if (doctors.length > 0) {
-  //     const fetch = async () => {
-  //       // Get Sched
-  //       const payload = {
-  //         ids: doctors.map((i) => i.id),
-  //         monthNo: getMonthNo(),
-  //       };
-  //       const { data, error: getError } = await getSchedule(payload);
-  //       if (getError) return openErrorDialog(getError);
+  useEffect(() => {
+    const q = query(
+      collection(db, "appointments"),
+      where("month", "==", currMonth),
+      where("rejected", "==", false)
+    );
 
-  //       // Combine schedules
-  //       const sched = data.reduce((a, i) => {
-  //         const s = i.schedules.reduce((b, j) => {
-  //           return [...b, ...j.schedules];
-  //         }, []);
-  //         return [...a, ...s];
-  //       }, []);
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      if (querySnapshot.docs.length > 0) {
+        const data = querySnapshot.docs.map((doc) => ({ ...doc.data() }));
+        const a = data.map((i) => ({
+          ...i,
+          type: i.patientId === user.id ? i.status : "others",
+        }));
+        setAppointments(a);
+      }
+    });
 
-  //       setSchedules(sched);
-  //       // data?.schedules?.reduce((acc, i) => {
-  //       //   return [...acc, ...i.schedules];
-  //       // }, []) || []
-  //       // setDoctors(data);
-  //     };
+    return () => unsub();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currMonth, user.id]);
 
-  //     fetch();
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [doctors]);
+  const handleDoctorClick = (info) => {
+    const date = formatTimeStamp(info.event.start);
+    const id = info.event.id;
 
+    // if same as prev selected, do noting
+    const a = date === formik.values.date;
+    const b = id === formik.values.doctorId;
+    if (a && b) return;
+
+    const ts = schedules.filter((i) => {
+      const matchId = i.id === id;
+      const matchDate = formatTimeStamp(i.start) === date;
+      return matchId && matchDate;
+    });
+
+    formik.setFieldValue("doctorId", id, false);
+    formik.setFieldValue("date", date, false);
+    formik.setFieldValue("startTime", "", false);
+    setSelectedDate(info.event.start);
+    setTimeslots(ts);
+  };
+
+  const handleTimeSelect = (e) => {
+    formik.setFieldValue("startTime", e.target.value, false);
+  };
+
+  const handleSave = () => {
+    formik.submitForm();
+  };
+
+  const handleCalendarPrev = () => {
+    setBaseDate((prev) => {
+      const v = subMonths(prev, 1);
+      const s = startOfMonth(v);
+      let d = isWeekend(s) ? addBusinessDays(s, 1) : s;
+      formik.setFieldValue("doctorId", "", false);
+      formik.setFieldValue("date", "", false);
+      formik.setFieldValue("startTime", "", false);
+      setSelectedDate(d);
+      setTimeslots([]);
+      return v;
+    });
+  };
+
+  const handleCalendarNext = () => {
+    setBaseDate((prev) => {
+      const v = addMonths(prev, 1);
+      const s = startOfMonth(v);
+      let d = isWeekend(s) ? addBusinessDays(s, 1) : s;
+      formik.setFieldValue("doctorId", "", false);
+      formik.setFieldValue("date", "", false);
+      formik.setFieldValue("startTime", "", false);
+      setSelectedDate(d);
+      setTimeslots([]);
+      return v;
+    });
+  };
   return (
-    <Box sx={{ pt: 2 }}>
-      <Box>
+    <Box sx={{ pt: 2, display: "flex", flexDirection: "row", gap: 2 }}>
+      <Box sx={{ width: 400 }}>
         <Select
-          sx={{ width: 400 }}
           required
           label="Service"
-          value={formik.values.service}
+          value={formik.values.serviceId}
           onChange={(e) => {
-            formik.setFieldValue("service", e.target.value, false);
+            formik.resetForm();
+            formik.setFieldValue("serviceId", e.target.value, false);
             setDoctors([]);
             setSchedules([]);
           }}
@@ -244,16 +311,50 @@ const ScheduleAppointmentPage = () => {
             </MenuItem>
           ))}
         </Select>
+
+        {displayTimepicker && (
+          <TimePicker
+            date={selectedDate}
+            data={timeslots}
+            doctor={doctorsMap[formik.values.doctorId]}
+            appointments={appointments}
+            selected={formik.values.startTime}
+            onTimeselect={handleTimeSelect}
+          />
+        )}
       </Box>
 
-      <Box>
-        {formik.values.service && !calendarLoading && (
-          <Calendar
-            doctorsMap={doctorsMap}
-            date={selectedDate}
-            events={schedules}
-            // onDateClick={handleDateClick}
-          />
+      {/* , mt: "-24px" */}
+      <Box sx={{ flex: 1 }}>
+        {displayCalendar && (
+          <>
+            {/* <Box>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={handleSave}
+                disabled={disabledSave}
+              >
+                submit appointment
+              </Button>
+            </Box> */}
+            <Header
+              selectedDate={baseDate}
+              handleCalendarPrev={handleCalendarPrev}
+              handleCalendarNext={handleCalendarNext}
+              prevDisabled={prevDisabled}
+              nextDisabled={nextDisabled}
+              handleSave={handleSave}
+              disabledSave={disabledSave}
+            />
+            <Calendar
+              height="calc(100vh - 180px)"
+              doctorsMap={doctorsMap}
+              date={baseDate}
+              events={schedules}
+              eventClick={handleDoctorClick}
+            />
+          </>
         )}
       </Box>
     </Box>
@@ -261,3 +362,38 @@ const ScheduleAppointmentPage = () => {
 };
 
 export default ScheduleAppointmentPage;
+
+const idNameMap = (a, i) => {
+  a[i.id] = i.name;
+  return a;
+};
+
+// const getMyAppointments = (id, data) => {
+//   data = data.filter((i) => !i.rejected);
+
+//   // const forApproval = data.filter((i) => {
+//   //   const a = i.patientId === id;
+//   //   const b = i.status === REQUEST_STATUS.forapproval;
+//   //   return a && b;
+//   // });
+
+//   // const approved = data.filter((i) => {
+//   //   const a = i.patientId === id;
+//   //   const b = i.status === REQUEST_STATUS.approved;
+//   //   return a && b;
+//   // });
+
+//   // const others = data.filter((i) => {
+//   //   const a = i.patientId !== id;
+//   //   return a && b;
+//   // });
+
+//   // console.log({ forApproval, approved, others });
+//   data = data.filter((i) => !i.rejected);
+//   const res = data.map((i) => {
+//     let type = i.patientId === id ? i.status : "others";
+//     return { ...i, type };
+//   });
+
+//   return res;
+// };
