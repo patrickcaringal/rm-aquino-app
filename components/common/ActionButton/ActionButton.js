@@ -8,6 +8,8 @@ import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import InfoIcon from "@mui/icons-material/Info";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
 import RestoreIcon from "@mui/icons-material/Restore";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import { IconButton, Tooltip } from "@mui/material";
 
 export const ACTION_BUTTONS = {
@@ -18,6 +20,8 @@ export const ACTION_BUTTONS = {
   // specific
   SCHEDULE: "SCHEDULE",
   DIAGNOSE: "DIAGNOSE",
+  APPROVE: "APPROVE",
+  REJECT: "REJECT",
 };
 
 export const ACTION_ICONS = {
@@ -28,6 +32,8 @@ export const ACTION_ICONS = {
   SCHEDULE: <CalendarMonthIcon />,
   INFO: <InfoIcon />,
   DIAGNOSE: <RecordVoiceOverIcon />,
+  APPROVE: <ThumbUpIcon />,
+  REJECT: <ThumbDownIcon />,
 };
 
 const getButton = ({

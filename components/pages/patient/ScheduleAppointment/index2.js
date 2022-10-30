@@ -322,6 +322,8 @@ const ScheduleAppointmentPage = () => {
             date={selectedDate}
             data={timeslots}
             doctor={doctorsMap[formik.values.doctorId]}
+            doctorId={formik.values.doctorId}
+            patientId={user.id}
             appointments={appointments}
             selected={formik.values.startTime}
             onTimeselect={handleTimeSelect}

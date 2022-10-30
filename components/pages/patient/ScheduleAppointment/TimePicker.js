@@ -62,6 +62,8 @@ const Timepicker = ({
   appointments = [],
   date,
   doctor,
+  doctorId,
+  patientId,
   selected,
   onTimeselect,
 }) => {
@@ -70,7 +72,13 @@ const Timepicker = ({
   const hasAMSlot = !!AMTimeslot.length;
   const hasPMSlot = !!PMTimeslot.length;
 
-  const disabledSlots = appointments.filter((i) => i.date === dateStr);
+  const disabledSlots = appointments.filter(
+    (i) => i.date === dateStr && doctorId === i.doctorId
+  );
+
+  const hasSlotDate = appointments.filter(
+    (i) => i.date === dateStr && i.patientId === patientId
+  );
 
   return (
     <Box sx={{ mt: 2, display: "flex", flexDirection: "column" }}>
@@ -97,7 +105,6 @@ const Timepicker = ({
             mt: 1,
             ml: "1px",
           }}
-          disabled
         >
           {hasAMSlot && (
             <Box>
@@ -107,7 +114,7 @@ const Timepicker = ({
               {AMTimeslot.map((slot, idx) => (
                 <SlotComponent
                   key={idx}
-                  disabled={!!disabledSlots.length}
+                  disabled={!!hasSlotDate.length}
                   time={slot}
                   disabledSlots={disabledSlots}
                 />
@@ -123,7 +130,7 @@ const Timepicker = ({
               {PMTimeslot.map((slot, idx) => (
                 <SlotComponent
                   key={idx}
-                  disabled={!!disabledSlots.length}
+                  disabled={!!hasSlotDate.length}
                   time={slot}
                   disabledSlots={disabledSlots}
                 />

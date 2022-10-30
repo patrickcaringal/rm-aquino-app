@@ -45,7 +45,7 @@ const referralDefaultValue = isMockDataEnabled
       content: "",
     };
 
-const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
+const ConsultModal = ({ open = false, data, onClose, onSave }) => {
   const { openErrorDialog, openResponseDialog } = useResponseDialog();
   const { setBackdropLoader } = useBackdropLoader();
 
@@ -132,7 +132,8 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
       if (diganoseError) return openErrorDialog(diganoseError);
 
       // Successful
-      setAppointments((prev) => prev.filter((i) => i.id !== id));
+      // setAppointments((prev) => prev.filter((i) => i.id !== id));
+      onSave();
       openResponseDialog({
         autoClose: true,
         content: successMessage({
@@ -231,7 +232,8 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
     if (diganoseError) return openErrorDialog(diganoseError);
 
     // Successful
-    setAppointments((prev) => prev.filter((i) => i.id !== id));
+    // setAppointments((prev) => prev.filter((i) => i.id !== id));
+    onSave();
     openResponseDialog({
       autoClose: true,
       content: successMessage({

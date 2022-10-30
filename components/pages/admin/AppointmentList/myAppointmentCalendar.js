@@ -32,9 +32,9 @@ import {
 } from "../../../../modules/helper";
 import { FullCalendar, PATHS, successMessage } from "../../../common";
 import { REQUEST_STATUS } from "../../../shared";
-import { getRangeId, getSlots } from "../DoctorSchedule/utils";
 import Header from "./Header";
 import Calendar from "./MyCalendar";
+import { getRangeId, getSlots } from "./utils";
 
 const AppointmentsCalendar = () => {
   const router = useRouter();
@@ -70,7 +70,6 @@ const AppointmentsCalendar = () => {
       };
       const { data, error } = await getAppointments(payload);
       if (error) return openErrorDialog(error);
-      console.log(data);
 
       setAppointments(data);
     };
@@ -79,11 +78,10 @@ const AppointmentsCalendar = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currMonth]);
 
-  const handleEventClick = (info) => {
-    if (info.event.title.includes("For Approval")) return;
+  const handleDateClick = (info) => {
     router.push({
       pathname: PATHS.ADMIN.MY_APPOINTMENT_APPROVED,
-      query: { id: doctorId, date: info.event.startStr },
+      query: { id: doctorId, date: info.dateStr },
     });
   };
 
@@ -131,7 +129,8 @@ const AppointmentsCalendar = () => {
           height="calc(100vh - 180px)"
           date={baseDate}
           events={appointments}
-          onEventClick={handleEventClick}
+          // onEventClick={handleEventClick}
+          onDateClick={handleDateClick}
         />
       )}
     </Box>

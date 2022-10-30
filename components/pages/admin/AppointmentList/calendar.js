@@ -31,9 +31,9 @@ import {
 } from "../../../../modules/helper";
 import { FullCalendar, PATHS, successMessage } from "../../../common";
 import { REQUEST_STATUS } from "../../../shared";
-import { getRangeId, getSlots } from "../DoctorSchedule/utils";
-import Calendar from "./CalendarComp";
 import Header from "./Header";
+import Calendar from "./MyCalendar";
+import { getRangeId, getSlots } from "./utils";
 
 const AppointmentsCalendar = () => {
   const router = useRouter();
@@ -58,6 +58,7 @@ const AppointmentsCalendar = () => {
       where("status", "in", [
         REQUEST_STATUS.forapproval,
         REQUEST_STATUS.approved,
+        REQUEST_STATUS.done,
       ])
     );
 
@@ -75,18 +76,10 @@ const AppointmentsCalendar = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currMonth]);
 
-  const handleEventClick = (info) => {
-    if (info.event.title.includes("For Approval")) {
-      router.push({
-        pathname: PATHS.ADMIN.APPOINTMENT_APPROVAL,
-        query: { date: info.event.startStr },
-      });
-      return;
-    }
-
+  const handleDateClick = (info) => {
     router.push({
-      pathname: PATHS.ADMIN.APPOINTMENT_APPROVED,
-      query: { date: info.event.startStr },
+      pathname: PATHS.ADMIN.APPOINTMENT_MANAGEMENT,
+      query: { date: info.dateStr },
     });
   };
 
@@ -134,7 +127,7 @@ const AppointmentsCalendar = () => {
           height="calc(100vh - 180px)"
           date={baseDate}
           events={appointments}
-          onEventClick={handleEventClick}
+          onDateClick={handleDateClick}
         />
       )}
     </Box>

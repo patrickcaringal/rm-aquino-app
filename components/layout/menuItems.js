@@ -88,9 +88,9 @@ export const getNavbarItems = (id, role, router) => {
         //   ],
         // },
         {
-          text: "Appointments approval",
+          text: "Appointments",
           icon: null,
-          onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_MANAGEMENT),
+          onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
         },
         // {
         //   text: "Consultation",
