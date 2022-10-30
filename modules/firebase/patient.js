@@ -188,19 +188,52 @@ export const verifyPatientEmailReq = async ({ id }) => {
       throw new Error("Unable to get Patient doc");
     }
 
-    const p = querySnapshot.data();
+    const document = querySnapshot.data();
 
-    if (!!p.verified) {
+    if (!!document.verified) {
       throw new Error("Patient email already verified");
     }
 
-    // update to verified
-    const docRef = doc(db, "patients", id);
-    await updateDoc(docRef, {
-      verified: true,
-    });
+    const password = faker.internet.password(8, false, /[a-z]/);
+    // Create Auth Account
+    const {
+      user: { uid },
+    } = await createUserWithEmailAndPassword(
+      secondaryAuth,
+      document.email,
+      password
+    );
 
-    return { data: p, success: true };
+    // Update to approved
+    const batch = writeBatch(db);
+    const docRef = doc(db, "patients", document.id);
+    const data = {
+      authId: uid,
+      approved: true,
+      verified: true,
+      ...timestampFields({ dateUpdated: true }),
+    };
+    batch.update(docRef, data);
+
+    // Register Patient name
+    const { namesDocRef, names } = await registerNames({
+      collectionName: "patients",
+      names: { [document.id]: document.name },
+    });
+    batch.update(namesDocRef, names);
+
+    await batch.commit();
+
+    // send email
+    const payload = {
+      name: document.name,
+      email: document.email,
+      password,
+      link: getBaseUrl("/signin"),
+    };
+    await sendEmail("/approve-patient", payload);
+
+    return { data: document, success: true };
   } catch (error) {
     console.log(error);
     return { error: error.message };

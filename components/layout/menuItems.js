@@ -68,11 +68,11 @@ export const getNavbarItems = (id, role, router) => {
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
         },
-        {
-          text: "Patient Approval",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
-        },
+        // {
+        //   text: "Patient Approval",
+        //   icon: null,
+        //   onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
+        // },
         // {
         //   text: "Patients",
         //   icon: null,
@@ -107,7 +107,7 @@ export const getNavbarItems = (id, role, router) => {
           onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
         },
         {
-          text: "Appointments",
+          text: "My Appointments",
           icon: null,
           onClick: () =>
             router.push({

@@ -45,7 +45,16 @@ const Calendar = ({
       };
     });
 
-  events = [...a, ...b];
+  events = [
+    ...a,
+    ...b,
+    // {
+    //   start: "2022-11-02",
+    //   end: "2022-11-02",
+    //   display: "background",
+    //   backgroundColor: "#15a446",
+    // },
+  ];
 
   return (
     <Box sx={{ mt: "-12px" }}>

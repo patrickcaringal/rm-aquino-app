@@ -32,6 +32,7 @@ import {
   startOfMonth,
   startOfToday,
   subBusinessDays,
+  subDays,
   subMonths,
 } from "date-fns";
 import faker from "faker";
@@ -187,7 +188,7 @@ const ScheduleAppointmentPage = () => {
         if (getError) return openErrorDialog(getError);
 
         // Combine schedules
-        const sched = data.reduce((a, i) => {
+        let sched = data.reduce((a, i) => {
           // combine per time slot
           const s = i.schedules.reduce((b, j) => {
             const c =
@@ -201,6 +202,10 @@ const ScheduleAppointmentPage = () => {
           // combine per doctor
           return [...a, ...s];
         }, []);
+
+        sched = sched.filter((i) =>
+          isAfter(new Date(i.start), subDays(new Date(), 1))
+        );
 
         setSchedules(sched);
       };
