@@ -137,6 +137,7 @@ const AppointmentsPage = () => {
                   service,
                   patientName,
                 } = i;
+                console.log(JSON.stringify(i, null, 4));
 
                 return (
                   <TableRow key={id}>
@@ -154,12 +155,6 @@ const AppointmentsPage = () => {
                     <TableCell>
                       <RequestStatus status={status} />
                     </TableCell>
-                    {/* <TableCell>
-                      <LongTypography
-                        text={reasonAppointment}
-                        displayedLines={2}
-                      />
-                    </TableCell> */}
                     <TableCell align="center"></TableCell>
                   </TableRow>
                 );

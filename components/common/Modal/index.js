@@ -24,12 +24,13 @@ const Modal = ({
   title = "",
   dialogActions,
   maxWidth = "md",
+  fullScreen = false,
 }) => {
   const isMobileView = useMediaQuery((theme) => theme.breakpoints.only("xs"));
 
   return (
     <Dialog
-      fullScreen={isMobileView}
+      fullScreen={fullScreen || isMobileView}
       fullWidth
       maxWidth={maxWidth}
       open={open}

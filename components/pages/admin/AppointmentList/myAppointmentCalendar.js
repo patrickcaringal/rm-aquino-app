@@ -62,10 +62,15 @@ const AppointmentsCalendar = () => {
       const payload = {
         id: doctorId,
         month: currMonth,
-        status: [REQUEST_STATUS.forapproval, REQUEST_STATUS.approved],
+        status: [
+          REQUEST_STATUS.forapproval,
+          REQUEST_STATUS.approved,
+          REQUEST_STATUS.done,
+        ],
       };
       const { data, error } = await getAppointments(payload);
       if (error) return openErrorDialog(error);
+      console.log(data);
 
       setAppointments(data);
     };

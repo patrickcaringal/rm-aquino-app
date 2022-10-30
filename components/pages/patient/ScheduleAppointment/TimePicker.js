@@ -24,12 +24,14 @@ const SlotComponent = ({ time, disabledSlots, disabled: d }) => {
   const label = {
     [REQUEST_STATUS.forapproval]: "For Approval",
     [REQUEST_STATUS.approved]: "Approved",
+    [REQUEST_STATUS.done]: "Done",
     others: "Taken",
   };
 
   const color = {
     [REQUEST_STATUS.forapproval]: "primary",
     [REQUEST_STATUS.approved]: "primary",
+    [REQUEST_STATUS.done]: "primary",
     others: "error",
   };
 

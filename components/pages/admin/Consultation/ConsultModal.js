@@ -66,9 +66,9 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
     date,
     startTime,
     endTimeEstimate,
-    reasonAppointment,
     patientName,
     patientId,
+    service,
   } = data;
 
   const { birthdate, gender } = patient;
@@ -83,28 +83,20 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
       value: birthdate ? calculateAge(formatTimeStamp(birthdate)) : "-",
     },
     {
-      label: "Birthdate",
-      value: birthdate ? formatTimeStamp(birthdate, "MMM-dd-yyyy") : "-",
-    },
-    {
       label: "Gender",
       value: gender ? gender : "-",
     },
     {
       label: "Appointment Date",
-      value: formatTimeStamp(date, "MMM dd, yyyy"),
-    },
-    {
-      label: "Appointment Day",
-      value: formatTimeStamp(date, "EEEE"),
+      value: formatTimeStamp(date, "MMM dd, yyyy (EEEE)"),
     },
     {
       label: "Appointment Time",
       value: `${startTime} - ${endTimeEstimate}`,
     },
     {
-      label: "Reason for Appointment",
-      value: reasonAppointment,
+      label: "Service",
+      value: `${service}`,
     },
   ];
 
@@ -117,16 +109,20 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
       const payload = {
         document: {
           diagnosis: values.diagnosis,
-          service: SERVICE_TYPE.DIAGNOSE,
+          action: SERVICE_TYPE.DIAGNOSE,
           ...lodash.pick(data, [
             "patientName",
             "patientId",
             "patientEmail",
-            "reasonAppointment",
+            "service",
+            "serviceId",
+            "doctor",
+            "doctorId",
             "date",
             "startTime",
             "endTimeEstimate",
             "weekNo",
+            "month",
           ]),
           appointmentId: id,
         },
@@ -211,16 +207,20 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
     const payload = {
       document: {
         referral: referralFormik.values,
-        service: SERVICE_TYPE.REFER,
+        action: SERVICE_TYPE.REFER,
         ...lodash.pick(data, [
           "patientName",
           "patientId",
           "patientEmail",
-          "reasonAppointment",
+          "service",
+          "serviceId",
+          "doctor",
+          "doctorId",
           "date",
           "startTime",
           "endTimeEstimate",
           "weekNo",
+          "month",
         ]),
         appointmentId: id,
         diagnosis: "",
@@ -248,6 +248,7 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
 
   return (
     <Modal
+      fullScreen
       open={open}
       onClose={handleClose}
       title="Doctor Consultation"
@@ -263,7 +264,6 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
               variant="contained"
               size="small"
               onClick={() => formik.submitForm()}
-              disabled
             >
               save diagnosis
             </Button>
@@ -275,7 +275,7 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
                   variant="outlined"
                   size="small"
                   onClick={() => referralFormik.submitForm()}
-                  disabled
+                  // disabled
                 >
                   generate referral
                 </Button>
@@ -284,7 +284,7 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
                   variant="contained"
                   size="small"
                   onClick={handleSaveReferral}
-                  disabled
+                  // disabled
                 >
                   save referral
                 </Button>
@@ -314,7 +314,7 @@ const ConsultModal = ({ open = false, data, onClose, setAppointments }) => {
           <Box sx={{ pr: 3 }}>
             <Select
               required
-              label="Service"
+              label="Action"
               onChange={handleServiceChange}
               value={serviceType}
               sx={{ mb: 2 }}

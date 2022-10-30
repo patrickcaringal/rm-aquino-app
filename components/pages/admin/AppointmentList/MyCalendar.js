@@ -20,6 +20,7 @@ const Calendar = ({
   let forapproval = events.filter(
     (i) => i.status === REQUEST_STATUS.forapproval
   );
+  let done = events.filter((i) => i.status === REQUEST_STATUS.done);
 
   const a = lodash
     .toPairs(lodash.chain(approved).groupBy("date").value())
@@ -45,9 +46,23 @@ const Calendar = ({
       };
     });
 
+  const c = lodash
+    .toPairs(lodash.chain(done).groupBy("date").value())
+    .map(([k, v]) => {
+      return {
+        start: k,
+        end: k,
+        title: `${v.length} Done`,
+        backgroundColor: "#15a446",
+        borderColor: "#rgb(14, 114, 49)",
+      };
+    });
+
   events = [
     ...a,
     ...b,
+    ...c,
+
     // {
     //   start: "2022-11-02",
     //   end: "2022-11-02",

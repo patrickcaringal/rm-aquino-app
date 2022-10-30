@@ -283,6 +283,7 @@ export const diagnosePatientReq = async ({ document }) => {
       status: REQUEST_STATUS.done,
       ...timestampFields({ dateUpdated: true }),
     });
+    console.log(document.appointmentId);
 
     await batch.commit();
 
