@@ -79,6 +79,11 @@ const AppointmentsCalendar = () => {
   }, [currMonth]);
 
   const handleDateClick = (info) => {
+    const noAppointment = !appointments.filter((i) => i.date === info.dateStr)
+      .length;
+    console.log({ noAppointment });
+    if (noAppointment) return;
+
     router.push({
       pathname: PATHS.ADMIN.MY_APPOINTMENT_APPROVED,
       query: { id: doctorId, date: info.dateStr },

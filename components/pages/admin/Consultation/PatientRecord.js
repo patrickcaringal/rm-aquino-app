@@ -108,7 +108,7 @@ const PatientRecord = ({ data = [] }) => {
                 </TableRow>
               );
             })}
-            <TablePlaceholder visible={data.length === 0} colSpan={3} />
+            <TablePlaceholder visible={data.length === 0} colSpan={4} />
           </TableBody>
         </Table>
       </TableContainer>

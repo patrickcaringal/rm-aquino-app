@@ -219,7 +219,11 @@ const ScheduleAppointmentPage = () => {
     const q = query(
       collection(db, "appointments"),
       where("month", "==", currMonth),
-      where("rejected", "==", false)
+      where("status", "in", [
+        REQUEST_STATUS.forapproval,
+        REQUEST_STATUS.approved,
+        REQUEST_STATUS.done,
+      ])
     );
 
     const unsub = onSnapshot(q, (querySnapshot) => {

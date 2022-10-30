@@ -137,7 +137,8 @@ const MedicalRecordPage = () => {
               <TableRow>
                 {[
                   { text: "Date of Visit", sx: { width: 140 } },
-                  { text: "Reason for Visit" },
+                  { text: "Doctor", sx: { width: 180 } },
+                  { text: "Service", sx: { width: 180 } },
                   { text: "Doctor Diagnosis" },
                 ].map(({ text, align, sx }) => (
                   <TableCell
@@ -152,18 +153,14 @@ const MedicalRecordPage = () => {
             </TableHead>
             <TableBody>
               {filtering.filtered.map((i, index) => {
-                const { date, reasonAppointment, diagnosis } = i;
+                const { id, date, service, doctor, diagnosis } = i;
                 return (
-                  <TableRow key={index}>
+                  <TableRow key={index} id={id}>
                     <TableCell>
                       {formatTimeStamp(date, "MMM dd, yyyy")}
                     </TableCell>
-                    <TableCell>
-                      <LongTypography
-                        text={reasonAppointment}
-                        whiteSpace="pre-line"
-                      />
-                    </TableCell>
+                    <TableCell>{doctor ? doctor : "-"}</TableCell>
+                    <TableCell>{service ? service : "-"}</TableCell>
                     <TableCell>
                       {diagnosis ? (
                         <LongTypography

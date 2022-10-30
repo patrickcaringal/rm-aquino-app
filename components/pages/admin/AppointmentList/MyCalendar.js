@@ -8,6 +8,7 @@ import lodash from "lodash";
 
 import { formatTimeStamp, pluralize } from "../../../../modules/helper";
 import { REQUEST_STATUS } from "../../../shared";
+import { getPreviousDateBgEvents } from "./utils";
 
 const Calendar = ({
   date,
@@ -58,18 +59,9 @@ const Calendar = ({
       };
     });
 
-  events = [
-    ...a,
-    ...b,
-    ...c,
+  const bgEvents = getPreviousDateBgEvents(date);
 
-    // {
-    //   start: "2022-11-02",
-    //   end: "2022-11-02",
-    //   display: "background",
-    //   backgroundColor: "#15a446",
-    // },
-  ];
+  events = [...a, ...b, ...c, ...bgEvents];
 
   return (
     <Box sx={{ mt: "-12px" }}>

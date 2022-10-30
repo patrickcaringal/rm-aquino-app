@@ -41,11 +41,8 @@ const AppointmentsCalendar = () => {
     useResponseDialog();
   const { setBackdropLoader } = useBackdropLoader();
 
-  // Requests
-
   // Local States
   const [appointments, setAppointments] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [baseDate, setBaseDate] = useState(new Date());
   const [UILoading, setUILoading] = useState(false);
 
