@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import {
   Box,
   Button,
@@ -326,6 +324,7 @@ const MyApprovedAppointmentsPage = () => {
                   </TableRow>
                 );
               })}
+              <TablePlaceholder visible={filtered.length === 0} colSpan={6} />
             </TableBody>
           </Table>
         </TableContainer>

@@ -40,6 +40,8 @@ const AppointmentsCalendar = () => {
   const { openResponseDialog, openErrorDialog, closeDialog } =
     useResponseDialog();
   const { setBackdropLoader } = useBackdropLoader();
+  const doctorId = router.query.id;
+  const multiDoctorMode = !doctorId;
 
   // Local States
   const [appointments, setAppointments] = useState([]);
@@ -49,23 +51,32 @@ const AppointmentsCalendar = () => {
   const currMonth = getMonth(new Date(baseDate)) + 1;
 
   useEffect(() => {
-    const q = query(
-      collection(db, "appointments"),
-      where("month", "==", currMonth),
-      where("status", "in", [
-        REQUEST_STATUS.forapproval,
-        REQUEST_STATUS.approved,
-        REQUEST_STATUS.done,
-      ])
-    );
+    const statuses = [
+      REQUEST_STATUS.forapproval,
+      REQUEST_STATUS.approved,
+      REQUEST_STATUS.done,
+    ];
+    const q = multiDoctorMode
+      ? query(
+          collection(db, "appointments"),
+          where("month", "==", currMonth),
+          where("status", "in", statuses)
+        )
+      : query(
+          collection(db, "appointments"),
+          where("month", "==", currMonth),
+          where("doctorId", "==", doctorId),
+          where("status", "in", statuses)
+        );
 
     const unsub = onSnapshot(q, (querySnapshot) => {
       if (querySnapshot.docs.length > 0) {
         const data = querySnapshot.docs.map((doc) => ({ ...doc.data() }));
+
         const a = data.map((i) => ({
           ...i,
         }));
-        setAppointments(a);
+        setAppointments(data);
       }
     });
 
@@ -74,9 +85,15 @@ const AppointmentsCalendar = () => {
   }, [currMonth]);
 
   const handleDateClick = (info) => {
+    const noAppointment = !appointments.filter((i) => i.date === info.dateStr)
+      .length;
+    if (noAppointment) return;
+
     router.push({
       pathname: PATHS.ADMIN.APPOINTMENT_MANAGEMENT,
-      query: { date: info.dateStr },
+      query: multiDoctorMode
+        ? { date: info.dateStr }
+        : { id: doctorId, date: info.dateStr },
     });
   };
 

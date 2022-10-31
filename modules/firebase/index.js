@@ -26,12 +26,13 @@ import {
   rejectAppointmentReq,
 } from "./appointment";
 import {
+  changePasswordReq,
+  getUserReq,
   monitorAuthState,
   signInReq,
-  // signInAnonymouslyReq,
-  // signOutAnonymouslyReq,
   signOutReq,
   signUpReq,
+  updateUserReq,
 } from "./auth";
 import { auth, db } from "./config";
 import { getPatientRecordReq } from "./medicalRecords";
@@ -66,12 +67,13 @@ export {
   // auth
   db,
   auth,
-  signUpReq,
-  signOutReq,
-  signInReq,
-  // signInAnonymouslyReq,
-  // signOutAnonymouslyReq,
+  changePasswordReq,
+  getUserReq,
   monitorAuthState,
+  signInReq,
+  signOutReq,
+  signUpReq,
+  updateUserReq,
   // storage
   uploadImageReq,
   deleteImageReq,

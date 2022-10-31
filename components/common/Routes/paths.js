@@ -9,6 +9,7 @@ export const PATHS = {
   // },
   ADMIN: {
     DASHBOARD: "/admin/dashboard",
+    PROFILE: "/admin/profile",
     STAFF_MANAGEMENT: "/admin/staffs",
     SERVICES_MANAGEMENT: "/admin/services",
     SERVICES_RESTORE: "/admin/services/restore",
@@ -33,6 +34,7 @@ export const PATHS = {
   // },
   PATIENT: {
     DASHBOARD: "/dashboard",
+    PROFILE: "/profile",
     APPOINTMENT: "/appointment",
     MEDICAL_RECORD: "/medical-record",
     SCHEDULE_APPOINTMENT: "/schedule-appointment",
