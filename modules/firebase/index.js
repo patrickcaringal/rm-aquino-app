@@ -35,7 +35,7 @@ import {
   updateUserReq,
 } from "./auth";
 import { auth, db } from "./config";
-import { getPatientRecordReq } from "./medicalRecords";
+import { getMedicalRecordsReq, getPatientRecordReq } from "./medicalRecords";
 import {
   approvePatientReq,
   createPatientAccountReq,
@@ -126,4 +126,5 @@ export {
   rejectAppointmentReq,
   // medical record
   getPatientRecordReq,
+  getMedicalRecordsReq,
 };

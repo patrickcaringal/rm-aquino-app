@@ -24,7 +24,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import Paper from "@mui/material/Paper";
 import { useRouter } from "next/router";
 
 import { Logo } from "../../components";
@@ -37,8 +36,6 @@ import { signOutAnonymouslyReq, signOutReq } from "../../modules/firebase";
 import { getFullName, getInitials } from "../../modules/helper";
 import { getNavbarItems } from "./menuItems";
 import NavbarItem from "./NavbarItem";
-
-const pages = ["Products", "Pricing", "Blog"];
 
 const ResponsiveAppBar = () => {
   const router = useRouter();
