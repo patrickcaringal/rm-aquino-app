@@ -13,7 +13,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { isAfter, isBefore } from "date-fns";
+import { endOfMonth, isAfter, isBefore, startOfMonth } from "date-fns";
 import { jsPDF } from "jspdf";
 import lodash from "lodash";
 import { useRouter } from "next/router";
@@ -59,7 +59,10 @@ const ReportAppointment = () => {
   // Local States
   const [consultations, setConsultations] = useState([]);
 
-  const filtering = useFilter({});
+  const filtering = useFilter({
+    defaultStartDate: startOfMonth(new Date()),
+    defaultEndDate: endOfMonth(new Date()),
+  });
 
   useEffect(() => {
     const fetch = async () => {

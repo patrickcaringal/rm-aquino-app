@@ -22,7 +22,7 @@ import { useRequest } from "../../../../hooks";
 import { getBaseApi } from "../../../../modules/env";
 import { getPatientRecordReq } from "../../../../modules/firebase";
 import { formatTimeStamp } from "../../../../modules/helper";
-import { LongTypography } from "../../../common";
+import { LongTypography, TablePlaceholder } from "../../../common";
 import { DatePicker } from "../../../common/Form";
 import ReferralModal from "./ReferralModal";
 import useFilter from "./useFilter";
@@ -181,6 +181,10 @@ const MedicalRecordPage = () => {
                   </TableRow>
                 );
               })}
+              <TablePlaceholder
+                visible={filtering.filtered.length === 0}
+                colSpan={4}
+              />
             </TableBody>
           </Table>
         </TableContainer>

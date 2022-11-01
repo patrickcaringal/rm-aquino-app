@@ -91,7 +91,7 @@ const AppointmentsPage = () => {
       autoClose: true,
       content: successMessage({
         noun: "Appointment",
-        verb: "rejected",
+        verb: "cancelled",
       }),
       type: "SUCCESS",
       closeCb() {
@@ -247,6 +247,7 @@ const AppointmentsPage = () => {
                   </TableRow>
                 );
               })}
+              <TablePlaceholder visible={filtered.length === 0} colSpan={5} />
             </TableBody>
           </Table>
         </TableContainer>
