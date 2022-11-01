@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import DownloadIcon from "@mui/icons-material/Download";
 import {
   Box,
   Button,
@@ -13,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { isAfter, isBefore } from "date-fns";
+import { jsPDF } from "jspdf";
 import lodash from "lodash";
 import { useRouter } from "next/router";
 
@@ -122,6 +124,13 @@ const ReportAppointment = () => {
             onChange={handleEndDateChange}
           />
         </Box>
+        <Button
+          variant="contained"
+          startIcon={<DownloadIcon />}
+          onClick={() => handleExport(filtering.filtered)}
+        >
+          Export
+        </Button>
       </Box>
 
       <Box>
@@ -160,6 +169,59 @@ const ReportAppointment = () => {
       </Box>
     </Box>
   );
+};
+
+const handleExport = (data) => {
+  const doc = new jsPDF({ orientation: "landscape" });
+
+  data.forEach((i, idx) => {
+    doc.setFontSize(14);
+    const { date, data } = i;
+
+    const baseX = 8;
+    const baseY = 10;
+    let movingY = baseY;
+
+    const thead = [
+      {
+        name: "time",
+        prompt: "Time",
+      },
+      {
+        name: "patient",
+        prompt: "Patient",
+      },
+      {
+        name: "doctor",
+        prompt: "Doctor",
+      },
+      {
+        name: "service",
+        prompt: "Service",
+      },
+    ];
+
+    const tbody = data.map((j) => ({
+      time: `${j.startTime} - ${j.endTimeEstimate}`,
+      patient: j.patientName,
+      doctor: j.doctor,
+      service: j.service,
+    }));
+
+    doc.text(formatTimeStamp(date, "MMMM dd, yyyy"), baseX, movingY);
+    movingY += 5;
+
+    doc.table(baseX, movingY, tbody, thead, {
+      autoSize: true,
+      headerBackgroundColor: "#15A446",
+      headerTextColor: "#fff",
+      fontSize: 10,
+    });
+
+    if (idx + 1 !== data.length) doc.addPage();
+  });
+
+  doc.output("pdfobjectnewwindow"); //opens the data uri in new window
 };
 
 export default ReportAppointment;
