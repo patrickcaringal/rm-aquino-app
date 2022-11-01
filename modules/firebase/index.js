@@ -13,6 +13,7 @@ import {
   SERVICE_TYPE,
   addAppointmentReq,
   approveAppointmentReq,
+  cancelAppointmentReq,
   diagnosePatientReq,
   getAppointmentByDateReq,
   getAppointmentByDateStatusReq,
@@ -25,15 +26,16 @@ import {
   rejectAppointmentReq,
 } from "./appointment";
 import {
+  changePasswordReq,
+  getUserReq,
   monitorAuthState,
   signInReq,
-  // signInAnonymouslyReq,
-  // signOutAnonymouslyReq,
   signOutReq,
   signUpReq,
+  updateUserReq,
 } from "./auth";
 import { auth, db } from "./config";
-import { getPatientRecordReq } from "./medicalRecords";
+import { getMedicalRecordsReq, getPatientRecordReq } from "./medicalRecords";
 import {
   approvePatientReq,
   createPatientAccountReq,
@@ -65,12 +67,13 @@ export {
   // auth
   db,
   auth,
-  signUpReq,
-  signOutReq,
-  signInReq,
-  // signInAnonymouslyReq,
-  // signOutAnonymouslyReq,
+  changePasswordReq,
+  getUserReq,
   monitorAuthState,
+  signInReq,
+  signOutReq,
+  signUpReq,
+  updateUserReq,
   // storage
   uploadImageReq,
   deleteImageReq,
@@ -110,10 +113,11 @@ export {
   SERVICE_TYPE,
   addAppointmentReq,
   approveAppointmentReq,
+  cancelAppointmentReq,
   diagnosePatientReq,
-  getAppointmentByDateStatusReq,
   getAppointmentByDateReq,
-  // getAppointmentForApprovalReq,
+  getAppointmentByDateStatusReq,
+  getAppointmentForApprovalReq,
   getAppointmentReq,
   getAppointmentsByWeekReq,
   getDoctorAppointmentByDateReq,
@@ -122,4 +126,5 @@ export {
   rejectAppointmentReq,
   // medical record
   getPatientRecordReq,
+  getMedicalRecordsReq,
 };

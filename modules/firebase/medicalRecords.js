@@ -37,3 +37,19 @@ export const getPatientRecordReq = async ({ id }) => {
     return { error: error.message };
   }
 };
+
+export const getMedicalRecordsReq = async () => {
+  try {
+    const q = query(collRef, where("deleted", "==", false));
+    const querySnapshot = await getDocs(q);
+
+    const data = querySnapshot.docs
+      .map((doc) => ({ ...doc.data() }))
+      .sort(sortBy("dateCreated", "desc"));
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};

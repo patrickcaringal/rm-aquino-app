@@ -32,6 +32,7 @@ import {
   startOfMonth,
   startOfToday,
   subBusinessDays,
+  subDays,
   subMonths,
 } from "date-fns";
 import faker from "faker";
@@ -187,7 +188,7 @@ const ScheduleAppointmentPage = () => {
         if (getError) return openErrorDialog(getError);
 
         // Combine schedules
-        const sched = data.reduce((a, i) => {
+        let sched = data.reduce((a, i) => {
           // combine per time slot
           const s = i.schedules.reduce((b, j) => {
             const c =
@@ -202,6 +203,10 @@ const ScheduleAppointmentPage = () => {
           return [...a, ...s];
         }, []);
 
+        sched = sched.filter((i) =>
+          isAfter(new Date(i.start), subDays(new Date(), 1))
+        );
+
         setSchedules(sched);
       };
 
@@ -214,7 +219,11 @@ const ScheduleAppointmentPage = () => {
     const q = query(
       collection(db, "appointments"),
       where("month", "==", currMonth),
-      where("rejected", "==", false)
+      where("status", "in", [
+        REQUEST_STATUS.forapproval,
+        REQUEST_STATUS.approved,
+        REQUEST_STATUS.done,
+      ])
     );
 
     const unsub = onSnapshot(q, (querySnapshot) => {
@@ -317,6 +326,8 @@ const ScheduleAppointmentPage = () => {
             date={selectedDate}
             data={timeslots}
             doctor={doctorsMap[formik.values.doctorId]}
+            doctorId={formik.values.doctorId}
+            patientId={user.id}
             appointments={appointments}
             selected={formik.values.startTime}
             onTimeselect={handleTimeSelect}

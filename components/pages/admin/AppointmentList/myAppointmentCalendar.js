@@ -1,136 +1,146 @@
-import React, { useCallback, useEffect, useState } from "react";
+// TODELETE
+// import React, { useCallback, useEffect, useState } from "react";
 
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Chip,
-  Link,
-  Typography,
-} from "@mui/material";
-import { addMonths, getMonth, subMonths } from "date-fns";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import lodash from "lodash";
-import { useRouter } from "next/router";
+// import {
+//   Box,
+//   Button,
+//   ButtonGroup,
+//   Chip,
+//   Link,
+//   Typography,
+// } from "@mui/material";
+// import { addMonths, getMonth, subMonths } from "date-fns";
+// import { collection, onSnapshot, query, where } from "firebase/firestore";
+// import lodash from "lodash";
+// import { useRouter } from "next/router";
 
-import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
-import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
-import useRequest from "../../../../hooks/useRequest";
-import {
-  addSchedulesReq,
-  db,
-  getAppointmentsByWeekReq,
-  getDoctorAppointmentByMonthReq,
-  getScheduleReq,
-  updateSchedulesReq,
-} from "../../../../modules/firebase";
-import {
-  days,
-  formatTimeStamp,
-  getDayOfWeek,
-  today,
-} from "../../../../modules/helper";
-import { FullCalendar, PATHS, successMessage } from "../../../common";
-import { REQUEST_STATUS } from "../../../shared";
-import { getRangeId, getSlots } from "../DoctorSchedule/utils";
-import Header from "./Header";
-import Calendar from "./MyCalendar";
+// import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
+// import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
+// import useRequest from "../../../../hooks/useRequest";
+// import {
+//   addSchedulesReq,
+//   db,
+//   getAppointmentsByWeekReq,
+//   getDoctorAppointmentByMonthReq,
+//   getScheduleReq,
+//   updateSchedulesReq,
+// } from "../../../../modules/firebase";
+// import {
+//   days,
+//   formatTimeStamp,
+//   getDayOfWeek,
+//   today,
+// } from "../../../../modules/helper";
+// import { FullCalendar, PATHS, successMessage } from "../../../common";
+// import { REQUEST_STATUS } from "../../../shared";
+// import Header from "./Header";
+// import Calendar from "./MyCalendar";
+// import { getRangeId, getSlots } from "./utils";
 
-const AppointmentsCalendar = () => {
-  const router = useRouter();
-  const { openResponseDialog, openErrorDialog, closeDialog } =
-    useResponseDialog();
-  const { setBackdropLoader } = useBackdropLoader();
-  const doctorId = router.query.id;
+// const AppointmentsCalendar = () => {
+//   const router = useRouter();
+//   const { openResponseDialog, openErrorDialog, closeDialog } =
+//     useResponseDialog();
+//   const { setBackdropLoader } = useBackdropLoader();
+//   const doctorId = router.query.id;
 
-  // Requests
-  const [getAppointments, appointmentsLoading] = useRequest(
-    getDoctorAppointmentByMonthReq,
-    setBackdropLoader
-  );
+//   // Requests
+//   const [getAppointments, appointmentsLoading] = useRequest(
+//     getDoctorAppointmentByMonthReq,
+//     setBackdropLoader
+//   );
 
-  // Local States
-  const [appointments, setAppointments] = useState([]);
-  const [baseDate, setBaseDate] = useState(new Date());
-  const [UILoading, setUILoading] = useState(false);
+//   // Local States
+//   const [appointments, setAppointments] = useState([]);
+//   const [baseDate, setBaseDate] = useState(new Date());
+//   const [UILoading, setUILoading] = useState(false);
 
-  const currMonth = getMonth(new Date(baseDate)) + 1;
+//   const currMonth = getMonth(new Date(baseDate)) + 1;
 
-  useEffect(() => {
-    // Get Appointments
-    const fetch = async () => {
-      const payload = {
-        id: doctorId,
-        month: currMonth,
-        status: [REQUEST_STATUS.forapproval, REQUEST_STATUS.approved],
-      };
-      const { data, error } = await getAppointments(payload);
-      if (error) return openErrorDialog(error);
+//   useEffect(() => {
+//     // Get Appointments
+//     const fetch = async () => {
+//       const payload = {
+//         id: doctorId,
+//         month: currMonth,
+//         status: [
+//           REQUEST_STATUS.forapproval,
+//           REQUEST_STATUS.approved,
+//           REQUEST_STATUS.done,
+//         ],
+//       };
+//       const { data, error } = await getAppointments(payload);
+//       if (error) return openErrorDialog(error);
 
-      setAppointments(data);
-    };
+//       setAppointments(data);
+//     };
 
-    fetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currMonth]);
+//     fetch();
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [currMonth]);
 
-  const handleEventClick = (info) => {
-    if (info.event.title.includes("For Approval")) return;
-    router.push({
-      pathname: PATHS.ADMIN.MY_APPOINTMENT_APPROVED,
-      query: { id: doctorId, date: info.event.startStr },
-    });
-  };
+//   const handleDateClick = (info) => {
+//     const noAppointment = !appointments.filter((i) => i.date === info.dateStr)
+//       .length;
+//     console.log({ noAppointment });
+//     if (noAppointment) return;
 
-  const loadTimeGrid = () => {
-    setUILoading(true);
-    setBackdropLoader(true);
+//     router.push({
+//       pathname: PATHS.ADMIN.MY_APPOINTMENT_APPROVED,
+//       query: { id: doctorId, date: info.dateStr },
+//     });
+//   };
 
-    setTimeout(() => {
-      setUILoading(false);
-      setBackdropLoader(false);
-    }, 1000);
-  };
+//   const loadTimeGrid = () => {
+//     setUILoading(true);
+//     setBackdropLoader(true);
 
-  const handleCalendarPrev = () => {
-    loadTimeGrid();
-    setBaseDate((prev) => {
-      return subMonths(prev, 1);
-    });
-  };
+//     setTimeout(() => {
+//       setUILoading(false);
+//       setBackdropLoader(false);
+//     }, 1000);
+//   };
 
-  const handleCalendarNext = () => {
-    loadTimeGrid();
-    setBaseDate((prev) => {
-      return addMonths(prev, 1);
-    });
-  };
+//   const handleCalendarPrev = () => {
+//     loadTimeGrid();
+//     setBaseDate((prev) => {
+//       return subMonths(prev, 1);
+//     });
+//   };
 
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        pt: 2,
-        // gap: 10,
-        // border: "1px solid red",
-      }}
-    >
-      <Header
-        selectedDate={baseDate}
-        handleCalendarPrev={handleCalendarPrev}
-        handleCalendarNext={handleCalendarNext}
-      />
-      {!appointmentsLoading && (
-        <Calendar
-          height="calc(100vh - 180px)"
-          date={baseDate}
-          events={appointments}
-          onEventClick={handleEventClick}
-        />
-      )}
-    </Box>
-  );
-};
+//   const handleCalendarNext = () => {
+//     loadTimeGrid();
+//     setBaseDate((prev) => {
+//       return addMonths(prev, 1);
+//     });
+//   };
 
-export default AppointmentsCalendar;
+//   return (
+//     <Box
+//       sx={{
+//         display: "flex",
+//         flexDirection: "column",
+//         pt: 2,
+//         // gap: 10,
+//         // border: "1px solid red",
+//       }}
+//     >
+//       <Header
+//         selectedDate={baseDate}
+//         handleCalendarPrev={handleCalendarPrev}
+//         handleCalendarNext={handleCalendarNext}
+//       />
+//       {!appointmentsLoading && (
+//         <Calendar
+//           height="calc(100vh - 180px)"
+//           date={baseDate}
+//           events={appointments}
+//           // onEventClick={handleEventClick}
+//           onDateClick={handleDateClick}
+//         />
+//       )}
+//     </Box>
+//   );
+// };
+
+// export default AppointmentsCalendar;

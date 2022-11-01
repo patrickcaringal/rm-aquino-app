@@ -10,7 +10,7 @@ export const getNavbarItems = (id, role, router) => {
           onClick: () => router.push(PATHS.PATIENT.MEDICAL_RECORD),
         },
         {
-          text: "Appointments",
+          text: "My Appointments",
           icon: null,
           onClick: () => router.push(PATHS.PATIENT.APPOINTMENT),
         },
@@ -29,18 +29,7 @@ export const getNavbarItems = (id, role, router) => {
           onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
         },
         {
-          text: "Patient Approval",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
-        },
-        {
-          text: "Appointments",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_MANAGEMENT),
-        },
-
-        {
-          text: "Appointment Approval",
+          text: "Appointment",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
         },
@@ -68,11 +57,11 @@ export const getNavbarItems = (id, role, router) => {
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
         },
-        {
-          text: "Patient Approval",
-          icon: null,
-          onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
-        },
+        // {
+        //   text: "Patient Approval",
+        //   icon: null,
+        //   onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
+        // },
         // {
         //   text: "Patients",
         //   icon: null,
@@ -90,13 +79,22 @@ export const getNavbarItems = (id, role, router) => {
         {
           text: "Appointments",
           icon: null,
-          onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_MANAGEMENT),
+          onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
         },
-        // {
-        //   text: "Consultation",
-        //   icon: null,
-        //   onClick: () => router.push(PATHS.ADMIN.CONSULTATION),
-        // },
+        {
+          text: "Reports",
+          icon: null,
+          menuItems: [
+            {
+              text: "Appointments per day",
+              onClick: () => router.push(PATHS.ADMIN.REPORTS_APPOINTMENTS),
+            },
+            {
+              text: "Patients per date range",
+              onClick: () => router.push(PATHS.ADMIN.REPORTS_PATIENTS),
+            },
+          ],
+        },
       ];
 
     case "doctor":
@@ -107,7 +105,7 @@ export const getNavbarItems = (id, role, router) => {
           onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
         },
         {
-          text: "Appointments",
+          text: "My Appointments",
           icon: null,
           onClick: () =>
             router.push({

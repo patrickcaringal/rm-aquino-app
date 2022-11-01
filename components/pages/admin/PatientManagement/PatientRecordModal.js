@@ -31,10 +31,10 @@ const ConsultModal = ({ open = false, data, onClose }) => {
       label: "Age",
       value: birthdate ? calculateAge(formatTimeStamp(birthdate)) : "-",
     },
-    {
-      label: "Birthdate",
-      value: birthdate ? formatTimeStamp(birthdate, "MMM-dd-yyyy") : "-",
-    },
+    // {
+    //   label: "Birthdate",
+    //   value: birthdate ? formatTimeStamp(birthdate, "MMM-dd-yyyy") : "-",
+    // },
     {
       label: "Gender",
       value: gender ? gender : "-",
@@ -61,6 +61,7 @@ const ConsultModal = ({ open = false, data, onClose }) => {
 
   return (
     <Modal
+      fullScreen
       open={open}
       onClose={handleClose}
       title="Patient Medical Record"

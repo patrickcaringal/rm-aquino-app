@@ -31,43 +31,52 @@ import {
 } from "../../../../modules/helper";
 import { FullCalendar, PATHS, successMessage } from "../../../common";
 import { REQUEST_STATUS } from "../../../shared";
-import { getRangeId, getSlots } from "../DoctorSchedule/utils";
-import Calendar from "./CalendarComp";
 import Header from "./Header";
+import Calendar from "./MyCalendar";
+import { getRangeId, getSlots } from "./utils";
 
 const AppointmentsCalendar = () => {
   const router = useRouter();
   const { openResponseDialog, openErrorDialog, closeDialog } =
     useResponseDialog();
   const { setBackdropLoader } = useBackdropLoader();
-
-  // Requests
+  const doctorId = router.query.id;
+  const multiDoctorMode = !doctorId;
 
   // Local States
   const [appointments, setAppointments] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [baseDate, setBaseDate] = useState(new Date());
   const [UILoading, setUILoading] = useState(false);
 
   const currMonth = getMonth(new Date(baseDate)) + 1;
 
   useEffect(() => {
-    const q = query(
-      collection(db, "appointments"),
-      where("month", "==", currMonth),
-      where("status", "in", [
-        REQUEST_STATUS.forapproval,
-        REQUEST_STATUS.approved,
-      ])
-    );
+    const statuses = [
+      REQUEST_STATUS.forapproval,
+      REQUEST_STATUS.approved,
+      REQUEST_STATUS.done,
+    ];
+    const q = multiDoctorMode
+      ? query(
+          collection(db, "appointments"),
+          where("month", "==", currMonth),
+          where("status", "in", statuses)
+        )
+      : query(
+          collection(db, "appointments"),
+          where("month", "==", currMonth),
+          where("doctorId", "==", doctorId),
+          where("status", "in", statuses)
+        );
 
     const unsub = onSnapshot(q, (querySnapshot) => {
       if (querySnapshot.docs.length > 0) {
         const data = querySnapshot.docs.map((doc) => ({ ...doc.data() }));
+
         const a = data.map((i) => ({
           ...i,
         }));
-        setAppointments(a);
+        setAppointments(data);
       }
     });
 
@@ -75,18 +84,16 @@ const AppointmentsCalendar = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currMonth]);
 
-  const handleEventClick = (info) => {
-    if (info.event.title.includes("For Approval")) {
-      router.push({
-        pathname: PATHS.ADMIN.APPOINTMENT_APPROVAL,
-        query: { date: info.event.startStr },
-      });
-      return;
-    }
+  const handleDateClick = (info) => {
+    const noAppointment = !appointments.filter((i) => i.date === info.dateStr)
+      .length;
+    if (noAppointment) return;
 
     router.push({
-      pathname: PATHS.ADMIN.APPOINTMENT_APPROVED,
-      query: { date: info.event.startStr },
+      pathname: PATHS.ADMIN.APPOINTMENT_MANAGEMENT,
+      query: multiDoctorMode
+        ? { date: info.dateStr }
+        : { id: doctorId, date: info.dateStr },
     });
   };
 
@@ -134,7 +141,7 @@ const AppointmentsCalendar = () => {
           height="calc(100vh - 180px)"
           date={baseDate}
           events={appointments}
-          onEventClick={handleEventClick}
+          onDateClick={handleDateClick}
         />
       )}
     </Box>

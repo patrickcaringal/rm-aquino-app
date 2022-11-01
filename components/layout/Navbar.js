@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
 import PlaceIcon from "@mui/icons-material/Place";
@@ -23,7 +24,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import Paper from "@mui/material/Paper";
 import { useRouter } from "next/router";
 
 import { Logo } from "../../components";
@@ -37,11 +37,9 @@ import { getFullName, getInitials } from "../../modules/helper";
 import { getNavbarItems } from "./menuItems";
 import NavbarItem from "./NavbarItem";
 
-const pages = ["Products", "Pricing", "Blog"];
-
 const ResponsiveAppBar = () => {
   const router = useRouter();
-  const { userSession, user, manualSetUser, isAdmin, isStaff, isLoggedIn } =
+  const { userSession, user, manualSetUser, isAdmin, isPatient, isLoggedIn } =
     useAuth();
   const { setBackdropLoader } = useBackdropLoader();
   const { openErrorDialog } = useResponseDialog();
@@ -183,6 +181,18 @@ const ResponsiveAppBar = () => {
                     </Typography>
                   </Box>
                   <Divider />
+                  <MenuItem
+                    onClick={() => {
+                      if (!isPatient) router.push(PATHS.ADMIN.PROFILE);
+                      else router.push(PATHS.PATIENT.PROFILE);
+                      handleCloseUserMenu();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <AccountCircleIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Profile</ListItemText>
+                  </MenuItem>
                   <MenuItem onClick={handleLogout}>
                     <ListItemIcon>
                       <LogoutIcon fontSize="small" />
@@ -192,60 +202,6 @@ const ResponsiveAppBar = () => {
                 </Menu>
               </>
             )}
-
-            {/* Mobile */}
-            {/* <>
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  display: { xs: "flex", md: "none" },
-                  color: "black",
-                }}
-              >
-                <IconButton
-                  size="large"
-                  aria-label="account of current user"
-                  aria-controls="menu-appbar"
-                  aria-haspopup="true"
-                  onClick={handleOpenNavMenu}
-                  color="inherit"
-                >
-                  <MenuIcon />
-                </IconButton>
-                <Menu
-                  id="menu-appbar"
-                  anchorEl={anchorElNav}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
-                  }}
-                  open={Boolean(anchorElNav)}
-                  onClose={handleCloseNavMenu}
-                  sx={{
-                    display: { xs: "block", md: "none" },
-                  }}
-                >
-                  {pages.map((page) => (
-                    <MenuItem key={page} onClick={handleCloseNavMenu}>
-                      <Typography textAlign="center">{page}</Typography>
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </Box>
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  display: { xs: "flex", md: "none" },
-                }}
-              >
-                <Logo width="160" height="56" />
-              </Box>
-            </> */}
 
             {/* Right */}
             <Box sx={{ flexGrow: 0 }}></Box>

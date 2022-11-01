@@ -1,10 +1,13 @@
 import {
+  EmailAuthProvider,
   createUserWithEmailAndPassword,
   deleteUser,
   onAuthStateChanged,
+  reauthenticateWithCredential,
   signInAnonymously,
   signInWithEmailAndPassword,
   signOut,
+  updatePassword,
 } from "firebase/auth";
 import {
   collection,
@@ -15,9 +18,11 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 
-import { auth, db, secondaryAuth } from "./config";
+import { auth, db, secondaryAuth, timestampFields } from "./config";
+import { checkDuplicate, registerNames } from "./helpers";
 
 export const getErrorMsg = (code) => {
   const errorMap = {
@@ -93,6 +98,79 @@ export const signOutAnonymouslyReq = async (session) => {
   } catch (error) {
     console.log(error);
     return { error: error.message };
+  }
+};
+
+export const getUserReq = async ({ id, type }) => {
+  try {
+    // Get User
+    const q = doc(db, type, id);
+    const querySnapshot = await getDoc(q);
+
+    if (!querySnapshot.exists()) {
+      throw new Error("Unable to get doc");
+    }
+
+    const data = querySnapshot.data();
+
+    return { data, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const updateUserReq = async ({ type, updates }) => {
+  try {
+    // Check duplicate
+    if (updates.name || updates.birthdate) {
+      await checkDuplicate({
+        collectionName: type,
+        whereClause: where("nameBirthdate", "==", updates.nameBirthdate),
+        errorMsg: {
+          noun: "Profile",
+        },
+      });
+    }
+
+    // Update
+    const batch = writeBatch(db);
+    const docRef = doc(db, type, updates.id);
+    const finalDoc = {
+      ...updates,
+      ...timestampFields({ dateUpdated: true }),
+    };
+    batch.update(docRef, finalDoc);
+
+    // Register updates name
+    if (updates.name) {
+      const { namesDocRef, names } = await registerNames({
+        collectionName: type,
+        names: { [updates.id]: updates.name },
+      });
+      batch.update(namesDocRef, names);
+    }
+
+    await batch.commit();
+
+    return { success: true };
+  } catch (error) {
+    const errMsg = getErrorMsg(error.code);
+    return { error: errMsg || error.message };
+  }
+};
+
+export const changePasswordReq = async ({ oldPassword, newPassword }) => {
+  try {
+    const user = auth.currentUser;
+    const credential = EmailAuthProvider.credential(user.email, oldPassword);
+    await reauthenticateWithCredential(user, credential);
+    await updatePassword(user, newPassword);
+    return { success: true };
+  } catch (error) {
+    console.log(error);
+    const errMsg = getErrorMsg(error.code);
+    return { error: errMsg || error.message };
   }
 };
 

@@ -24,12 +24,14 @@ const SlotComponent = ({ time, disabledSlots, disabled: d }) => {
   const label = {
     [REQUEST_STATUS.forapproval]: "For Approval",
     [REQUEST_STATUS.approved]: "Approved",
+    [REQUEST_STATUS.done]: "Done",
     others: "Taken",
   };
 
   const color = {
     [REQUEST_STATUS.forapproval]: "primary",
     [REQUEST_STATUS.approved]: "primary",
+    [REQUEST_STATUS.done]: "primary",
     others: "error",
   };
 
@@ -60,6 +62,8 @@ const Timepicker = ({
   appointments = [],
   date,
   doctor,
+  doctorId,
+  patientId,
   selected,
   onTimeselect,
 }) => {
@@ -68,7 +72,13 @@ const Timepicker = ({
   const hasAMSlot = !!AMTimeslot.length;
   const hasPMSlot = !!PMTimeslot.length;
 
-  const disabledSlots = appointments.filter((i) => i.date === dateStr);
+  const disabledSlots = appointments.filter(
+    (i) => i.date === dateStr && doctorId === i.doctorId
+  );
+
+  const hasSlotDate = appointments.filter(
+    (i) => i.date === dateStr && i.patientId === patientId
+  );
 
   return (
     <Box sx={{ mt: 2, display: "flex", flexDirection: "column" }}>
@@ -95,7 +105,6 @@ const Timepicker = ({
             mt: 1,
             ml: "1px",
           }}
-          disabled
         >
           {hasAMSlot && (
             <Box>
@@ -105,7 +114,7 @@ const Timepicker = ({
               {AMTimeslot.map((slot, idx) => (
                 <SlotComponent
                   key={idx}
-                  disabled={!!disabledSlots.length}
+                  disabled={!!hasSlotDate.length}
                   time={slot}
                   disabledSlots={disabledSlots}
                 />
@@ -121,7 +130,7 @@ const Timepicker = ({
               {PMTimeslot.map((slot, idx) => (
                 <SlotComponent
                   key={idx}
-                  disabled={!!disabledSlots.length}
+                  disabled={!!hasSlotDate.length}
                   time={slot}
                   disabledSlots={disabledSlots}
                 />

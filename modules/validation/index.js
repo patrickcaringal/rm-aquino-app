@@ -1,5 +1,6 @@
 import {
   BranchesSchema,
+  ChangePassSchema,
   DiagnoseSchema,
   DoctorSchema,
   DoctorSigninSchema,
@@ -10,11 +11,13 @@ import {
   SigninSchema,
   SignupSchema,
   StaffSchema,
+  UpdateProfileSchema,
   VerificationCodeSchema,
 } from "./schema";
 
 export {
   BranchesSchema,
+  ChangePassSchema,
   DiagnoseSchema,
   DoctorSchema,
   DoctorSigninSchema,
@@ -25,5 +28,6 @@ export {
   SigninSchema,
   SignupSchema,
   StaffSchema,
+  UpdateProfileSchema,
   VerificationCodeSchema,
 };

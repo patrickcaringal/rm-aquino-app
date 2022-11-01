@@ -248,7 +248,28 @@ export const rejectAppointmentReq = async ({ document }) => {
       status: REQUEST_STATUS.rejected,
       rejected: true,
       rejectedBy: document.rejectedBy,
-      reasonReject: document.reason,
+      reason: document.reason,
+      ...timestampFields({ dateUpdated: true }),
+    };
+    // Update Document
+    await updateDoc(docRef, data);
+
+    return { success: true };
+  } catch (error) {
+    console.log(error);
+    const errMsg = getErrorMsg(error.code);
+    return { error: errMsg || error.message };
+  }
+};
+
+export const cancelAppointmentReq = async ({ document }) => {
+  try {
+    // TODO: add send email
+
+    const docRef = doc(db, "appointments", document.id);
+    const data = {
+      status: REQUEST_STATUS.cancelled,
+      reason: document.reason,
       ...timestampFields({ dateUpdated: true }),
     };
     // Update Document
@@ -283,6 +304,7 @@ export const diagnosePatientReq = async ({ document }) => {
       status: REQUEST_STATUS.done,
       ...timestampFields({ dateUpdated: true }),
     });
+    console.log(document.appointmentId);
 
     await batch.commit();
 

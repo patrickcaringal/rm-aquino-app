@@ -8,6 +8,7 @@ import lodash from "lodash";
 
 import { formatTimeStamp, pluralize } from "../../../../modules/helper";
 import { REQUEST_STATUS } from "../../../shared";
+import { getPreviousDateBgEvents } from "./utils";
 
 const Calendar = ({
   date,
@@ -20,6 +21,7 @@ const Calendar = ({
   let forapproval = events.filter(
     (i) => i.status === REQUEST_STATUS.forapproval
   );
+  let done = events.filter((i) => i.status === REQUEST_STATUS.done);
 
   const a = lodash
     .toPairs(lodash.chain(approved).groupBy("date").value())
@@ -45,7 +47,21 @@ const Calendar = ({
       };
     });
 
-  events = [...a, ...b];
+  const c = lodash
+    .toPairs(lodash.chain(done).groupBy("date").value())
+    .map(([k, v]) => {
+      return {
+        start: k,
+        end: k,
+        title: `${v.length} Done`,
+        backgroundColor: "#15a446",
+        borderColor: "#rgb(14, 114, 49)",
+      };
+    });
+
+  const bgEvents = getPreviousDateBgEvents(date);
+
+  events = [...a, ...b, ...c, ...bgEvents];
 
   return (
     <Box sx={{ mt: "-12px" }}>

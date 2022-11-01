@@ -1,6 +1,6 @@
 import React from "react";
 
-import AppointmentManagementPage from "../../../components/pages/admin/AppointmentList/calendar";
+import ApprovedAppointmentsPage from "../../../components/pages/admin/AppointmentList/myApprovedAppointments";
 
-const AppointmentManagement = () => <AppointmentManagementPage />;
-export default AppointmentManagement;
+const ApprovedAppointments = () => <ApprovedAppointmentsPage />;
+export default ApprovedAppointments;

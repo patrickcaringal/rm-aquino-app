@@ -1,4 +1,13 @@
-import { format, getWeek, isBefore, isWithinInterval } from "date-fns";
+import {
+  eachDayOfInterval,
+  endOfMonth,
+  format,
+  getWeek,
+  isAfter,
+  isBefore,
+  isWithinInterval,
+  startOfMonth,
+} from "date-fns";
 
 import { REQUEST_STATUS } from "../../../../components/shared";
 import { formatTimeStamp } from "../../../../modules/helper";
@@ -50,4 +59,49 @@ export const checkSlotAppointment = ({ start, end, slots }) => {
   const forApproval = slots.forApproval?.[rangeId]?.length;
   const approved = slots.approved?.[rangeId]?.length;
   return forApproval || approved;
+};
+
+export const getPreviousDateBgEvents = (date) => {
+  const today = new Date();
+
+  const s = startOfMonth(date);
+  const e = endOfMonth(date);
+
+  const within = isWithinInterval(today, {
+    start: s,
+    end: e,
+  });
+
+  const after = isAfter(today, date);
+
+  let bgEvents = [];
+  if (within) {
+    bgEvents = eachDayOfInterval({
+      start: s,
+      end: today,
+    });
+  } else if (after) {
+    bgEvents = eachDayOfInterval({
+      start: s,
+      end: e,
+    });
+  }
+
+  const res = bgEvents
+    // prev dates
+    .map((i) => ({
+      start: formatTimeStamp(i),
+      display: "background",
+      backgroundColor: "#CFD2CF",
+    }))
+    // today
+    .concat([
+      {
+        start: formatTimeStamp(today),
+        display: "background",
+        backgroundColor: "#15a446",
+      },
+    ]);
+
+  return res;
 };

@@ -4,10 +4,13 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import EventBusyIcon from "@mui/icons-material/EventBusy";
 import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import InfoIcon from "@mui/icons-material/Info";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
 import RestoreIcon from "@mui/icons-material/Restore";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import { IconButton, Tooltip } from "@mui/material";
 
 export const ACTION_BUTTONS = {
@@ -18,6 +21,9 @@ export const ACTION_BUTTONS = {
   // specific
   SCHEDULE: "SCHEDULE",
   DIAGNOSE: "DIAGNOSE",
+  APPROVE: "APPROVE",
+  REJECT: "REJECT",
+  CANCEL: "CANCEL",
 };
 
 export const ACTION_ICONS = {
@@ -28,6 +34,9 @@ export const ACTION_ICONS = {
   SCHEDULE: <CalendarMonthIcon />,
   INFO: <InfoIcon />,
   DIAGNOSE: <RecordVoiceOverIcon />,
+  APPROVE: <ThumbUpIcon />,
+  REJECT: <ThumbDownIcon />,
+  CANCEL: <EventBusyIcon />,
 };
 
 const getButton = ({
