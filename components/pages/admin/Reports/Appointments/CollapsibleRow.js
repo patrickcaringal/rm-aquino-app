@@ -97,8 +97,6 @@ const CollapsibleRow = ({ data }) => {
 
                   <TableBody>
                     {consultations.map((i) => {
-                      const { date } = i;
-                      console.log(i);
                       return (
                         <TableRow key={i.date}>
                           <TableCell>

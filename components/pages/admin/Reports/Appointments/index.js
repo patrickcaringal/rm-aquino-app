@@ -126,7 +126,7 @@ const ReportAppointment = () => {
 
       <Box>
         <TableContainer>
-          <Table>
+          <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell sx={{ width: 50 }} />

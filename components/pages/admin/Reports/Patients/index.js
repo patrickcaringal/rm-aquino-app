@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import DownloadIcon from "@mui/icons-material/Download";
 import {
   Box,
   Button,
@@ -40,10 +41,22 @@ import {
   getActionButtons,
   successMessage,
 } from "../../../../common";
-import PerDay from "./PerDay";
-import PerMonth from "./PerMonth";
-import PerWeek from "./PerWeek";
-import PerYear from "./PerYear";
+import PerDay, {
+  compute as computePerDayPdf,
+  exportPdf as exportPerDayPdf,
+} from "./PerDay";
+import PerMonth, {
+  compute as computePerMonthPdf,
+  exportPdf as exportPerMonthPdf,
+} from "./PerMonth";
+import PerWeek, {
+  compute as computePerWeekPdf,
+  exportPdf as exportPerWeekPdf,
+} from "./PerWeek";
+import PerYear, {
+  compute as computePerYearPdf,
+  exportPdf as exportPerYearPdf,
+} from "./PerYear";
 import useFilter from "./useFilter";
 
 const ReportAppointment = () => {
@@ -111,6 +124,38 @@ const ReportAppointment = () => {
     filtering.setRangeDisplay(v);
   };
 
+  const handleExport = () => {
+    if (filtering.filters.rangeDisplay === "perday") {
+      const d = computePerDayPdf({
+        data: filtering.filtered,
+        start: filtering.filters.startDate,
+        end: filtering.filters.endDate,
+      });
+      exportPerDayPdf(d);
+    } else if (filtering.filters.rangeDisplay === "perweek") {
+      const d = computePerWeekPdf({
+        data: filtering.filtered,
+        start: filtering.filters.startDate,
+        end: filtering.filters.endDate,
+      });
+      exportPerWeekPdf(d);
+    } else if (filtering.filters.rangeDisplay === "permonth") {
+      const d = computePerMonthPdf({
+        data: filtering.filtered,
+        start: filtering.filters.startDate,
+        end: filtering.filters.endDate,
+      });
+      exportPerMonthPdf(d);
+    } else if (filtering.filters.rangeDisplay === "peryear") {
+      const d = computePerYearPdf({
+        data: filtering.filtered,
+        start: filtering.filters.startDate,
+        end: filtering.filters.endDate,
+      });
+      exportPerYearPdf(d);
+    }
+  };
+
   return (
     <Box sx={{ pt: 2 }}>
       <Box sx={{ mb: 2, display: "flex", flexDirection: "row", gap: 2 }}>
@@ -149,6 +194,14 @@ const ReportAppointment = () => {
             </MenuItem>
           </Select>
         </Box>
+
+        <Button
+          variant="contained"
+          startIcon={<DownloadIcon />}
+          onClick={handleExport}
+        >
+          Export
+        </Button>
       </Box>
 
       <Box sx={{ mb: 2 }}>
