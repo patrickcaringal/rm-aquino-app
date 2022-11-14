@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 
 import { REQUEST_STATUS } from "../../components/shared";
+import { sendEmail } from "../email";
 import { formatTimeStamp, pluralize, sortBy } from "../helper";
 import { getErrorMsg } from "./auth";
 import { db, timestampFields } from "./config";
@@ -211,6 +212,18 @@ export const addAppointmentReq = async ({ document }) => {
     // Create Document
     await setDoc(docRef, data);
 
+    // send email
+    const payload = {
+      email: document.patientEmail,
+      date: document.date,
+      name: document.patientName,
+      service: document.service,
+      doctor: document.doctor,
+      startTime: document.startTime,
+      endTime: document.endTimeEstimate,
+    };
+    await sendEmail("/schedule-appointment", payload);
+
     return { success: true };
   } catch (error) {
     console.log(error);
@@ -230,6 +243,17 @@ export const approveAppointmentReq = async ({ document }) => {
     };
     // Update Document
     await updateDoc(docRef, data);
+
+    const payload = {
+      email: document.patientEmail,
+      date: document.date,
+      name: document.patientName,
+      service: document.service,
+      doctor: document.doctor,
+      startTime: document.startTime,
+      endTime: document.endTimeEstimate,
+    };
+    await sendEmail("/approve-appointment", payload);
 
     return { success: true };
   } catch (error) {
@@ -253,6 +277,18 @@ export const rejectAppointmentReq = async ({ document }) => {
     };
     // Update Document
     await updateDoc(docRef, data);
+
+    const payload = {
+      email: document.patientEmail,
+      date: document.date,
+      name: document.patientName,
+      service: document.service,
+      doctor: document.doctor,
+      startTime: document.startTime,
+      endTime: document.endTimeEstimate,
+      reason: document.reason,
+    };
+    await sendEmail("/reject-appointment", payload);
 
     return { success: true };
   } catch (error) {
