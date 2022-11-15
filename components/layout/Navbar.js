@@ -32,7 +32,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useBackdropLoader } from "../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../contexts/ResponseDialogContext";
 import useRequest from "../../hooks/useRequest";
-import { signOutAnonymouslyReq, signOutReq } from "../../modules/firebase";
+import { signOutReq } from "../../modules/firebase";
 import { getFullName, getInitials } from "../../modules/helper";
 import { getNavbarItems } from "./menuItems";
 import NavbarItem from "./NavbarItem";
@@ -43,10 +43,6 @@ const ResponsiveAppBar = () => {
     useAuth();
   const { setBackdropLoader } = useBackdropLoader();
   const { openErrorDialog } = useResponseDialog();
-  const [signOutAnonymously] = useRequest(
-    signOutAnonymouslyReq,
-    setBackdropLoader
-  );
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
