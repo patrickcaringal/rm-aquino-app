@@ -1,10 +1,10 @@
 import axios from "axios";
 
-import { getBaseApi } from "../env";
+import { getBaseApi, isDevEnv } from "../env";
 
 export const sendEmail = async (url, payload) => {
-  // await axios.post(getBaseApi(url), payload);
-  await resolveAfter2Seconds();
+  if (!isDevEnv) await axios.post(getBaseApi(url), payload);
+  else await resolveAfter2Seconds();
 };
 
 function resolveAfter2Seconds() {
