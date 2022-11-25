@@ -81,6 +81,7 @@ const Form = ({
             onChange={(value) => {
               setFieldValue("birthdate", formatTimeStamp(value), false);
             }}
+            maxDate={new Date()}
             onBlur={handleBlur}
             required
             name="birthdate"

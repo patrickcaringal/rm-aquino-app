@@ -174,10 +174,10 @@ const ReportAppointment = () => {
   );
 };
 
-const handleExport = (data) => {
+const handleExport = (data1) => {
   const doc = new jsPDF({ orientation: "landscape" });
 
-  data.forEach((i, idx) => {
+  data1.forEach((i, idx) => {
     doc.setFontSize(14);
     const { date, data } = i;
 
@@ -221,7 +221,7 @@ const handleExport = (data) => {
       fontSize: 10,
     });
 
-    if (idx + 1 !== data.length) doc.addPage();
+    if (idx + 1 !== data1.length) doc.addPage();
   });
 
   doc.output("pdfobjectnewwindow"); //opens the data uri in new window

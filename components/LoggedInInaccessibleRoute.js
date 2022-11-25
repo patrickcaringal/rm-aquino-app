@@ -21,7 +21,7 @@ const LoggedInInaccessibleRoute = ({ children }) => {
       //   return;
       // }
 
-      router.push("/dashboard");
+      router.push(PATHS.PATIENT.MEDICAL_RECORD);
     }
   }, [router, isLoggedIn]);
 

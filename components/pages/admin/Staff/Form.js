@@ -177,6 +177,7 @@ const Form = ({
                               false
                             );
                           }}
+                          maxDate={new Date()}
                           onBlur={handleBlur}
                           error={getError("birthdate")}
                         />

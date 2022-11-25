@@ -59,7 +59,7 @@ export default function ManageStaffModal({
             size="small"
             onClick={submitForm}
           >
-            reject
+            {title}
           </Button>
         </>
       }

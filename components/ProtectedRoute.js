@@ -54,7 +54,7 @@ const ProtectedRoute = ({ children }) => {
     }
 
     if (isRouteNotAllowed.patient) {
-      router.push(PATHS.PATIENT.DASHBOARD);
+      router.push(PATHS.PATIENT.MEDICAL_RECORD);
       return;
     }
   }, [router, isRouteNotAllowed]);
