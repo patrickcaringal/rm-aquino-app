@@ -130,6 +130,7 @@ const ProfilePage = ({ data, onSave }) => {
               if (!value || value == "Invalid Date") return;
               setFieldValue("birthdate", formatTimeStamp(value), false);
             }}
+            maxDate={new Date()}
             onBlur={handleBlur}
             error={getError("birthdate")}
           />

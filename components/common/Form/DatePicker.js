@@ -27,6 +27,7 @@ const DatePickerComponent = ({
         renderInput={(params) => (
           <Input {...params} required={required} name={name} error={error} />
         )}
+        maxDate={new Date()}
         {...rest}
       />
     </LocalizationProvider>

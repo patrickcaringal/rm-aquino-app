@@ -35,7 +35,7 @@ export const PATHS = {
   //   MEMBER_APPROVAL: "/staff/member/approval",
   // },
   PATIENT: {
-    DASHBOARD: "/dashboard",
+    // DASHBOARD: "/dashboard",
     PROFILE: "/profile",
     APPOINTMENT: "/appointment",
     MEDICAL_RECORD: "/medical-record",
