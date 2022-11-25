@@ -40,7 +40,7 @@ const referralDefaultValue = isMockDataEnabled
       content: `${specialistName},\n\n${faker.lorem.paragraphs(2)}`,
     }
   : {
-      date: "",
+      date: formatTimeStamp(new Date()),
       address: "",
       content: "",
     };
@@ -70,6 +70,8 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
     patientId,
     service,
   } = data;
+
+  // console.log(data.doctor);
 
   const { birthdate, gender } = patient;
 
@@ -151,7 +153,13 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
   });
 
   const referralFormik = useFormik({
-    initialValues: referralDefaultValue,
+    initialValues: isMockDataEnabled
+      ? referralDefaultValue
+      : {
+          date: formatTimeStamp(new Date()),
+          address: `DR. <Doctor Name>\n<Address>`,
+          content: `DR. <Doctor Name>\nI am referring ${data.patientName} ...\n ...\n ...`,
+        },
     validationSchema: ReferSchema,
     validateOnChange: false,
     onSubmit: async (values) => {
