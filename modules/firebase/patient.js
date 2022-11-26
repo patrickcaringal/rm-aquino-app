@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import faker from "faker";
 import {
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import {
@@ -310,6 +311,17 @@ export const rejectPatientReq = async ({ document }) => {
 
     return { data: document, success: true };
   } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const forgotPasswordReq = async ({ email }) => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return { success: true };
+  } catch (error) {
+    return { success: true };
     console.log(error);
     return { error: error.message };
   }

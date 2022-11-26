@@ -14,6 +14,7 @@ const Form = ({
   values,
   errors,
   touched,
+  onForgotPasswordModalOpen,
 }) => {
   return (
     <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
@@ -52,7 +53,7 @@ const Form = ({
       </LoadingButton>
       <Grid container>
         <Grid item xs>
-          <Link href="#" variant="body2">
+          <Link href="#" variant="body2" onClick={onForgotPasswordModalOpen}>
             Forgot password?
           </Link>
         </Grid>
