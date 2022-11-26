@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 
-import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Container,
@@ -12,12 +11,16 @@ import {
 import { useFormik } from "formik";
 import Image from "next/image";
 
+import { ForgotPasswordModal } from "../../../../components/shared";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
 import { isMockDataEnabled } from "../../../../modules/env";
-import { signInAdminReq } from "../../../../modules/firebase";
+import {
+  forgotPasswordReq,
+  signInAdminReq,
+} from "../../../../modules/firebase";
 import { DoctorSigninSchema } from "../../../../modules/validation";
 import Form from "./Form";
 
@@ -31,13 +34,25 @@ const defaultValues = isMockDataEnabled
       password: "",
     };
 
+const defaultModal = {
+  open: false,
+  data: {},
+};
+
 const AdminSignInPage = () => {
   const { manualSetUser } = useAuth();
   const { setBackdropLoader } = useBackdropLoader();
-  const { openErrorDialog } = useResponseDialog();
+  const { openResponseDialog, openErrorDialog } = useResponseDialog();
 
   // Requests
   const [signIn] = useRequest(signInAdminReq, setBackdropLoader);
+  const [forgotPatientPassword] = useRequest(
+    forgotPasswordReq,
+    setBackdropLoader
+  );
+
+  // Local States
+  const [forgotPassModal, setForgotPassModal] = useState(defaultModal);
 
   const formik = useFormik({
     initialValues: defaultValues,
@@ -56,6 +71,30 @@ const AdminSignInPage = () => {
       manualSetUser(userInfo);
     },
   });
+
+  const handleForgotPasswordModalOpen = () => {
+    setForgotPassModal({
+      open: true,
+      data: {},
+    });
+  };
+
+  const handleForgotPassword = async (v) => {
+    const payload = { email: v.email };
+    const { error } = await forgotPatientPassword(payload);
+    if (error) return openErrorDialog(error);
+
+    openResponseDialog({
+      title: "Forgot Password",
+      type: "CONFIRM",
+      autoClose: true,
+      content: `An email to reset your password is sent to ${v.email}.`,
+      closeCb() {
+        setForgotPassModal(defaultModal);
+      },
+    });
+  };
+
   return (
     <Box
       sx={{
@@ -84,8 +123,17 @@ const AdminSignInPage = () => {
           mb: 10,
         }}
       >
-        <Form {...formik} />
+        <Form
+          {...formik}
+          onForgotPasswordModalOpen={handleForgotPasswordModalOpen}
+        />
       </Box>
+
+      <ForgotPasswordModal
+        open={forgotPassModal.open}
+        onSubmit={handleForgotPassword}
+        onClose={() => setForgotPassModal(defaultModal)}
+      />
     </Box>
   );
 };

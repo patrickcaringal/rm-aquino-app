@@ -57,6 +57,10 @@ export const DoctorSigninSchema = Yup.object().shape({
   password: Yup.string().required("Required"),
 });
 
+export const ForgotPassSchema = Yup.object().shape({
+  email: Yup.string().email("Invalid email").required("Required"),
+});
+
 export const FamilyMemberSchema = Yup.object().shape({
   familyMembers: Yup.array().of(
     Yup.object().shape({

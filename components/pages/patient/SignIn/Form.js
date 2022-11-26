@@ -12,6 +12,7 @@ const Form = ({
   values,
   errors,
   touched,
+  onForgotPasswordModalOpen,
 }) => {
   const router = useRouter();
 
@@ -47,7 +48,7 @@ const Form = ({
       </Button>
       <Grid container>
         <Grid item xs>
-          <Link href="#" variant="body2">
+          <Link href="#" variant="body2" onClick={onForgotPasswordModalOpen}>
             Forgot password?
           </Link>
         </Grid>
