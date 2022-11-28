@@ -60,7 +60,7 @@ const DashboardPage = () => {
     };
 
     const fetchDoctor = async () => {
-      const { data, error } = await getStaffs();
+      const { data, error } = await getDoctors();
       if (error) return openErrorDialog(error);
 
       setDoctors(data);
