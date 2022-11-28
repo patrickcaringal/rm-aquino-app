@@ -17,13 +17,14 @@ import { useRouter } from "next/router";
 
 import {
   ACTION_BUTTONS,
+  Input,
   PATHS,
   getActionButtons,
   successMessage,
 } from "../../../../components/common";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
-import useRequest from "../../../../hooks/useRequest";
+import { useFilter, useRequest } from "../../../../hooks";
 import {
   addDoctorReq,
   getDoctorsReq,
@@ -60,6 +61,7 @@ const DoctorsPage = () => {
   const [services, setServices] = useState([]);
   const [servicesMap, setServicesMap] = useState({});
   const [doctorModal, setDoctorModal] = useState(defaultModal);
+  const filtering = useFilter({});
 
   useEffect(() => {
     const fetch = async () => {
@@ -83,6 +85,11 @@ const DoctorsPage = () => {
     fetchServices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    filtering.setData(doctors);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [doctors]);
 
   const handleAddDoctor = async (docs) => {
     docs = docs.map((i) => ({
@@ -174,7 +181,15 @@ const DoctorsPage = () => {
 
   return (
     <Box sx={{ pt: 2 }}>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
+        <Input
+          label="Search"
+          value={filtering.filters.name}
+          onChange={(e) => {
+            filtering.onNameChange(e?.target?.value);
+          }}
+          sx={{ width: 300, mr: 2 }}
+        />
         <Button variant="contained" size="small" onClick={handleAddModalOpen}>
           add doctor
         </Button>
@@ -209,7 +224,7 @@ const DoctorsPage = () => {
             </TableHead>
 
             <TableBody>
-              {doctors.map((i) => {
+              {filtering.filtered.map((i) => {
                 const {
                   id,
                   name,

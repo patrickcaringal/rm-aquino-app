@@ -13,14 +13,14 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
-import useRequest from "../../../../hooks/useRequest";
+import { useFilter, useRequest } from "../../../../hooks";
 import { getPatientsReq } from "../../../../modules/firebase";
 import { calculateAge, formatTimeStamp } from "../../../../modules/helper";
 import {
   ACTION_BUTTONS,
+  Input,
   LongTypography,
   getActionButtons,
 } from "../../../common";
@@ -41,19 +41,24 @@ const PatientListPage = () => {
 
   // Local States
   const [patients, setPatients] = useState([]);
+  const filtering = useFilter({});
 
   useEffect(() => {
     const fetch = async () => {
-      // Get Staffs
-      const { data: patientList, error: getPatientError } = await getPatients();
-      if (getPatientError) return openErrorDialog(getPatientError);
+      const { data, error } = await getPatients();
+      if (error) return openErrorDialog(error);
 
-      setPatients(patientList);
+      setPatients(data);
     };
 
     fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    filtering.setData(patients);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patients]);
 
   const handlePatientRecordOpen = (data) => {
     setpatientRecordModal({
@@ -69,6 +74,14 @@ const PatientListPage = () => {
   return (
     <Box sx={{ pt: 2 }}>
       <Box>
+        <Input
+          label="Search"
+          value={filtering.filters.name}
+          onChange={(e) => {
+            filtering.onNameChange(e?.target?.value);
+          }}
+          sx={{ width: 300, mb: 2 }}
+        />
         <TableContainer>
           <Table size="small">
             <TableHead>
@@ -95,7 +108,7 @@ const PatientListPage = () => {
             </TableHead>
 
             <TableBody>
-              {patients.map((i) => {
+              {filtering.filtered.map((i) => {
                 const {
                   id,
                   name,

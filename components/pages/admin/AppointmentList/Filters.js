@@ -2,18 +2,28 @@ import React from "react";
 
 import { Box, MenuItem } from "@mui/material";
 
-import { DatePicker, Select } from "../../../../components/common/Form";
+import { DatePicker, Input, Select } from "../../../../components/common/Form";
 import { formatTimeStamp } from "../../../../modules/helper";
 
 const Filters = ({
   filters,
   onStatusChange,
   onDateChange,
+  onNameChange,
   displayStatus = true,
 }) => {
   const { status, date } = filters;
   return (
     <Box sx={{ mb: 2, display: "flex", flexDirection: "row", gap: 2 }}>
+      <Input
+        label="Search"
+        value={filters.name}
+        onChange={(e) => {
+          onNameChange(e?.target?.value);
+        }}
+        sx={{ width: 300, mr: 2 }}
+      />
+
       {displayStatus && (
         <Box sx={{ width: 200 }}>
           <Select

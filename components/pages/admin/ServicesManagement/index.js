@@ -197,7 +197,15 @@ const ServicesManagementPage = () => {
 
   return (
     <Box sx={{ pt: 2 }}>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
+        <Input
+          label="Search"
+          value={filtering.filters.name}
+          onChange={(e) => {
+            filtering.onNameChange(e?.target?.value);
+          }}
+          sx={{ width: 300, mr: 2 }}
+        />
         <Button
           variant="contained"
           size="small"
@@ -217,7 +225,7 @@ const ServicesManagementPage = () => {
       </Box>
 
       <TableContainer>
-        <Table>
+        <Table size="small">
           <TableHead>
             <TableRow>
               {[
