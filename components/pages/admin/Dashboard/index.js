@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import PersonIcon from "@mui/icons-material/Person";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
@@ -14,6 +14,14 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 
+import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
+import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
+import useRequest from "../../../../hooks/useRequest";
+import {
+  getDoctorsReq,
+  getPatientsReq,
+  getStaffsReq,
+} from "../../../../modules/firebase";
 import {
   days,
   formatTimeStamp,
@@ -23,6 +31,47 @@ import {
 import PanelItem from "./PanelItem";
 
 const DashboardPage = () => {
+  const { setBackdropLoader } = useBackdropLoader();
+  const { openErrorDialog } = useResponseDialog();
+
+  // Requests
+  const [getPatients] = useRequest(getPatientsReq, setBackdropLoader);
+  const [getStaffs] = useRequest(getStaffsReq, setBackdropLoader);
+  const [getDoctors] = useRequest(getDoctorsReq, setBackdropLoader);
+
+  // Local States
+  const [patients, setPatients] = useState([]);
+  const [staffs, setStaffs] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    const fetchPatient = async () => {
+      const { data, error } = await getPatients();
+      if (error) return openErrorDialog(error);
+
+      setPatients(data);
+    };
+
+    const fetchStaff = async () => {
+      const { data, error } = await getStaffs();
+      if (error) return openErrorDialog(error);
+
+      setStaffs(data);
+    };
+
+    const fetchDoctor = async () => {
+      const { data, error } = await getStaffs();
+      if (error) return openErrorDialog(error);
+
+      setDoctors(data);
+    };
+
+    fetchPatient();
+    fetchStaff();
+    fetchDoctor();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const panelData = [
     {
       icon: <TodayIcon sx={{ fontSize: 100 }} />,
@@ -44,7 +93,7 @@ const DashboardPage = () => {
     {
       icon: <PersonIcon sx={{ fontSize: 100 }} />,
       content1: {
-        text: 50,
+        text: patients?.length || "-",
       },
       content2: {
         text: "Patients",
@@ -53,7 +102,7 @@ const DashboardPage = () => {
     {
       icon: <SupervisorAccountIcon sx={{ fontSize: 100 }} />,
       content1: {
-        text: 7,
+        text: staffs?.length || "-",
       },
       content2: {
         text: "Staffs",
@@ -62,7 +111,7 @@ const DashboardPage = () => {
     {
       icon: <SupervisorAccountIcon sx={{ fontSize: 100 }} />,
       content1: {
-        text: 10,
+        text: doctors?.length || "-",
       },
       content2: {
         text: "Doctors",
