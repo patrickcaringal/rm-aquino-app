@@ -15,10 +15,10 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 
-import { successMessage } from "../../../../components/common";
+import { Input, successMessage } from "../../../../components/common";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
-import useRequest from "../../../../hooks/useRequest";
+import { useFilter, useRequest } from "../../../../hooks";
 import {
   addStaffReq,
   getStaffsReq,
@@ -51,6 +51,7 @@ const DashboardPage = () => {
   // Local States
   const [staffs, setStaffs] = useState([]);
   const [staffModal, setStaffModal] = useState(defaultModal);
+  const filtering = useFilter({});
 
   useEffect(() => {
     const fetch = async () => {
@@ -64,6 +65,11 @@ const DashboardPage = () => {
     fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    filtering.setData(staffs);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [staffs]);
 
   const handleAddStaff = async (docs) => {
     docs = docs.map((i) => ({
@@ -149,82 +155,89 @@ const DashboardPage = () => {
 
   return (
     <Box sx={{ pt: 2 }}>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
+        <Input
+          label="Search"
+          value={filtering.filters.name}
+          onChange={(e) => {
+            filtering.onNameChange(e?.target?.value);
+          }}
+          sx={{ width: 300, mr: 2 }}
+        />
         <Button variant="contained" size="small" onClick={handleAddModalOpen}>
           add staff
         </Button>
       </Box>
 
-      <Box>
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }} align="center">
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
+      <TableContainer>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Address</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }} align="center">
+                Actions
+              </TableCell>
+            </TableRow>
+          </TableHead>
 
-            <TableBody>
-              {staffs.map((i) => {
-                const {
-                  id,
-                  firstName,
-                  suffix,
-                  lastName,
-                  middleName,
-                  email,
-                  birthdate,
-                  address,
-                } = i;
+          <TableBody>
+            {filtering.filtered.map((i) => {
+              const {
+                id,
+                firstName,
+                suffix,
+                lastName,
+                middleName,
+                email,
+                birthdate,
+                address,
+              } = i;
 
-                return (
-                  <TableRow key={id}>
-                    <TableCell sx={{ width: 260 }}>
-                      <Typography variant="body2">
-                        {getFullName({
-                          firstName,
-                          suffix,
-                          lastName,
-                          middleName,
-                        })}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ width: 260 }}>
-                      <Typography variant="body2">{email}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: "2",
-                          overflow: "hidden",
-                        }}
-                        component="div"
-                      >
-                        {address}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ width: 110 }} align="center">
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() =>
-                          handleEditModalOpen({
-                            ...i,
-                            birthdate: formatTimeStamp(birthdate),
-                          })
-                        }
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      {/* <IconButton
+              return (
+                <TableRow key={id}>
+                  <TableCell sx={{ width: 260 }}>
+                    <Typography variant="body2">
+                      {getFullName({
+                        firstName,
+                        suffix,
+                        lastName,
+                        middleName,
+                      })}
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ width: 260 }}>
+                    <Typography variant="body2">{email}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "-webkit-box",
+                        WebkitBoxOrient: "vertical",
+                        WebkitLineClamp: "2",
+                        overflow: "hidden",
+                      }}
+                      component="div"
+                    >
+                      {address}
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ width: 110 }} align="center">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() =>
+                        handleEditModalOpen({
+                          ...i,
+                          birthdate: formatTimeStamp(birthdate),
+                        })
+                      }
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    {/* <IconButton
                         size="small"
                         color="error"
                         onClick={() =>
@@ -236,14 +249,13 @@ const DashboardPage = () => {
                       >
                         <DeleteIcon />
                       </IconButton> */}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {staffModal.open && (
         <ManageStaffModal

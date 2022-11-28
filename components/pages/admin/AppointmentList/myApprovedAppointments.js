@@ -80,11 +80,17 @@ const MyApprovedAppointmentsPage = () => {
   const [rejectModal, setRejectModal] = useState(defaultModal);
 
   const baseDay = getNearestBusinessDay(router.query?.date);
-  const { filtered, setData, filters, onStatusChange, onDateChange } =
-    useFilter({
-      defaultStatus: "all",
-      defaultDate: baseDay,
-    });
+  const {
+    filtered,
+    setData,
+    filters,
+    onStatusChange,
+    onDateChange,
+    onNameChange,
+  } = useFilter({
+    defaultStatus: "all",
+    defaultDate: baseDay,
+  });
 
   useEffect(() => {
     setData(appointments);
@@ -231,6 +237,7 @@ const MyApprovedAppointmentsPage = () => {
         filters={filters}
         onStatusChange={onStatusChange}
         onDateChange={onDateChange}
+        onNameChange={onNameChange}
         displayStatus={false}
       />
       <Box>
