@@ -12,6 +12,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { addWeeks } from "date-fns";
 
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
@@ -162,6 +163,7 @@ const AppointmentsPage = () => {
             onChange={(value) => {
               onDateChange(value ? formatTimeStamp(value) : "");
             }}
+            maxDate={addWeeks(new Date(), 1)}
           />
         </Box>
       </Box>

@@ -93,7 +93,7 @@ export const getDoctorsReq = async () => {
   try {
     const q = query(
       collRef,
-      where("role", "==", "doctor"),
+      where("role", "in", ["doctor", "superadmin"]),
       where("deleted", "==", false)
     );
     const querySnapshot = await getDocs(q);

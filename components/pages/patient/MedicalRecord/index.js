@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { isAfter, isBefore } from "date-fns";
+import { addWeeks, isAfter, isBefore } from "date-fns";
 
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
@@ -119,6 +119,7 @@ const MedicalRecordPage = () => {
             label="Start Date"
             value={filtering.filters.startDate}
             onChange={handleStartateChange}
+            maxDate={addWeeks(new Date(), 1)}
           />
         </Box>
         <Box sx={{ width: 200 }}>
@@ -126,6 +127,7 @@ const MedicalRecordPage = () => {
             label="End Date"
             value={filtering.filters.endDate}
             onChange={handleEndDateChange}
+            maxDate={addWeeks(new Date(), 1)}
           />
         </Box>
       </Box>
