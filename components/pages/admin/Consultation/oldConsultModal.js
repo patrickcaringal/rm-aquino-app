@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Divider,
-  MenuItem,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Divider, MenuItem, Typography } from "@mui/material";
 import axios from "axios";
 import faker from "faker";
 import { useFormik } from "formik";
@@ -24,38 +17,33 @@ import {
   getPatientReq,
 } from "../../../../modules/firebase";
 import { calculateAge, formatTimeStamp } from "../../../../modules/helper";
-import { DiagnoseSchema } from "../../../../modules/validation";
-import { Datalist, Modal, successMessage } from "../../../common";
+import { DiagnoseSchema, ReferSchema } from "../../../../modules/validation";
+import { Datalist, Modal, PdfFrame, successMessage } from "../../../common";
 import { Input, Select } from "../../../common/Form";
-import MedicationTable from "./MedicationTable";
 import PatientRecord from "./PatientRecord";
 import ReferralForm from "./ReferralForm";
 
 const defaultValues = isMockDataEnabled
   ? {
-      // diagnosis: faker.lorem.sentences(1),
-      medications: [
-        {
-          name: "",
-          dosage: "",
-          frequency: "",
-          remarks: "",
-        },
-      ],
+      diagnosis: faker.lorem.sentences(1),
     }
-  : {
-      // diagnosis: "",
-      medications: [
-        {
-          name: "",
-          dosage: "",
-          frequency: "",
-          remarks: "",
-        },
-      ],
-    };
+  : { diagnosis: "" };
 
 const specialistName = `Dr.${faker.name.firstName()} ${faker.name.lastName()}`;
+
+const referralDefaultValue = isMockDataEnabled
+  ? {
+      date: formatTimeStamp(new Date()),
+      address: `${specialistName}\n${faker.lorem.words(3)}\n${faker.lorem.words(
+        3
+      )}`,
+      content: `${specialistName},\n\n${faker.lorem.paragraphs(2)}`,
+    }
+  : {
+      date: formatTimeStamp(new Date()),
+      address: "",
+      content: "",
+    };
 
 const ConsultModal = ({ open = false, data, onClose, onSave }) => {
   const { openErrorDialog, openResponseDialog } = useResponseDialog();
@@ -71,7 +59,7 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
   const [patient, setPatient] = useState({});
   const [medicalRecords, setMedicalRecords] = useState([]);
   const [serviceType, setServiceType] = useState(SERVICE_TYPE.DIAGNOSE);
-  const [displayMedicalRecords, setDisplayMedicalRecords] = useState(false);
+  const [pdfFile, setPdfFile] = useState(null);
 
   const {
     id,
@@ -140,7 +128,7 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
 
   const formik = useFormik({
     initialValues: defaultValues,
-    // validationSchema: DiagnoseSchema,
+    validationSchema: DiagnoseSchema,
     validateOnChange: false,
     enableReinitialize: true,
     onSubmit: async (values, { resetForm }) => {
@@ -188,15 +176,32 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
     },
   });
 
-  const {
-    values,
-    touched,
-    errors,
-    handleChange,
-    handleBlur,
-    setFieldValue,
-    submitForm,
-  } = formik;
+  const referralFormik = useFormik({
+    initialValues: isMockDataEnabled
+      ? referralDefaultValue
+      : {
+          date: formatTimeStamp(new Date()),
+          address: `DR. <Doctor Name>\n<Address>`,
+          content: `DR. <Doctor Name>\nI am referring ${data.patientName} ...\n ...\n ...`,
+        },
+    validationSchema: ReferSchema,
+    validateOnChange: false,
+    onSubmit: async (values) => {
+      const payload = {
+        ...values,
+        date: formatTimeStamp(values.date, "MMMM dd, yyyy"),
+        // referrer: "Dr. RM Aquino",
+      };
+
+      try {
+        const res = await generateReferral(getBaseApi("/pdf"), payload);
+        setPdfFile(res?.data);
+      } catch (error) {
+        setBackdropLoader(false);
+        openErrorDialog(error?.message);
+      }
+    },
+  });
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -226,7 +231,54 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
     onClose();
   };
 
-  // console.log(values);
+  const handleServiceChange = (e) => {
+    setServiceType(e.target.value);
+    setPdfFile(null);
+  };
+
+  const handleSaveReferral = async () => {
+    const payload = {
+      document: {
+        referral: referralFormik.values,
+        action: SERVICE_TYPE.REFER,
+        ...lodash.pick(data, [
+          "patientName",
+          "patientId",
+          "patientEmail",
+          "service",
+          "serviceId",
+          "doctor",
+          "doctorId",
+          "date",
+          "startTime",
+          "endTimeEstimate",
+          "weekNo",
+          "month",
+        ]),
+        appointmentId: id,
+        diagnosis: "",
+      },
+    };
+
+    const { error: diganoseError } = await diagnosePatient(payload);
+    if (diganoseError) return openErrorDialog(diganoseError);
+
+    // Successful
+    // setAppointments((prev) => prev.filter((i) => i.id !== id));
+    onSave();
+    openResponseDialog({
+      autoClose: true,
+      content: successMessage({
+        noun: "Referral",
+        verb: "saved",
+      }),
+      type: "SUCCESS",
+      closeCb() {
+        handleClose();
+        referralFormik.resetForm();
+      },
+    });
+  };
 
   return (
     <Modal
@@ -245,11 +297,33 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
             <Button
               variant="contained"
               size="small"
-              onClick={submitForm}
-              disabled
+              onClick={() => formik.submitForm()}
             >
               save diagnosis
             </Button>
+          )}
+          {serviceType === SERVICE_TYPE.REFER && (
+            <>
+              {!pdfFile ? (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => referralFormik.submitForm()}
+                  // disabled
+                >
+                  generate referral
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleSaveReferral}
+                  // disabled
+                >
+                  save referral
+                </Button>
+              )}
+            </>
           )}
         </>
       }
@@ -272,76 +346,58 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
 
           <Divider sx={{ my: 3 }} />
           <Box sx={{ pr: 3 }}>
-            {!displayMedicalRecords && (
-              <Button
-                variant="contained"
-                size="small"
-                onClick={() => setDisplayMedicalRecords(true)}
-                sx={{ mb: 2 }}
-              >
-                view past medical records
-              </Button>
-            )}
-
-            <Autocomplete
-              value={values.diagnosis}
-              disablePortal
-              options={[]}
-              onChange={(event, newValue) => {
-                // setFieldValue("patientId", newValue?.id);
-                // setFieldValue("patientName", newValue?.name);
-              }}
-              onBlur={handleBlur}
-              renderInput={(params) => (
-                <Input
-                  {...params}
-                  required
-                  label="Diagnosis"
-                  placeholder="Select Diagnosis"
-                  name="diagnosis"
-                />
-              )}
+            <Select
+              required
+              label="Action"
+              onChange={handleServiceChange}
+              value={serviceType}
               sx={{ mb: 2 }}
-            />
-            <Input
-              multiline
-              rows={2}
-              label="Remarks"
-              name="remarks"
-              value={values.remarks}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              // error={formik.touched.diagnosis && formik.errors.diagnosis}
-            />
+            >
+              <MenuItem value={SERVICE_TYPE.DIAGNOSE}>Diagnose</MenuItem>
+              <MenuItem value={SERVICE_TYPE.REFER}>Referral</MenuItem>
+            </Select>
+            {serviceType === SERVICE_TYPE.DIAGNOSE && (
+              <Input
+                multiline
+                rows={3}
+                required
+                label="Doctor Diagnosis"
+                name="diagnosis"
+                value={formik.values.diagnosis}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.diagnosis && formik.errors.diagnosis}
+              />
+            )}
           </Box>
         </Box>
         <Divider orientation="vertical" flexItem />
         {/* Patient Record */}
         <Box sx={{ pl: 3, flex: 1 }}>
-          {!displayMedicalRecords && <MedicationTable formik={formik} />}
-          {displayMedicalRecords && (
+          {serviceType === SERVICE_TYPE.DIAGNOSE ? (
             <>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  mb: 2,
-                }}
-              >
-                <Typography variant="body1" fontWeight="500">
-                  Past Medical Records
-                </Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => setDisplayMedicalRecords(false)}
-                >
-                  back to medication
-                </Button>
-              </Box>
+              <Typography variant="body1" fontWeight="500" sx={{ mb: 2 }}>
+                Past Medical Records
+              </Typography>
               <PatientRecord data={medicalRecords} />
+            </>
+          ) : (
+            <>
+              {!pdfFile ? (
+                <ReferralForm onSave={() => {}} {...referralFormik} />
+              ) : (
+                <>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setPdfFile(null)}
+                    sx={{ mb: 1 }}
+                  >
+                    back to form
+                  </Button>
+                  <PdfFrame src={`${pdfFile}`} width="100%" height="600" />
+                </>
+              )}
             </>
           )}
         </Box>
