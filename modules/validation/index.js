@@ -1,4 +1,5 @@
 import {
+  AffiliatesSchema,
   BranchesSchema,
   ChangePassSchema,
   DiagnoseSchema,
@@ -17,6 +18,7 @@ import {
 } from "./schema";
 
 export {
+  AffiliatesSchema,
   BranchesSchema,
   ChangePassSchema,
   DiagnoseSchema,

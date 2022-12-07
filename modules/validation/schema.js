@@ -144,6 +144,16 @@ export const BranchesSchema = Yup.object().shape({
   ),
 });
 
+export const AffiliatesSchema = Yup.object().shape({
+  affiliates: Yup.array().of(
+    Yup.object().shape({
+      name: Yup.string().max(255, "Name too long").required("Required"),
+      address: Yup.string().max(250, "address too long").required("Required"),
+      email: Yup.string().email("Invalid email").required("Required"),
+    })
+  ),
+});
+
 export const PatientRejectSchema = Yup.object().shape({
   reason: Yup.string().max(250, "Reason too long").required("Required"),
 });

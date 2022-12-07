@@ -10,6 +10,12 @@ import {
   updateStaffReq,
 } from "./admin";
 import {
+  addAffiliateReq,
+  deleteAffiliateReq,
+  getAffiliatesReq,
+  updateAffiliateReq,
+} from "./affiliates";
+import {
   SERVICE_TYPE,
   addAppointmentReq,
   approveAppointmentReq,
@@ -129,4 +135,9 @@ export {
   // medical record
   getPatientRecordReq,
   getMedicalRecordsReq,
+  // affiliate
+  addAffiliateReq,
+  deleteAffiliateReq,
+  getAffiliatesReq,
+  updateAffiliateReq,
 };

@@ -57,26 +57,6 @@ export const getNavbarItems = (id, role, router) => {
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
         },
-
-        // {
-        //   text: "Patient Approval",
-        //   icon: null,
-        //   onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
-        // },
-        // {
-        //   text: "Patients",
-        //   icon: null,
-        //   menuItems: [
-        //     {
-        //       text: "Patient List",
-        //       onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
-        //     },
-        //     {
-        //       text: "Patient Approval",
-        //       onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
-        //     },
-        //   ],
-        // },
         {
           text: "Appointments",
           icon: null,
@@ -105,6 +85,11 @@ export const getNavbarItems = (id, role, router) => {
               onClick: () => router.push(PATHS.ADMIN.REPORTS_PATIENTS),
             },
           ],
+        },
+        {
+          text: "Affiliates",
+          icon: null,
+          onClick: () => router.push(PATHS.ADMIN.AFFILIATES_MANAGEMENT),
         },
       ];
 
