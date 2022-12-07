@@ -7,12 +7,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import InfoIcon from "@mui/icons-material/Info";
+import MonitorHeartIcon from "@mui/icons-material/MonitorHeart";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
 import RestoreIcon from "@mui/icons-material/Restore";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import { IconButton, Tooltip } from "@mui/material";
-
 export const ACTION_BUTTONS = {
   DETAILS: "DETAILS",
   EDIT: "EDIT",
@@ -24,6 +24,7 @@ export const ACTION_BUTTONS = {
   APPROVE: "APPROVE",
   REJECT: "REJECT",
   CANCEL: "CANCEL",
+  VITALSIGN: "VITALSIGN",
 };
 
 export const ACTION_ICONS = {
@@ -37,6 +38,7 @@ export const ACTION_ICONS = {
   APPROVE: <ThumbUpIcon />,
   REJECT: <ThumbDownIcon />,
   CANCEL: <EventBusyIcon />,
+  VITALSIGN: <MonitorHeartIcon />,
 };
 
 const getButton = ({

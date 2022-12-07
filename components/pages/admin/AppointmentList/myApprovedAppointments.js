@@ -28,6 +28,8 @@ import {
   getAppointmentByDateStatusReq,
   getDoctorAppointmentByDateReq,
   rejectAppointmentReq,
+  updateAppointmentReq,
+  updatePatientReq,
 } from "../../../../modules/firebase";
 import {
   formatTimeStamp,
@@ -43,6 +45,7 @@ import {
 import ConsultModal from "../Consultation/ConsultModal";
 import Filters from "./Filters";
 import useFilter from "./useFilter";
+import VitalsignsModal from "./VitalsignsModal";
 
 const defaultModal = {
   open: false,
@@ -65,6 +68,11 @@ const MyApprovedAppointmentsPage = () => {
       : getDoctorAppointmentByDateReq,
     setBackdropLoader
   );
+  const [updatePatient] = useRequest(updatePatientReq, setBackdropLoader);
+  const [updateAppointment] = useRequest(
+    updateAppointmentReq,
+    setBackdropLoader
+  );
   const [approveAppointment] = useRequest(
     approveAppointmentReq,
     setBackdropLoader
@@ -77,6 +85,7 @@ const MyApprovedAppointmentsPage = () => {
   // Local States
   const [appointments, setAppointments] = useState([]);
   const [consultModal, setConsultModal] = useState(defaultModal);
+  const [vitalSignsModal, setVitalSignsModal] = useState(defaultModal);
   const [rejectModal, setRejectModal] = useState(defaultModal);
 
   const baseDay = getNearestBusinessDay(router.query?.date);
@@ -97,7 +106,6 @@ const MyApprovedAppointmentsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appointments]);
 
-  // Get
   const fetchAppointments = async () => {
     const payload = {
       id: doctorId,
@@ -111,6 +119,42 @@ const MyApprovedAppointmentsPage = () => {
     const { data, error } = await getAppointments(payload);
     if (error) return openErrorDialog(error);
     setAppointments(data);
+  };
+
+  const handleVitalSigns = async (vitalSigns) => {
+    const { appointmentId } = vitalSigns;
+    delete vitalSigns.appointmentId;
+
+    const p = { patient: { ...vitalSigns } };
+    const { error } = await updatePatient(p);
+    if (error) return openErrorDialog(error);
+
+    const p2 = {
+      document: { ...vitalSigns, id: appointmentId, vitalSignsChecked: true },
+    };
+    const { error2 } = await updateAppointment(p2);
+    if (error2) return openErrorDialog(error2);
+
+    setAppointments((prev) => {
+      const idx = prev.findIndex((i) => i.id === appointmentId);
+      prev[idx] = {
+        ...prev[idx],
+        ...vitalSigns,
+        vitalSignsChecked: true,
+      };
+      return prev;
+    });
+
+    openResponseDialog({
+      autoClose: true,
+      content: successMessage({
+        noun: "Vital Signs",
+        verb: "saved",
+      }),
+      type: "SUCCESS",
+    });
+
+    handleitalSignsModalClose();
   };
 
   useEffect(() => {
@@ -127,6 +171,17 @@ const MyApprovedAppointmentsPage = () => {
 
   const handleConsultModalClose = () => {
     setConsultModal(defaultModal);
+  };
+
+  const handleVitalSignsModalOpen = (data) => {
+    setVitalSignsModal({
+      open: true,
+      data,
+    });
+  };
+
+  const handleitalSignsModalClose = () => {
+    setVitalSignsModal(defaultModal);
   };
 
   const handleApproveConfirmation = (document) => {
@@ -275,14 +330,14 @@ const MyApprovedAppointmentsPage = () => {
                   startTime,
                   endTimeEstimate,
                   doctor,
-
                   service,
                   patientName,
                   status,
+                  vitalSignsChecked = false,
                 } = i;
 
                 return (
-                  <TableRow key={id}>
+                  <TableRow key={id} id={id}>
                     <TableCell>{patientName}</TableCell>
                     <TableCell>
                       {formatTimeStamp(date, "MMM dd, yyyy (EEEE)")}
@@ -305,7 +360,22 @@ const MyApprovedAppointmentsPage = () => {
                     </TableCell>
                     <TableCell align="center">
                       {status === REQUEST_STATUS.approved &&
+                        // !vitalSignsChecked &&
+                        getActionButtons([
+                          {
+                            action: ACTION_BUTTONS.VITALSIGN,
+                            color: "success",
+                            onClick: () =>
+                              handleVitalSignsModalOpen({
+                                ...i,
+                                appointmentId: id,
+                              }),
+                          },
+                        ])}
+
+                      {status === REQUEST_STATUS.approved &&
                         !multiDoctorMode &&
+                        vitalSignsChecked &&
                         getActionButtons([
                           {
                             action: ACTION_BUTTONS.DIAGNOSE,
@@ -343,6 +413,15 @@ const MyApprovedAppointmentsPage = () => {
           data={consultModal.data}
           onClose={handleConsultModalClose}
           onSave={fetchAppointments}
+        />
+      )}
+
+      {vitalSignsModal.open && (
+        <VitalsignsModal
+          open={vitalSignsModal.open}
+          data={vitalSignsModal.data}
+          onClose={handleitalSignsModalClose}
+          onSave={handleVitalSigns}
         />
       )}
 

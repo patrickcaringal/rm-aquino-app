@@ -87,9 +87,18 @@ export const getNavbarItems = (id, role, router) => {
           ],
         },
         {
-          text: "Affiliates",
+          text: "Referral",
           icon: null,
-          onClick: () => router.push(PATHS.ADMIN.AFFILIATES_MANAGEMENT),
+          menuItems: [
+            {
+              text: "Affiliates",
+              onClick: () => router.push(PATHS.ADMIN.AFFILIATES_MANAGEMENT),
+            },
+            {
+              text: "Referr Patient",
+              onClick: () => router.push(PATHS.ADMIN.REFERRAL),
+            },
+          ],
         },
       ];
 

@@ -9,12 +9,14 @@ import {
   ForgotPassSchema,
   PatientRejectSchema,
   ReferSchema,
+  ReferralSchema,
   ServicesSchema,
   SigninSchema,
   SignupSchema,
   StaffSchema,
   UpdateProfileSchema,
   VerificationCodeSchema,
+  VitalSignsSchema,
 } from "./schema";
 
 export {
@@ -28,10 +30,12 @@ export {
   ForgotPassSchema,
   PatientRejectSchema,
   ReferSchema,
+  ReferralSchema,
   ServicesSchema,
   SigninSchema,
   SignupSchema,
   StaffSchema,
   UpdateProfileSchema,
   VerificationCodeSchema,
+  VitalSignsSchema,
 };

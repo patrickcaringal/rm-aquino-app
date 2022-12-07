@@ -30,6 +30,7 @@ import {
   getDoctorAppointmentByMonthReq,
   getPatientAppointmentReq,
   rejectAppointmentReq,
+  updateAppointmentReq,
 } from "./appointment";
 import {
   changePasswordReq,
@@ -51,6 +52,7 @@ import {
   getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
+  updatePatientReq,
   verifyPatientEmailReq,
 } from "./patient";
 import {
@@ -100,6 +102,7 @@ export {
   getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
+  updatePatientReq,
   verifyPatientEmailReq,
   // admin
   addDoctorReq,
@@ -132,6 +135,7 @@ export {
   getDoctorAppointmentByMonthReq,
   getPatientAppointmentReq,
   rejectAppointmentReq,
+  updateAppointmentReq,
   // medical record
   getPatientRecordReq,
   getMedicalRecordsReq,

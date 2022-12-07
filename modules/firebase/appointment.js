@@ -232,6 +232,27 @@ export const addAppointmentReq = async ({ document }) => {
   }
 };
 
+export const updateAppointmentReq = async ({ document }) => {
+  try {
+    const batch = writeBatch(db);
+
+    // Update
+    const docRef = doc(db, "appointments", document.id);
+    const finalDoc = {
+      ...document,
+      ...timestampFields({ dateUpdated: true }),
+    };
+    batch.update(docRef, finalDoc);
+
+    await batch.commit();
+
+    return { success: true };
+  } catch (error) {
+    const errMsg = getErrorMsg(error.code);
+    return { error: errMsg || error.message };
+  }
+};
+
 export const approveAppointmentReq = async ({ document }) => {
   try {
     const docRef = doc(db, "appointments", document.id);

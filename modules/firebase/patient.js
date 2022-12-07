@@ -185,6 +185,27 @@ export const getPatientsAccountApprovalReq = async () => {
   }
 };
 
+export const updatePatientReq = async ({ patient }) => {
+  try {
+    const batch = writeBatch(db);
+
+    // Update
+    const docRef = doc(db, "patients", patient.id);
+    const finalDoc = {
+      ...patient,
+      ...timestampFields({ dateUpdated: true }),
+    };
+    batch.update(docRef, finalDoc);
+
+    await batch.commit();
+
+    return { success: true };
+  } catch (error) {
+    const errMsg = getErrorMsg(error.code);
+    return { error: errMsg || error.message };
+  }
+};
+
 export const verifyPatientEmailReq = async ({ id }) => {
   try {
     // Get Patient
