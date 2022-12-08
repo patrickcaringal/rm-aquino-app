@@ -61,12 +61,21 @@ const MedicationTable = ({ formik, onClose, onSave }) => {
             variant="outlined"
             size="small"
             onClick={() => {
-              arrayHelpersRef.current.push({
-                name: "",
-                dosage: "",
-                frequency: "",
-                remarks: "",
-              });
+              arrayHelpersRef.current.push(
+                isMockDataEnabled
+                  ? {
+                      name: faker.lorem.words(1),
+                      dosage: "mg",
+                      frequency: "2 times a day",
+                      remarks: faker.lorem.words(4),
+                    }
+                  : {
+                      name: "",
+                      dosage: "",
+                      frequency: "",
+                      remarks: "",
+                    }
+              );
             }}
           >
             Add medication
@@ -153,7 +162,7 @@ const MedicationTable = ({ formik, onClose, onSave }) => {
                               {
                                 action: ACTION_BUTTONS.DELETE,
                                 color: "error",
-                                onClick: () => arrayHelpers.remove(),
+                                onClick: () => arrayHelpers.remove(index),
                               },
                             ])}
                           </TableCell>

@@ -31,6 +31,7 @@ export const PATHS = {
     CONSULTATION: "/admin/consultation",
     AFFILIATES_MANAGEMENT: "/admin/affiliates",
     REFERRAL: "/admin/refer-patient",
+    DIAGNOSIS: "/admin/diagnosis",
   },
   // STAFF: {
   //   DASHBOARD: "/staff/dashboard",

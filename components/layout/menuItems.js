@@ -53,6 +53,11 @@ export const getNavbarItems = (id, role, router) => {
           onClick: () => router.push(PATHS.ADMIN.SERVICES_MANAGEMENT),
         },
         {
+          text: "Diagnosis",
+          icon: null,
+          onClick: () => router.push(PATHS.ADMIN.DIAGNOSIS),
+        },
+        {
           text: "Patient Records",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
@@ -60,17 +65,21 @@ export const getNavbarItems = (id, role, router) => {
         {
           text: "Appointments",
           icon: null,
-          onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
-        },
-        {
-          text: "My Appointments",
-          icon: null,
-          onClick: () =>
-            router.push({
-              // MY_APPOINTMENT_APPROVED
-              pathname: PATHS.ADMIN.MY_APPOINTMENT_CALENDAR,
-              query: { id },
-            }),
+          menuItems: [
+            {
+              text: "All Appointments",
+              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
+            },
+            {
+              text: "My Appointments",
+              onClick: () =>
+                router.push({
+                  // MY_APPOINTMENT_APPROVED
+                  pathname: PATHS.ADMIN.MY_APPOINTMENT_CALENDAR,
+                  query: { id },
+                }),
+            },
+          ],
         },
         {
           text: "Reports",

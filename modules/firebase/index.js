@@ -42,6 +42,12 @@ import {
   updateUserReq,
 } from "./auth";
 import { auth, db } from "./config";
+import {
+  addDiagnosisReq,
+  deleteDiagnosisReq,
+  getDiagnosisReq,
+  updateDiagnosisReq,
+} from "./diagnosis";
 import { getMedicalRecordsReq, getPatientRecordReq } from "./medicalRecords";
 import {
   approvePatientReq,
@@ -144,4 +150,9 @@ export {
   deleteAffiliateReq,
   getAffiliatesReq,
   updateAffiliateReq,
+  // diagnosis
+  addDiagnosisReq,
+  getDiagnosisReq,
+  updateDiagnosisReq,
+  deleteDiagnosisReq,
 };

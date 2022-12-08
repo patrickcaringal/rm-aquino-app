@@ -36,10 +36,10 @@ const defaultValues = isMockDataEnabled
       // diagnosis: faker.lorem.sentences(1),
       medications: [
         {
-          name: "",
-          dosage: "",
-          frequency: "",
-          remarks: "",
+          name: faker.lorem.words(1),
+          dosage: "mg",
+          frequency: "2 times a day",
+          remarks: faker.lorem.words(4),
         },
       ],
     }
