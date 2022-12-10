@@ -148,10 +148,6 @@ export const PatientRejectSchema = Yup.object().shape({
   reason: Yup.string().max(250, "Reason too long").required("Required"),
 });
 
-export const DiagnoseSchema = Yup.object().shape({
-  diagnosis: Yup.string().required("Required").max(500, "Diagnosis too long"),
-});
-
 export const ReferSchema = Yup.object().shape({
   date: Yup.string().nullable().required("Required"),
   address: Yup.string().max(250, "Address too long").required("Required"),
@@ -185,4 +181,13 @@ export const VitalSignsSchema = Yup.object().shape({
   bloodPressure: Yup.string().required("Required"),
   height: Yup.string().required("Required"),
   weight: Yup.string().required("Required"),
+});
+
+export const DiagnoseSchema = Yup.object().shape({
+  diagnosis: Yup.string().required("Required"),
+  otherDiagnosis: Yup.string().when("diagnosis", {
+    is: (diagnosis) => diagnosis === "Others",
+    then: Yup.string().required("Required"),
+  }),
+  remarks: Yup.string(),
 });

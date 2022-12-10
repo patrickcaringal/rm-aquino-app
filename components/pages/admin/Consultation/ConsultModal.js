@@ -20,6 +20,7 @@ import { getBaseApi, isMockDataEnabled } from "../../../../modules/env";
 import {
   SERVICE_TYPE,
   diagnosePatientReq,
+  getDiagnosisReq,
   getPatientRecordReq,
   getPatientReq,
 } from "../../../../modules/firebase";
@@ -33,7 +34,10 @@ import ReferralForm from "./ReferralForm";
 
 const defaultValues = isMockDataEnabled
   ? {
-      // diagnosis: faker.lorem.sentences(1),
+      diagnosis: "",
+      diagnosisId: "",
+      otherDiagnosis: "",
+      remarks: "",
       medications: [
         {
           name: faker.lorem.words(1),
@@ -44,7 +48,10 @@ const defaultValues = isMockDataEnabled
       ],
     }
   : {
-      // diagnosis: "",
+      diagnosis: "",
+      diagnosisId: "",
+      otherDiagnosis: "",
+      remarks: "",
       medications: [
         {
           name: "",
@@ -55,8 +62,6 @@ const defaultValues = isMockDataEnabled
       ],
     };
 
-const specialistName = `Dr.${faker.name.firstName()} ${faker.name.lastName()}`;
-
 const ConsultModal = ({ open = false, data, onClose, onSave }) => {
   const { openErrorDialog, openResponseDialog } = useResponseDialog();
   const { setBackdropLoader } = useBackdropLoader();
@@ -65,11 +70,12 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
   const [getPatient] = useRequest(getPatientReq, setBackdropLoader);
   const [getPatientRecord] = useRequest(getPatientRecordReq, setBackdropLoader);
   const [diagnosePatient] = useRequest(diagnosePatientReq, setBackdropLoader);
-  const [generateReferral] = useRequest(axios.post, setBackdropLoader);
+  const [getDiagnosis] = useRequest(getDiagnosisReq, setBackdropLoader);
 
   // Local States
   const [patient, setPatient] = useState({});
   const [medicalRecords, setMedicalRecords] = useState([]);
+  const [diagnosis, setDiagnosis] = useState([]);
   const [serviceType, setServiceType] = useState(SERVICE_TYPE.DIAGNOSE);
   const [displayMedicalRecords, setDisplayMedicalRecords] = useState(false);
 
@@ -140,14 +146,25 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
 
   const formik = useFormik({
     initialValues: defaultValues,
-    // validationSchema: DiagnoseSchema,
+    validationSchema: DiagnoseSchema,
     validateOnChange: false,
     enableReinitialize: true,
     onSubmit: async (values, { resetForm }) => {
+      if (values.medications.length < 1)
+        return openErrorDialog("Medication is required.");
+
+      const p = {
+        ...values,
+        diagnosis:
+          values.diagnosis === "Others"
+            ? values.otherDiagnosis
+            : values.diagnosis,
+      };
+      delete p.otherDiagnosis;
+
       const payload = {
         document: {
-          diagnosis: values.diagnosis,
-          action: SERVICE_TYPE.DIAGNOSE,
+          ...p,
           ...lodash.pick(data, [
             "patientName",
             "patientId",
@@ -161,13 +178,19 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
             "endTimeEstimate",
             "weekNo",
             "month",
+            // vitals
+            "bodyTemperature",
+            "pulseRate",
+            "bloodPressure",
+            "height",
+            "weight",
           ]),
           appointmentId: id,
         },
       };
 
-      const { error: diganoseError } = await diagnosePatient(payload);
-      if (diganoseError) return openErrorDialog(diganoseError);
+      const { error } = await diagnosePatient(payload);
+      if (error) return openErrorDialog(error);
 
       // Successful
       // setAppointments((prev) => prev.filter((i) => i.id !== id));
@@ -198,6 +221,8 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
     submitForm,
   } = formik;
 
+  const getError = (field) => touched?.[field] && errors?.[field];
+
   useEffect(() => {
     const fetchPatient = async () => {
       // Get Patient
@@ -217,16 +242,24 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
       setMedicalRecords(data);
     };
 
+    const fetchDiagnosis = async () => {
+      const { data, error } = await getDiagnosis();
+      if (error) return openErrorDialog(error);
+
+      const d = data.map((i) => ({ ...i, label: i.name }));
+      d.push({ label: "Others", id: "", name: "Others" });
+      setDiagnosis(d);
+    };
+
     fetchPatient();
     fetchMedicalRecord();
+    fetchDiagnosis();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleClose = () => {
     onClose();
   };
-
-  // console.log(values);
 
   return (
     <Modal
@@ -241,16 +274,9 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
           <Button color="inherit" size="small" onClick={handleClose}>
             Close
           </Button>
-          {serviceType === SERVICE_TYPE.DIAGNOSE && (
-            <Button
-              variant="contained"
-              size="small"
-              onClick={submitForm}
-              disabled
-            >
-              save diagnosis
-            </Button>
-          )}
+          <Button variant="contained" size="small" onClick={submitForm}>
+            save diagnosis
+          </Button>
         </>
       }
     >
@@ -286,10 +312,10 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
             <Autocomplete
               value={values.diagnosis}
               disablePortal
-              options={[]}
+              options={diagnosis}
               onChange={(event, newValue) => {
-                // setFieldValue("patientId", newValue?.id);
-                // setFieldValue("patientName", newValue?.name);
+                setFieldValue("diagnosisId", newValue?.id);
+                setFieldValue("diagnosis", newValue?.name);
               }}
               onBlur={handleBlur}
               renderInput={(params) => (
@@ -299,10 +325,23 @@ const ConsultModal = ({ open = false, data, onClose, onSave }) => {
                   label="Diagnosis"
                   placeholder="Select Diagnosis"
                   name="diagnosis"
+                  error={getError("diagnosis")}
                 />
               )}
               sx={{ mb: 2 }}
             />
+            {values.diagnosis === "Others" && (
+              <Input
+                value={values.otherDiagnosis}
+                label="Other Diagnosis"
+                name="otherDiagnosis"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                sx={{ mb: 2 }}
+                error={getError("otherDiagnosis")}
+              />
+            )}
+
             <Input
               multiline
               rows={2}

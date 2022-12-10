@@ -10,11 +10,13 @@ import InfoIcon from "@mui/icons-material/Info";
 import MonitorHeartIcon from "@mui/icons-material/MonitorHeart";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
 import RestoreIcon from "@mui/icons-material/Restore";
+import SourceIcon from "@mui/icons-material/Source";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import { IconButton, Tooltip } from "@mui/material";
 export const ACTION_BUTTONS = {
   DETAILS: "DETAILS",
+  DETAILS2: "DETAILS2",
   EDIT: "EDIT",
   DELETE: "DELETE",
   RESTORE: "RESTORE",
@@ -29,6 +31,7 @@ export const ACTION_BUTTONS = {
 
 export const ACTION_ICONS = {
   DETAILS: <FolderSharedIcon />,
+  DETAILS2: <SourceIcon />,
   EDIT: <EditIcon />,
   DELETE: <DeleteIcon />,
   RESTORE: <RestoreIcon />,

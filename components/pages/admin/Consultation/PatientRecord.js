@@ -18,7 +18,19 @@ import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import { useRequest } from "../../../../hooks";
 import { getBaseApi } from "../../../../modules/env";
 import { formatTimeStamp } from "../../../../modules/helper";
-import { LongTypography, PdfFrame, TablePlaceholder } from "../../../common";
+import {
+  ACTION_BUTTONS,
+  LongTypography,
+  PdfFrame,
+  TablePlaceholder,
+  getActionButtons,
+} from "../../../common";
+import RecordDetailModal from "./RecordDetailModal";
+
+const defaultModal = {
+  open: false,
+  data: {},
+};
 
 const PatientRecord = ({ data = [] }) => {
   const { openErrorDialog } = useResponseDialog();
@@ -28,37 +40,19 @@ const PatientRecord = ({ data = [] }) => {
   const [generateReferral] = useRequest(axios.post, setBackdropLoader);
 
   // Local States
-  const [pdfFile, setPdfFile] = useState(null);
+  // Local States
+  const [detailModal, setDetailModal] = useState(defaultModal);
 
-  const handleViewReferral = async (patient) => {
-    try {
-      const payload = {
-        ...patient.referral,
-        date: formatTimeStamp(patient.referral?.date, "MMMM dd, yyyy"),
-      };
-      const res = await generateReferral(getBaseApi("/pdf"), payload);
-      setPdfFile(res?.data);
-    } catch (error) {
-      setBackdropLoader(false);
-      openErrorDialog(error?.message);
-    }
+  const handleDetailModalOpen = (data) => {
+    setDetailModal({
+      open: true,
+      data,
+    });
   };
 
-  if (pdfFile) {
-    return (
-      <>
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => setPdfFile(null)}
-          sx={{ mb: 1 }}
-        >
-          back to medical records
-        </Button>
-        <PdfFrame src={`${pdfFile}`} width="100%" height="600" />
-      </>
-    );
-  }
+  const handleDetailModalClose = () => {
+    setDetailModal(defaultModal);
+  };
 
   return (
     <Box>
@@ -68,9 +62,10 @@ const PatientRecord = ({ data = [] }) => {
             <TableRow>
               {[
                 { text: "Date of Visit", sx: { width: 140 } },
-                { text: "Doctor", sx: { width: 180 } },
-                { text: "Service", sx: { width: 180 } },
+                { text: "Doctor", sx: { width: 220 } },
+                { text: "Service", sx: { width: 220 } },
                 { text: "Doctor Diagnosis" },
+                { text: "Actions", align: "center", sx: { width: 110 } },
               ].map(({ text, align, sx }) => (
                 <TableCell
                   key={text}
@@ -92,7 +87,8 @@ const PatientRecord = ({ data = [] }) => {
                   <TableCell>{doctor ? doctor : "-"}</TableCell>
                   <TableCell>{service ? service : "-"}</TableCell>
                   <TableCell>
-                    {diagnosis ? (
+                    <LongTypography text={diagnosis} whiteSpace="pre-line" />
+                    {/* {diagnosis ? (
                       <LongTypography text={diagnosis} whiteSpace="pre-line" />
                     ) : (
                       <Button
@@ -103,7 +99,16 @@ const PatientRecord = ({ data = [] }) => {
                       >
                         view referral
                       </Button>
-                    )}
+                    )} */}
+                  </TableCell>
+                  <TableCell align="center">
+                    {getActionButtons([
+                      {
+                        action: ACTION_BUTTONS.DETAILS2,
+                        color: "success",
+                        onClick: () => handleDetailModalOpen(i),
+                      },
+                    ])}
                   </TableCell>
                 </TableRow>
               );
@@ -112,6 +117,14 @@ const PatientRecord = ({ data = [] }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {detailModal.open && (
+        <RecordDetailModal
+          open={detailModal.open}
+          data={detailModal.data}
+          onClose={handleDetailModalClose}
+        />
+      )}
     </Box>
   );
 };

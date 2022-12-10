@@ -138,11 +138,6 @@ const AffiliatesManagementPage = () => {
   } = formik;
   const getError = (field) => touched?.[field] && errors?.[field];
 
-  // console.log(
-  //   JSON.stringify(errors, null, 4),
-  //   JSON.stringify(errors, null, 4),
-  //   JSON.stringify(touched, null, 4)
-  // );
   return (
     <Box sx={{ pt: 2 }}>
       <Autocomplete

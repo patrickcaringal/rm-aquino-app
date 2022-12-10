@@ -359,9 +359,9 @@ export const diagnosePatientReq = async ({ document }) => {
     batch.update(docRef1, {
       medicalRecordId: docRef2.id,
       status: REQUEST_STATUS.done,
+      paid: false,
       ...timestampFields({ dateUpdated: true }),
     });
-    console.log(document.appointmentId);
 
     await batch.commit();
 

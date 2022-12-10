@@ -39,7 +39,6 @@ import ReferralForm from "./ReferralForm";
 
 const MedicationTable = ({ formik, onClose, onSave }) => {
   const arrayHelpersRef = useRef(null);
-
   const { values, touched, errors, handleChange, submitForm } = formik;
 
   return (
