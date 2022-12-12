@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Divider,
-  MenuItem,
-  Typography,
-} from "@mui/material";
-import axios from "axios";
+import { Autocomplete, Box, Button, Divider, Typography } from "@mui/material";
 import faker from "faker";
 import { useFormik } from "formik";
 import lodash from "lodash";
@@ -16,7 +8,7 @@ import lodash from "lodash";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import useRequest from "../../../../hooks/useRequest";
-import { getBaseApi, isMockDataEnabled } from "../../../../modules/env";
+import { isMockDataEnabled } from "../../../../modules/env";
 import {
   SERVICE_TYPE,
   diagnosePatientReq,
@@ -27,10 +19,9 @@ import {
 import { calculateAge, formatTimeStamp } from "../../../../modules/helper";
 import { DiagnoseSchema } from "../../../../modules/validation";
 import { Datalist, Modal, successMessage } from "../../../common";
-import { Input, Select } from "../../../common/Form";
+import { Input } from "../../../common/Form";
 import MedicationTable from "./MedicationTable";
 import PatientRecord from "./PatientRecord";
-import ReferralForm from "./ReferralForm";
 
 const defaultValues = isMockDataEnabled
   ? {
@@ -43,6 +34,7 @@ const defaultValues = isMockDataEnabled
           name: faker.lorem.words(1),
           dosage: "mg",
           frequency: "2 times a day",
+          quantity: "0",
           remarks: faker.lorem.words(4),
         },
       ],
@@ -57,6 +49,7 @@ const defaultValues = isMockDataEnabled
           name: "",
           dosage: "",
           frequency: "",
+          quantity: "02",
           remarks: "",
         },
       ],

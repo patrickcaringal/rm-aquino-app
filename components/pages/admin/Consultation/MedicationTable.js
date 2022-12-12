@@ -89,6 +89,7 @@ const MedicationTable = ({ formik, onClose, onSave }) => {
                   { text: "Medecine", sx: { width: 200 } },
                   { text: "Dosage", sx: { width: 150 } },
                   { text: "Frequency", sx: { width: 200 } },
+                  { text: "Quantity", sx: { width: 80 } },
                   { text: "Remarks" },
                   { text: "Actions", align: "center", sx: { width: 50 } },
                 ].map(({ text, align, sx }) => (
@@ -144,6 +145,14 @@ const MedicationTable = ({ formik, onClose, onSave }) => {
                               variant="standard"
                               name={getFieldName("frequency")}
                               value={valueArr.frequency}
+                              onChange={handleChange}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              variant="standard"
+                              name={getFieldName("quantity")}
+                              value={valueArr.quantity}
                               onChange={handleChange}
                             />
                           </TableCell>
