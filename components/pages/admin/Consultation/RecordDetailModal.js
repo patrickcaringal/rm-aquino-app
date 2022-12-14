@@ -10,6 +10,7 @@ import { useRequest } from "../../../../hooks";
 import { getDoctorReq } from "../../../../modules/firebase";
 import { formatTimeStamp } from "../../../../modules/helper";
 import { Datalist, Modal } from "../../../common";
+import MedicalCertificateModal from "./MedicalCertificateModal";
 import PrescriptionModal from "./PrescriptionModal";
 
 const defaultModal = {
@@ -26,6 +27,7 @@ const RecordDetailModal = ({ open = false, data, onClose }) => {
 
   // Local States
   const [prescriptionModal, setPrescriptionModal] = useState(defaultModal);
+  const [medicalCertModal, setMedicalCertModal] = useState(defaultModal);
 
   const {
     id,
@@ -120,6 +122,17 @@ const RecordDetailModal = ({ open = false, data, onClose }) => {
     setPrescriptionModal(defaultModal);
   };
 
+  const handleMedicalCertModalOpen = (data) => {
+    setMedicalCertModal({
+      open: true,
+      data,
+    });
+  };
+
+  const handleMedicalCertModalClose = () => {
+    setMedicalCertModal(defaultModal);
+  };
+
   const handlePrintPrescription = async (i) => {
     const payload = { id: data.doctorId };
     const { data: d, error } = await getDoctor(payload);
@@ -133,10 +146,14 @@ const RecordDetailModal = ({ open = false, data, onClose }) => {
       email: d.email,
       contactNo: d.contactNo,
     };
-    exportPrescroption({
+    exportPrescription({
       ...i,
       ...j,
     });
+  };
+
+  const handlePrintMedicalCert = async (i) => {
+    exportMedCert(i);
   };
 
   return (
@@ -159,7 +176,11 @@ const RecordDetailModal = ({ open = false, data, onClose }) => {
           >
             prescription
           </Button>
-          <Button variant="outlined" size="small" onClick={() => {}}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => handleMedicalCertModalOpen(data)}
+          >
             medical certificate
           </Button>
         </>
@@ -220,13 +241,22 @@ const RecordDetailModal = ({ open = false, data, onClose }) => {
           onSave={handlePrintPrescription}
         />
       )}
+
+      {medicalCertModal.open && (
+        <MedicalCertificateModal
+          open={medicalCertModal.open}
+          data={medicalCertModal.data}
+          onClose={handleMedicalCertModalClose}
+          onSave={handlePrintMedicalCert}
+        />
+      )}
     </Modal>
   );
 };
 
 export default RecordDetailModal;
 
-const exportPrescroption = (data) => {
+const exportPrescription = (data) => {
   const { medications, date, patient, doctor, specialty, email, contactNo } =
     data;
 
@@ -295,6 +325,72 @@ const exportPrescroption = (data) => {
   doc.text(`License #: ${faker.finance.account(5)}`, baseX, 192); // License #
   // movingY += 10;
   doc.text(`PRT #: ${faker.finance.account(5)}`, baseX, 196); // License #
+
+  doc.output("pdfobjectnewwindow"); //opens the data uri in new window
+};
+
+const exportMedCert = (data) => {
+  const { patientName, date, doctor, service, diagnosis, remarks } = data;
+
+  const doc = new jsPDF();
+  const baseX = 8;
+  const endX = 200;
+  const baseY = 10;
+  let movingY = baseY;
+
+  doc.setFontSize(14);
+  doc.text(`RM Aquino Medical Clinic`, 105, movingY, null, null, "center"); // clinic
+  movingY += 4;
+
+  doc.setFontSize(10);
+  doc.text(
+    `JP Rizal St, Poblacion Uno, Cabuyao, 4026 Laguna`,
+    105,
+    movingY,
+    null,
+    null,
+    "center"
+  ); // address
+  movingY += 4;
+
+  doc.text("+63-2-8840-0588", 105, movingY, null, null, "center"); // address
+  movingY += 4;
+
+  doc.text(
+    `https://rm-aquino-app.vercel.app/`,
+    105,
+    movingY,
+    null,
+    null,
+    "center"
+  ); // clinic
+  movingY += 4;
+
+  doc.setLineWidth(0.5);
+  doc.line(baseX, movingY, endX, movingY);
+  movingY += 6;
+
+  // ########################## content
+  movingY += 20;
+  doc.setFontSize(12);
+  const tab = `            `;
+  const x = `${tab}This is to certify that ${patientName} visited Sigua Medical Clinic, JP Rizal St, Poblacion Uno, Cabuyao, 4026 Laguna and undergo ${service} with ${doctor} on ${date}. With the diagnosis of ${diagnosis}.`;
+
+  doc.splitTextToSize(x, endX - 26).forEach((i) => {
+    doc.text(i, baseX + 10, movingY);
+    movingY += 8;
+  });
+
+  movingY += 8;
+  doc.text(`${tab}${remarks}.`, baseX + 10, movingY);
+  movingY += 8;
+
+  // ########################## footer
+
+  // doc.text(`License #: ${faker.finance.account(5)}`, baseX, endX - 26); // License #
+  doc.line(endX - 60, movingY + 25, endX - 10, movingY + 25);
+
+  doc.text(`Doctor Signature`, endX - 18, movingY + 31, null, null, "right"); // date
 
   doc.output("pdfobjectnewwindow"); //opens the data uri in new window
 };
