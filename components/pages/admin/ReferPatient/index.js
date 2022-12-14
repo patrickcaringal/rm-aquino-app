@@ -24,6 +24,7 @@ import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import { useFilter, usePagination, useRequest } from "../../../../hooks";
 import {
   addAffiliateReq,
+  addReferralReq,
   deleteAffiliateReq,
   getAffiliatesReq,
   getPatientsReq,
@@ -57,6 +58,7 @@ const AffiliatesManagementPage = () => {
   const [getPatients] = useRequest(getPatientsReq, setBackdropLoader);
   const [getAffiliates] = useRequest(getAffiliatesReq, setBackdropLoader);
   const [getServices] = useRequest(getServicesReq, setBackdropLoader);
+  const [addReferral] = useRequest(addReferralReq, setBackdropLoader);
 
   // const [addAffiliate] = useRequest(addAffiliateReq, setBackdropLoader);
   // const [updateAffiliate] = useRequest(updateAffiliateReq, setBackdropLoader);
@@ -122,8 +124,32 @@ const AffiliatesManagementPage = () => {
     validationSchema: ReferralSchema,
     validateOnChange: false,
     enableReinitialize: true,
-    onSubmit: async (values) => {
-      console.log(values);
+    onSubmit: async (values, { resetForm }) => {
+      // otherServiceName
+
+      const p = {
+        ...values,
+        serviceName:
+          values.serviceName === "Others"
+            ? values.otherServiceName
+            : values.serviceName,
+      };
+      delete p.otherServiceName;
+
+      const { error } = await addReferral({ document: p });
+      if (error) return openErrorDialog(error);
+
+      openResponseDialog({
+        autoClose: true,
+        content: successMessage({
+          noun: "Referral",
+          verb: "saved",
+        }),
+        type: "SUCCESS",
+        closeCb() {
+          resetForm();
+        },
+      });
     },
   });
 
