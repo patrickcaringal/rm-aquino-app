@@ -61,7 +61,11 @@ import {
   updatePatientReq,
   verifyPatientEmailReq,
 } from "./patient";
-import { addReferralReq } from "./referrals";
+import {
+  addReferralReq,
+  getReferralsByPatientReq,
+  getReferralsReq,
+} from "./referrals";
 import {
   addSchedulesReq,
   getDoctorsScheduleReq,
@@ -158,4 +162,6 @@ export {
   deleteDiagnosisReq,
   // referral
   addReferralReq,
+  getReferralsReq,
+  getReferralsByPatientReq,
 };

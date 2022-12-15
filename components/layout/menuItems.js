@@ -107,6 +107,10 @@ export const getNavbarItems = (id, role, router) => {
               text: "Referr Patient",
               onClick: () => router.push(PATHS.ADMIN.REFERRAL),
             },
+            {
+              text: "Referral list",
+              onClick: () => router.push(PATHS.ADMIN.REFERRAL_LIST),
+            },
           ],
         },
       ];
