@@ -15,6 +15,7 @@ import {
   CssBaseline,
   Divider,
   IconButton,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -33,7 +34,11 @@ import { useBackdropLoader } from "../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../contexts/ResponseDialogContext";
 import useRequest from "../../hooks/useRequest";
 import { signOutReq } from "../../modules/firebase";
-import { getFullName, getInitials } from "../../modules/helper";
+import {
+  formatTimeStamp,
+  getFullName,
+  getInitials,
+} from "../../modules/helper";
 import { getNavbarItems } from "./menuItems";
 import NavbarItem from "./NavbarItem";
 
@@ -136,6 +141,39 @@ const ResponsiveAppBar = () => {
 
             {isLoggedIn && (
               <>
+                <Box>
+                  <Typography
+                    variant="caption"
+                    component="div"
+                    sx={{
+                      color: "primary.dark",
+                      // width: 200,
+                      display: "-webkit-box",
+                      WebkitBoxOrient: "vertical",
+                      WebkitLineClamp: "2",
+                      overflow: "hidden",
+                      mr: 3,
+                    }}
+                  >
+                    Hi {user?.name}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    component="div"
+                    sx={{
+                      color: "primary.dark",
+                      // width: 200,
+                      display: "-webkit-box",
+                      WebkitBoxOrient: "vertical",
+                      WebkitLineClamp: "2",
+                      overflow: "hidden",
+                      mr: 3,
+                    }}
+                  >
+                    {/* {formatTimeStamp(new Date(), "MMM dd, yyyy")} */}
+                    {user?.email}
+                  </Typography>
+                </Box>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar sx={{ bgcolor: "primary.main" }}>
                     {getInitials(user?.firstName)}
@@ -211,25 +249,38 @@ const ResponsiveAppBar = () => {
             minHeight: "40px !important",
           }}
         >
-          <Container maxWidth={isAdmin ? "none" : "lg"}>
+          <Container
+            maxWidth={isAdmin ? "none" : "lg"}
+            sx={{ display: "flex" }}
+          >
             {isLoggedIn &&
-              menuItems.map(({ text, icon, onClick, menuItems }) => {
+              menuItems.map(({ text, icon, onClick, menuItems, id = [] }) => {
+                const selected = id.includes(router.pathname);
+
                 if (!menuItems) {
                   return (
-                    <Button
-                      sx={{ color: "common.white", mr: 3 }}
+                    <ListItemButton
+                      sx={{
+                        // color: "common.white",
+                        maxWidth: 150,
+                        justifyContent: "center",
+                        bgcolor: selected ? "primary.light" : "primary",
+                      }}
                       key={text}
-                      variant="text"
                       onClick={onClick}
-                      startIcon={icon}
                     >
                       {text}
-                    </Button>
+                    </ListItemButton>
                   );
                 }
 
                 return (
-                  <NavbarItem key={text} text={text} menuItems={menuItems} />
+                  <NavbarItem
+                    key={text}
+                    text={text}
+                    menuItems={menuItems}
+                    selected={selected}
+                  />
                 );
               })}
           </Container>

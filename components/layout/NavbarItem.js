@@ -1,8 +1,15 @@
 import * as React from "react";
 
-import { Button, ListItemText, Menu, MenuItem, MenuList } from "@mui/material";
+import {
+  Button,
+  ListItemButton,
+  ListItemText,
+  Menu,
+  MenuItem,
+  MenuList,
+} from "@mui/material";
 
-const NavbarItem = ({ text, menuItems = [] }) => {
+const NavbarItem = ({ text, menuItems = [], selected }) => {
   const [itemEl, setItemEl] = React.useState(null);
 
   const handleOpenMenu = (event) => {
@@ -15,13 +22,17 @@ const NavbarItem = ({ text, menuItems = [] }) => {
 
   return (
     <>
-      <Button
+      <ListItemButton
         onClick={handleOpenMenu}
-        sx={{ color: "common.white", mr: 3 }}
+        sx={{
+          maxWidth: 150,
+          justifyContent: "center",
+          bgcolor: selected ? "primary.light" : "primary",
+        }}
         variant="text"
       >
         {text}
-      </Button>
+      </ListItemButton>
       <Menu
         sx={{ mt: "38px", ml: 1 }}
         id="basic-menu"

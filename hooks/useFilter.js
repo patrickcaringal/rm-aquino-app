@@ -16,7 +16,7 @@ const useFilter = ({ data = [], defaultName = "" }) => {
 
     if (name) {
       filtered = filtered.filter((i) =>
-        i.patientName.toUpperCase().includes(name.toUpperCase())
+        i.name.toUpperCase().includes(name.toUpperCase())
       );
     }
 
