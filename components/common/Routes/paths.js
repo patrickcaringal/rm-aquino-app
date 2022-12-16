@@ -29,6 +29,10 @@ export const PATHS = {
     REPORTS_APPOINTMENTS: "/admin/reports/appointments",
     REPORTS_PATIENTS: "/admin/reports/patients",
     CONSULTATION: "/admin/consultation",
+    AFFILIATES_MANAGEMENT: "/admin/affiliates",
+    // REFERRAL: "/admin/refer-patient",
+    REFERRAL_LIST: "/admin/referrals",
+    DIAGNOSIS: "/admin/diagnosis",
   },
   // STAFF: {
   //   DASHBOARD: "/staff/dashboard",

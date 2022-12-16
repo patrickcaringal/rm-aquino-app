@@ -10,6 +10,12 @@ import {
   updateStaffReq,
 } from "./admin";
 import {
+  addAffiliateReq,
+  deleteAffiliateReq,
+  getAffiliatesReq,
+  updateAffiliateReq,
+} from "./affiliates";
+import {
   SERVICE_TYPE,
   addAppointmentReq,
   approveAppointmentReq,
@@ -23,7 +29,9 @@ import {
   getDoctorAppointmentByDateReq,
   getDoctorAppointmentByMonthReq,
   getPatientAppointmentReq,
+  payAppointmentReq,
   rejectAppointmentReq,
+  updateAppointmentReq,
 } from "./appointment";
 import {
   changePasswordReq,
@@ -35,7 +43,17 @@ import {
   updateUserReq,
 } from "./auth";
 import { auth, db } from "./config";
-import { getMedicalRecordsReq, getPatientRecordReq } from "./medicalRecords";
+import {
+  addDiagnosisReq,
+  deleteDiagnosisReq,
+  getDiagnosisReq,
+  updateDiagnosisReq,
+} from "./diagnosis";
+import {
+  getMedicalRecordsReq,
+  getPatientRecordReq,
+  updateMedicalRecordReq,
+} from "./medicalRecords";
 import {
   approvePatientReq,
   createPatientAccountReq,
@@ -45,8 +63,14 @@ import {
   getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
+  updatePatientReq,
   verifyPatientEmailReq,
 } from "./patient";
+import {
+  addReferralReq,
+  getReferralsByPatientReq,
+  getReferralsReq,
+} from "./referrals";
 import {
   addSchedulesReq,
   getDoctorsScheduleReq,
@@ -58,6 +82,7 @@ import {
   addServiceReq,
   deleteServiceReq,
   getDeletedServicesReq,
+  getServiceReq,
   getServicesReq,
   restoreServiceReq,
   updateServiceReq,
@@ -85,6 +110,7 @@ export {
   getServicesReq,
   restoreServiceReq,
   updateServiceReq,
+  getServiceReq,
   // patient
   approvePatientReq,
   createPatientAccountReq,
@@ -94,6 +120,7 @@ export {
   getPatientsReq,
   rejectPatientReq,
   signInPatientReq,
+  updatePatientReq,
   verifyPatientEmailReq,
   // admin
   addDoctorReq,
@@ -126,7 +153,24 @@ export {
   getDoctorAppointmentByMonthReq,
   getPatientAppointmentReq,
   rejectAppointmentReq,
+  updateAppointmentReq,
+  payAppointmentReq,
   // medical record
   getPatientRecordReq,
   getMedicalRecordsReq,
+  updateMedicalRecordReq,
+  // affiliate
+  addAffiliateReq,
+  deleteAffiliateReq,
+  getAffiliatesReq,
+  updateAffiliateReq,
+  // diagnosis
+  addDiagnosisReq,
+  getDiagnosisReq,
+  updateDiagnosisReq,
+  deleteDiagnosisReq,
+  // referral
+  addReferralReq,
+  getReferralsReq,
+  getReferralsByPatientReq,
 };

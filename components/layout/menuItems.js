@@ -8,16 +8,19 @@ export const getNavbarItems = (id, role, router) => {
           text: "Medical Record",
           icon: null,
           onClick: () => router.push(PATHS.PATIENT.MEDICAL_RECORD),
+          id: [PATHS.PATIENT.MEDICAL_RECORD],
         },
         {
           text: "My Appointments",
           icon: null,
           onClick: () => router.push(PATHS.PATIENT.APPOINTMENT),
+          id: [PATHS.PATIENT.APPOINTMENT],
         },
         {
           text: "Schedule Appointment",
           icon: null,
           onClick: () => router.push(PATHS.PATIENT.SCHEDULE_APPOINTMENT),
+          id: [PATHS.PATIENT.SCHEDULE_APPOINTMENT],
         },
       ];
 
@@ -27,11 +30,13 @@ export const getNavbarItems = (id, role, router) => {
           text: "Patient Records",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
+          id: [PATHS.ADMIN.PATIENT_MANAGEMENT],
         },
         {
           text: "Appointment",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
+          id: [PATHS.ADMIN.APPOINTMENT_CALENDAR],
         },
       ];
 
@@ -41,56 +46,68 @@ export const getNavbarItems = (id, role, router) => {
           text: "Doctors",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.DOCTORS_MANAGEMENT),
+          id: [PATHS.ADMIN.DOCTORS_MANAGEMENT],
         },
         {
           text: "Staffs",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.STAFF_MANAGEMENT),
+          id: [PATHS.ADMIN.STAFF_MANAGEMENT],
         },
         {
           text: "Services",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.SERVICES_MANAGEMENT),
+          id: [PATHS.ADMIN.SERVICES_MANAGEMENT],
+        },
+        {
+          text: "Diagnosis",
+          icon: null,
+          onClick: () => router.push(PATHS.ADMIN.DIAGNOSIS),
+          id: [PATHS.ADMIN.DIAGNOSIS],
         },
         {
           text: "Patient Records",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
+          id: [PATHS.ADMIN.PATIENT_MANAGEMENT],
         },
-
-        // {
-        //   text: "Patient Approval",
-        //   icon: null,
-        //   onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
-        // },
-        // {
-        //   text: "Patients",
-        //   icon: null,
-        //   menuItems: [
-        //     {
-        //       text: "Patient List",
-        //       onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
-        //     },
-        //     {
-        //       text: "Patient Approval",
-        //       onClick: () => router.push(PATHS.ADMIN.PATIENT_APPROVAL),
-        //     },
-        //   ],
-        // },
         {
           text: "Appointments",
           icon: null,
-          onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
+          menuItems: [
+            {
+              text: "All Appointments",
+              onClick: () => router.push(PATHS.ADMIN.APPOINTMENT_CALENDAR),
+            },
+            {
+              text: "My Appointments",
+              onClick: () =>
+                router.push({
+                  pathname: PATHS.ADMIN.MY_APPOINTMENT_CALENDAR,
+                  query: { id },
+                }),
+            },
+          ],
+          id: [
+            PATHS.ADMIN.APPOINTMENT_CALENDAR,
+            PATHS.ADMIN.MY_APPOINTMENT_CALENDAR,
+          ],
         },
         {
-          text: "My Appointments",
+          text: "Referral",
           icon: null,
-          onClick: () =>
-            router.push({
-              // MY_APPOINTMENT_APPROVED
-              pathname: PATHS.ADMIN.MY_APPOINTMENT_CALENDAR,
-              query: { id },
-            }),
+          menuItems: [
+            {
+              text: "Affiliates",
+              onClick: () => router.push(PATHS.ADMIN.AFFILIATES_MANAGEMENT),
+            },
+            {
+              text: "Referral list",
+              onClick: () => router.push(PATHS.ADMIN.REFERRAL_LIST),
+            },
+          ],
+          id: [PATHS.ADMIN.AFFILIATES_MANAGEMENT, PATHS.ADMIN.REFERRAL_LIST],
         },
         {
           text: "Reports",
@@ -105,6 +122,7 @@ export const getNavbarItems = (id, role, router) => {
               onClick: () => router.push(PATHS.ADMIN.REPORTS_PATIENTS),
             },
           ],
+          id: [PATHS.ADMIN.REPORTS_APPOINTMENTS, PATHS.ADMIN.REPORTS_PATIENTS],
         },
       ];
 
@@ -114,6 +132,7 @@ export const getNavbarItems = (id, role, router) => {
           text: "Patient Records",
           icon: null,
           onClick: () => router.push(PATHS.ADMIN.PATIENT_MANAGEMENT),
+          id: [PATHS.ADMIN.PATIENT_MANAGEMENT],
         },
         {
           text: "My Schedule",
@@ -124,6 +143,7 @@ export const getNavbarItems = (id, role, router) => {
               pathname: PATHS.ADMIN.DOCTORS_SCHEDULE,
               query: { id },
             }),
+          id: [PATHS.ADMIN.DOCTORS_SCHEDULE],
         },
         {
           text: "My Appointments",
@@ -134,6 +154,23 @@ export const getNavbarItems = (id, role, router) => {
               pathname: PATHS.ADMIN.MY_APPOINTMENT_CALENDAR,
               query: { id },
             }),
+          id: [PATHS.ADMIN.MY_APPOINTMENT_CALENDAR],
+        },
+        {
+          text: "Referral",
+          icon: null,
+          // menuItems: [
+          //   {
+          //     text: "Affiliates",
+          //     onClick: () => router.push(PATHS.ADMIN.AFFILIATES_MANAGEMENT),
+          //   },
+          //   {
+          //     text: "Referral list",
+          //     onClick: () => router.push(PATHS.ADMIN.REFERRAL_LIST),
+          //   },
+          // ],
+          id: [PATHS.ADMIN.AFFILIATES_MANAGEMENT, PATHS.ADMIN.REFERRAL_LIST],
+          onClick: () => router.push(PATHS.ADMIN.REFERRAL_LIST),
         },
         // {
         //   text: "Appointments",

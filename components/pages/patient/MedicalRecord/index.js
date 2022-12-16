@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import {
   Box,
   Button,
@@ -22,8 +21,13 @@ import { useRequest } from "../../../../hooks";
 import { getBaseApi } from "../../../../modules/env";
 import { getPatientRecordReq } from "../../../../modules/firebase";
 import { formatTimeStamp } from "../../../../modules/helper";
-import { LongTypography, TablePlaceholder } from "../../../common";
+import {
+  ACTION_BUTTONS,
+  TablePlaceholder,
+  getActionButtons,
+} from "../../../common";
 import { DatePicker } from "../../../common/Form";
+import RecordDetailModal from "./RecordDetailModal";
 import ReferralModal from "./ReferralModal";
 import useFilter from "./useFilter";
 
@@ -43,7 +47,7 @@ const MedicalRecordPage = () => {
 
   // Local States
   const [medicalRecords, setMedicalRecords] = useState([]);
-  const [referralModal, setReferralModal] = useState(defaultModal);
+  const [detailModal, setDetailModal] = useState(defaultModal);
 
   const filtering = useFilter({});
 
@@ -88,27 +92,15 @@ const MedicalRecordPage = () => {
     filtering.onEndDateChange(v);
   };
 
-  const handleViewReferral = async (patient) => {
-    try {
-      const payload = {
-        ...patient.referral,
-        date: formatTimeStamp(patient.referral?.date, "MMMM dd, yyyy"),
-      };
-      const res = await generateReferral(getBaseApi("/pdf"), payload);
-      // setPdfFile(res?.data);
-
-      setReferralModal({
-        open: true,
-        data: res?.data,
-      });
-    } catch (error) {
-      setBackdropLoader(false);
-      openErrorDialog(error?.message);
-    }
+  const handleDetailModalOpen = (data) => {
+    setDetailModal({
+      open: true,
+      data,
+    });
   };
 
-  const handleReferralModal = () => {
-    setReferralModal(defaultModal);
+  const handleDetailModalClose = () => {
+    setDetailModal(defaultModal);
   };
 
   return (
@@ -139,9 +131,10 @@ const MedicalRecordPage = () => {
               <TableRow>
                 {[
                   { text: "Date of Visit", sx: { width: 140 } },
-                  { text: "Doctor", sx: { width: 180 } },
-                  { text: "Service", sx: { width: 180 } },
+                  { text: "Doctor", sx: { width: 220 } },
+                  { text: "Service", sx: { width: 220 } },
                   { text: "Doctor Diagnosis" },
+                  { text: "Actions", align: "center", sx: { width: 110 } },
                 ].map(({ text, align, sx }) => (
                   <TableCell
                     key={text}
@@ -163,42 +156,35 @@ const MedicalRecordPage = () => {
                     </TableCell>
                     <TableCell>{doctor ? doctor : "-"}</TableCell>
                     <TableCell>{service ? service : "-"}</TableCell>
-                    <TableCell>
-                      {diagnosis ? (
-                        <LongTypography
-                          text={diagnosis}
-                          whiteSpace="pre-line"
-                        />
-                      ) : (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          startIcon={<PictureAsPdfIcon />}
-                          onClick={() => handleViewReferral(i)}
-                        >
-                          view referral
-                        </Button>
-                      )}
+                    <TableCell>{diagnosis}</TableCell>
+                    <TableCell align="center">
+                      {getActionButtons([
+                        {
+                          action: ACTION_BUTTONS.DETAILS2,
+                          color: "success",
+                          onClick: () => handleDetailModalOpen(i),
+                        },
+                      ])}
                     </TableCell>
                   </TableRow>
                 );
               })}
               <TablePlaceholder
                 visible={filtering.filtered.length === 0}
-                colSpan={4}
+                colSpan={5}
               />
             </TableBody>
           </Table>
         </TableContainer>
-      </Box>
 
-      {referralModal.open && (
-        <ReferralModal
-          open={referralModal.open}
-          data={referralModal.data}
-          onClose={handleReferralModal}
-        />
-      )}
+        {detailModal.open && (
+          <RecordDetailModal
+            open={detailModal.open}
+            data={detailModal.data}
+            onClose={handleDetailModalClose}
+          />
+        )}
+      </Box>
     </Box>
   );
 };

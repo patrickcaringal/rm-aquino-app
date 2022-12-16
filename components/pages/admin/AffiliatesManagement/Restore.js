@@ -106,7 +106,6 @@ const ServicesRestorePage = () => {
               {[
                 { text: "Service", sx: { width: 200 } },
                 { text: "Description" },
-                { text: "Service Cost" },
               ].map(({ text, align, sx }) => (
                 <TableCell
                   key={text}

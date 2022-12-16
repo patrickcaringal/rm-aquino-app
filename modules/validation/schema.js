@@ -148,12 +148,46 @@ export const PatientRejectSchema = Yup.object().shape({
   reason: Yup.string().max(250, "Reason too long").required("Required"),
 });
 
-export const DiagnoseSchema = Yup.object().shape({
-  diagnosis: Yup.string().required("Required").max(500, "Diagnosis too long"),
-});
-
 export const ReferSchema = Yup.object().shape({
   date: Yup.string().nullable().required("Required"),
   address: Yup.string().max(250, "Address too long").required("Required"),
   content: Yup.string().required("Required"),
+});
+
+export const AffiliatesSchema = Yup.object().shape({
+  affiliates: Yup.array().of(
+    Yup.object().shape({
+      name: Yup.string().max(255, "Name too long").required("Required"),
+      address: Yup.string().max(250, "address too long").required("Required"),
+      email: Yup.string().email("Invalid email").required("Required"),
+    })
+  ),
+});
+
+export const ReferralSchema = Yup.object().shape({
+  affiliateName: Yup.string().required("Required"),
+  patientName: Yup.string().required("Required"),
+  serviceName: Yup.string().required("Required"),
+  otherServiceName: Yup.string().when("serviceName", {
+    is: (serviceName) => serviceName === "Others",
+    then: Yup.string().required("Required"),
+  }),
+  remarks: Yup.string(),
+});
+
+export const VitalSignsSchema = Yup.object().shape({
+  bodyTemperature: Yup.string().required("Required"),
+  pulseRate: Yup.string().required("Required"),
+  bloodPressure: Yup.string().required("Required"),
+  height: Yup.string().required("Required"),
+  weight: Yup.string().required("Required"),
+});
+
+export const DiagnoseSchema = Yup.object().shape({
+  diagnosis: Yup.string().required("Required"),
+  otherDiagnosis: Yup.string().when("diagnosis", {
+    is: (diagnosis) => diagnosis === "Others",
+    then: Yup.string().required("Required"),
+  }),
+  remarks: Yup.string(),
 });

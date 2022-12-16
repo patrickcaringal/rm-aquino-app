@@ -6,8 +6,8 @@ import { Box, Divider, Fab, Grid, IconButton } from "@mui/material";
 import faker from "faker";
 import { FieldArray } from "formik";
 
-import { Input } from "../../../../components/common/Form";
 import { isMockDataEnabled } from "../../../../modules/env";
+import { Input } from "../../../common/Form";
 
 const defaultItem = {
   name: "",
@@ -28,7 +28,7 @@ const Form = ({
 
   return (
     <FieldArray
-      name="services"
+      name="affiliates"
       render={({ push, remove }) => {
         return (
           <>
@@ -62,14 +62,14 @@ const Form = ({
                 minHeight: isCreate ? 280 : 0,
               }}
             >
-              {values.services.map((s, index) => {
-                const valueArr = values.services[index];
-                const touchedArr = touched.services?.[index];
-                const errorsArr = errors.services?.[index];
+              {values.affiliates.map((s, index) => {
+                const valueArr = values.affiliates[index];
+                const touchedArr = touched.affiliates?.[index];
+                const errorsArr = errors.affiliates?.[index];
 
                 const getError = (field) =>
                   touchedArr?.[field] && errorsArr?.[field];
-                const getFieldName = (field) => `services[${index}].${field}`;
+                const getFieldName = (field) => `affiliates[${index}].${field}`;
 
                 return (
                   <React.Fragment key={index}>
@@ -90,7 +90,8 @@ const Form = ({
                       <Grid item xs={12} sm={12}>
                         <Input
                           required
-                          label="Service"
+                          label="Affiliate name"
+                          placeholder="Doctor name OR Clinic name"
                           name={getFieldName("name")}
                           value={valueArr.name}
                           onChange={handleChange}
@@ -102,29 +103,28 @@ const Form = ({
                         <Input
                           multiline
                           rows={2}
+                          value={valueArr.address}
                           required
-                          label="Description"
-                          name={`services[${index}].description`}
-                          value={valueArr.description}
+                          label="Full Address"
+                          name={getFieldName("address")}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          error={getError("description")}
+                          error={getError("address")}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={12}>
+                      <Grid item xs={12}>
                         <Input
-                          type="number"
                           required
-                          label="Price"
-                          name={getFieldName("price")}
-                          value={valueArr.price}
+                          label="Email"
+                          name={getFieldName("email")}
+                          value={valueArr.email}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          error={getError("price")}
+                          error={getError("email")}
                         />
                       </Grid>
                     </Grid>
-                    {values.services.length !== index + 1 && (
+                    {values.affiliates.length !== index + 1 && (
                       <Divider sx={{ mt: 3, mb: 4 }} />
                     )}
                   </React.Fragment>

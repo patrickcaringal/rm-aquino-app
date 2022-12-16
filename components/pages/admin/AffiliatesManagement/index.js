@@ -21,10 +21,10 @@ import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import { useFilter, usePagination, useRequest } from "../../../../hooks";
 import {
-  addServiceReq,
-  deleteServiceReq,
-  getServicesReq,
-  updateServiceReq,
+  addAffiliateReq,
+  deleteAffiliateReq,
+  getAffiliatesReq,
+  updateAffiliateReq,
 } from "../../../../modules/firebase";
 import { localUpdateDocs, pluralize } from "../../../../modules/helper";
 import {
@@ -34,7 +34,7 @@ import {
   confirmMessage,
   successMessage,
 } from "../../../common";
-import ManageServiceModal from "./ManageServiceModal";
+import ManageModal from "./ManageServiceModal";
 import TableCells from "./TableCells";
 
 const defaultModal = {
@@ -42,102 +42,97 @@ const defaultModal = {
   data: {},
 };
 
-const ServicesManagementPage = () => {
+const AffiliatesManagementPage = () => {
   const router = useRouter();
   const { setBackdropLoader } = useBackdropLoader();
   const { openResponseDialog, openErrorDialog } = useResponseDialog();
 
   // Requests
-  const [getServices] = useRequest(getServicesReq, setBackdropLoader);
-  const [addService] = useRequest(addServiceReq, setBackdropLoader);
-  const [updateService] = useRequest(updateServiceReq, setBackdropLoader);
-  const [deleteService] = useRequest(deleteServiceReq, setBackdropLoader);
+  const [getAffiliates] = useRequest(getAffiliatesReq, setBackdropLoader);
+  const [addAffiliate] = useRequest(addAffiliateReq, setBackdropLoader);
+  const [updateAffiliate] = useRequest(updateAffiliateReq, setBackdropLoader);
+  const [deleteAffiliate] = useRequest(deleteAffiliateReq, setBackdropLoader);
 
   // Local States
-  const [services, setServices] = useState([]);
-  const [serviceModal, setServiceModal] = useState(false);
+  const [affiliates, setAffiliates] = useState([]);
+  const [manageModal, setManageModal] = useState(false);
   const filtering = useFilter({});
   const pagination = usePagination(filtering.filtered);
 
   useEffect(() => {
     const fetch = async () => {
-      // Get Services
-      const { data: serviceList, error: getServicesError } =
-        await getServices();
-      if (getServicesError) return openErrorDialog(getServicesError);
+      const { data, error } = await getAffiliates();
+      if (error) return openErrorDialog(error);
 
-      setServices(serviceList);
+      setAffiliates(data);
     };
     fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    filtering.setData(services);
+    filtering.setData(affiliates);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [services]);
+  }, [affiliates]);
 
   useEffect(() => {
     pagination.setTotalItems(filtering.filtered.length);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtering.filtered.length]);
 
-  const handleAddService = async (docs) => {
-    // Add
-    const { data: newDocs, error: addError } = await addService({
-      docs,
-    });
+  const handleAdd = async (docs) => {
+    const p = { docs };
+    const { data: newDocs, error: addError } = await addAffiliate(p);
     if (addError) return openErrorDialog(addError);
 
     // Successful
-    setServices((prev) => [...prev, ...newDocs]);
+    setAffiliates((prev) => [...prev, ...newDocs]);
     openResponseDialog({
       autoClose: true,
       content: successMessage({
-        noun: pluralize("Service", newDocs.length),
+        noun: pluralize("Affiliate", newDocs.length),
         verb: "added",
       }),
       type: "SUCCESS",
       closeCb() {
-        setServiceModal(defaultModal);
+        setManageModal(defaultModal);
       },
     });
   };
 
-  const handleEditService = async (updatedDocs) => {
-    const updatedService = updatedDocs[0];
-    const serviceCopy = [...services];
+  const handleEdit = async (updatedDocs) => {
+    const updatedAffiliate = updatedDocs[0];
+    const affiliateCopy = [...affiliates];
     const { latestDocs, updates } = localUpdateDocs({
-      updatedDoc: updatedService,
-      oldDocs: serviceCopy,
+      updatedDoc: updatedAffiliate,
+      oldDocs: affiliateCopy,
     });
 
     // Update
-    const { error: updateError } = await updateService({
-      service: updates,
-    });
-    if (updateError) return openErrorDialog(updateError);
+    const p = { affiliate: updates };
+    const { error } = await updateAffiliate(p);
+    if (error) return openErrorDialog(error);
 
     // Success
-    setServices(latestDocs);
+    setAffiliates(latestDocs);
     openResponseDialog({
       autoClose: true,
-      content: successMessage({ noun: "Service", verb: "updated" }),
+      content: successMessage({ noun: "Affiliate", verb: "updated" }),
       type: "SUCCESS",
       closeCb() {
-        setServiceModal(defaultModal);
+        setManageModal(defaultModal);
       },
     });
   };
 
-  const handleDeleteConfirm = (service) => {
+  const handleDeleteConfirm = (affiliate) => {
     openResponseDialog({
-      content: confirmMessage({ verb: "Delete", item: service.name }),
+      content: confirmMessage({ verb: "Delete", item: affiliate.name }),
       type: "CONFIRM",
       actions: (
         <Button
           color="error"
-          onClick={() => handleDelete(service)}
+          onClick={() => handleDelete(affiliate)}
           size="small"
         >
           delete
@@ -146,40 +141,40 @@ const ServicesManagementPage = () => {
     });
   };
 
-  const handleDelete = async (service) => {
+  const handleDelete = async (affiliate) => {
     // Delete
-    const { error: deleteError } = await deleteService({ service });
+    const { error: deleteError } = await deleteAffiliate({ affiliate });
     if (deleteError) return openErrorDialog(deleteError);
 
     // Success
-    setServices((prev) => prev.filter((i) => i.id !== service.id));
+    setAffiliates((prev) => prev.filter((i) => i.id !== affiliate.id));
     openResponseDialog({
       autoClose: true,
-      content: successMessage({ noun: "Service", verb: "deleted" }),
+      content: successMessage({ noun: "Affiliate", verb: "deleted" }),
       type: "SUCCESS",
     });
   };
 
-  const handleServiceModalOpen = () => {
-    setServiceModal({
+  const handleManageModalOpen = () => {
+    setManageModal({
       open: true,
       data: null,
     });
   };
 
-  const handleServiceModalClose = () => {
-    setServiceModal(defaultModal);
+  const handleManageModalClose = () => {
+    setManageModal(defaultModal);
   };
 
-  const handleEditServiceModalOpen = (service) => {
-    setServiceModal({
+  const handleEditModalOpen = (data) => {
+    setManageModal({
       open: true,
-      data: service,
+      data,
     });
   };
 
   const handleRestoreRedirect = () => {
-    router.push(PATHS.ADMIN.SERVICES_RESTORE);
+    // router.push(PATHS.ADMIN.SERVICES_RESTORE);
   };
 
   const handleSearchChange = useCallback(
@@ -209,19 +204,19 @@ const ServicesManagementPage = () => {
         <Button
           variant="contained"
           size="small"
-          onClick={handleServiceModalOpen}
+          onClick={handleManageModalOpen}
           startIcon={<AddCircleIcon />}
         >
-          add service
+          add affiliate
         </Button>
-        <Button
+        {/* <Button
           size="small"
           onClick={handleRestoreRedirect}
           startIcon={<RestoreIcon />}
           sx={{ ml: 2 }}
         >
           restore service
-        </Button>
+        </Button> */}
       </Box>
 
       <TableContainer>
@@ -229,9 +224,9 @@ const ServicesManagementPage = () => {
           <TableHead>
             <TableRow>
               {[
-                { text: "Service", sx: { width: 200 } },
-                { text: "Description" },
-                { text: "Service Cost" },
+                { text: "Name", sx: { width: 300 } },
+                { text: "Email", sx: { width: 300 } },
+                { text: "Address" },
                 { text: "Actions", align: "center", sx: { width: 110 } },
               ].map(({ text, align, sx }) => (
                 <TableCell
@@ -256,7 +251,7 @@ const ServicesManagementPage = () => {
                       <IconButton
                         color="primary"
                         size="small"
-                        onClick={() => handleEditServiceModalOpen(i)}
+                        onClick={() => handleEditModalOpen(i)}
                       >
                         <EditIcon />
                       </IconButton>
@@ -276,16 +271,16 @@ const ServicesManagementPage = () => {
       </TableContainer>
       <Pagination pagination={pagination} onChange={handlePageChange} />
 
-      {serviceModal.open && (
-        <ManageServiceModal
-          open={serviceModal.open}
-          data={serviceModal.data}
-          onClose={handleServiceModalClose}
-          onSave={!serviceModal.data ? handleAddService : handleEditService}
+      {manageModal.open && (
+        <ManageModal
+          open={manageModal.open}
+          data={manageModal.data}
+          onClose={handleManageModalClose}
+          onSave={!manageModal.data ? handleAdd : handleEdit}
         />
       )}
     </Box>
   );
 };
 
-export default ServicesManagementPage;
+export default AffiliatesManagementPage;

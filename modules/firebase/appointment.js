@@ -232,6 +232,27 @@ export const addAppointmentReq = async ({ document }) => {
   }
 };
 
+export const updateAppointmentReq = async ({ document }) => {
+  try {
+    const batch = writeBatch(db);
+
+    // Update
+    const docRef = doc(db, "appointments", document.id);
+    const finalDoc = {
+      ...document,
+      ...timestampFields({ dateUpdated: true }),
+    };
+    batch.update(docRef, finalDoc);
+
+    await batch.commit();
+
+    return { success: true };
+  } catch (error) {
+    const errMsg = getErrorMsg(error.code);
+    return { error: errMsg || error.message };
+  }
+};
+
 export const approveAppointmentReq = async ({ document }) => {
   try {
     const docRef = doc(db, "appointments", document.id);
@@ -338,9 +359,9 @@ export const diagnosePatientReq = async ({ document }) => {
     batch.update(docRef1, {
       medicalRecordId: docRef2.id,
       status: REQUEST_STATUS.done,
+      paid: false,
       ...timestampFields({ dateUpdated: true }),
     });
-    console.log(document.appointmentId);
 
     await batch.commit();
 
@@ -348,5 +369,25 @@ export const diagnosePatientReq = async ({ document }) => {
   } catch (error) {
     console.log(error);
     return { error: error.message };
+  }
+};
+
+export const payAppointmentReq = async (document) => {
+  console.log({ document });
+  try {
+    const docRef = doc(db, "appointments", document.id);
+    const data = {
+      paid: true,
+      cost: document.cost,
+      ...timestampFields({ dateUpdated: true }),
+    };
+    // Update Document
+    await updateDoc(docRef, data);
+
+    return { success: true };
+  } catch (error) {
+    console.log(error);
+    const errMsg = getErrorMsg(error.code);
+    return { error: errMsg || error.message };
   }
 };

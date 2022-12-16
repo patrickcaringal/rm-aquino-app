@@ -27,7 +27,11 @@ import {
   approveAppointmentReq,
   getAppointmentByDateStatusReq,
   getDoctorAppointmentByDateReq,
+  getServiceReq,
+  payAppointmentReq,
   rejectAppointmentReq,
+  updateAppointmentReq,
+  updatePatientReq,
 } from "../../../../modules/firebase";
 import {
   formatTimeStamp,
@@ -43,6 +47,7 @@ import {
 import ConsultModal from "../Consultation/ConsultModal";
 import Filters from "./Filters";
 import useFilter from "./useFilter";
+import VitalsignsModal from "./VitalsignsModal";
 
 const defaultModal = {
   open: false,
@@ -65,6 +70,11 @@ const MyApprovedAppointmentsPage = () => {
       : getDoctorAppointmentByDateReq,
     setBackdropLoader
   );
+  const [updatePatient] = useRequest(updatePatientReq, setBackdropLoader);
+  const [updateAppointment] = useRequest(
+    updateAppointmentReq,
+    setBackdropLoader
+  );
   const [approveAppointment] = useRequest(
     approveAppointmentReq,
     setBackdropLoader
@@ -73,10 +83,13 @@ const MyApprovedAppointmentsPage = () => {
     rejectAppointmentReq,
     setBackdropLoader
   );
+  const [getService] = useRequest(getServiceReq, setBackdropLoader);
+  const [payAppointment] = useRequest(payAppointmentReq, setBackdropLoader);
 
   // Local States
   const [appointments, setAppointments] = useState([]);
   const [consultModal, setConsultModal] = useState(defaultModal);
+  const [vitalSignsModal, setVitalSignsModal] = useState(defaultModal);
   const [rejectModal, setRejectModal] = useState(defaultModal);
 
   const baseDay = getNearestBusinessDay(router.query?.date);
@@ -97,7 +110,6 @@ const MyApprovedAppointmentsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appointments]);
 
-  // Get
   const fetchAppointments = async () => {
     const payload = {
       id: doctorId,
@@ -111,6 +123,42 @@ const MyApprovedAppointmentsPage = () => {
     const { data, error } = await getAppointments(payload);
     if (error) return openErrorDialog(error);
     setAppointments(data);
+  };
+
+  const handleVitalSigns = async (vitalSigns) => {
+    const { appointmentId } = vitalSigns;
+    delete vitalSigns.appointmentId;
+
+    const p = { patient: { ...vitalSigns } };
+    const { error } = await updatePatient(p);
+    if (error) return openErrorDialog(error);
+
+    const p2 = {
+      document: { ...vitalSigns, id: appointmentId, vitalSignsChecked: true },
+    };
+    const { error2 } = await updateAppointment(p2);
+    if (error2) return openErrorDialog(error2);
+
+    setAppointments((prev) => {
+      const idx = prev.findIndex((i) => i.id === appointmentId);
+      prev[idx] = {
+        ...prev[idx],
+        ...vitalSigns,
+        vitalSignsChecked: true,
+      };
+      return prev;
+    });
+
+    openResponseDialog({
+      autoClose: true,
+      content: successMessage({
+        noun: "Vital Signs",
+        verb: "saved",
+      }),
+      type: "SUCCESS",
+    });
+
+    handleitalSignsModalClose();
   };
 
   useEffect(() => {
@@ -127,6 +175,17 @@ const MyApprovedAppointmentsPage = () => {
 
   const handleConsultModalClose = () => {
     setConsultModal(defaultModal);
+  };
+
+  const handleVitalSignsModalOpen = (data) => {
+    setVitalSignsModal({
+      open: true,
+      data,
+    });
+  };
+
+  const handleitalSignsModalClose = () => {
+    setVitalSignsModal(defaultModal);
   };
 
   const handleApproveConfirmation = (document) => {
@@ -231,6 +290,62 @@ const MyApprovedAppointmentsPage = () => {
     );
   };
 
+  const handlePaymentConfirm = async (i) => {
+    const payload = { id: i.serviceId };
+    const { data, error } = await getService(payload);
+    if (error) return openErrorDialog(error);
+
+    openResponseDialog({
+      title: "Payment",
+      content: (
+        <>
+          <Typography variant="body1" gutterBottom>
+            Record payment?
+          </Typography>
+          <Typography variant="body2">
+            {formatTimeStamp(i.date, "MMM dd, yyyy (EEEE)")}
+          </Typography>
+          <Typography variant="body2">{`${i.patientName}`}</Typography>
+          <Typography variant="body2">{i.doctor}</Typography>
+          <Typography variant="body2">{i.service}</Typography>
+          <Typography variant="body2" sx={{ mt: 1, fontWeight: 500 }}>
+            ₱ {data.price}
+          </Typography>
+        </>
+      ),
+      type: "CONFIRM",
+      actions: (
+        <Button
+          variant="contained"
+          onClick={async () => {
+            const p = {
+              id: i.id,
+              cost: data.price,
+            };
+            const { error } = await payAppointment(p);
+            if (error) return openErrorDialog(error);
+
+            closeDialog();
+            setTimeout(() => {
+              fetchAppointments();
+              openResponseDialog({
+                autoClose: true,
+                content: successMessage({
+                  noun: "Payment",
+                  verb: "saved",
+                }),
+                type: "SUCCESS",
+              });
+            }, 500);
+          }}
+          size="small"
+        >
+          Save payment
+        </Button>
+      ),
+    });
+  };
+
   return (
     <Box sx={{ pt: 2 }}>
       <Filters
@@ -275,14 +390,15 @@ const MyApprovedAppointmentsPage = () => {
                   startTime,
                   endTimeEstimate,
                   doctor,
-
                   service,
                   patientName,
                   status,
+                  vitalSignsChecked = false,
+                  paid = false,
                 } = i;
 
                 return (
-                  <TableRow key={id}>
+                  <TableRow key={id} id={id}>
                     <TableCell>{patientName}</TableCell>
                     <TableCell>
                       {formatTimeStamp(date, "MMM dd, yyyy (EEEE)")}
@@ -304,8 +420,34 @@ const MyApprovedAppointmentsPage = () => {
                       <RequestStatus status={status} />
                     </TableCell>
                     <TableCell align="center">
+                      {status === REQUEST_STATUS.done &&
+                        !paid &&
+                        user?.role === "staff" &&
+                        getActionButtons([
+                          {
+                            action: ACTION_BUTTONS.PAID,
+                            color: "success",
+                            onClick: () => handlePaymentConfirm(i),
+                          },
+                        ])}
+
+                      {status === REQUEST_STATUS.approved &&
+                        user?.role === "staff" &&
+                        getActionButtons([
+                          {
+                            action: ACTION_BUTTONS.VITALSIGN,
+                            color: "success",
+                            onClick: () =>
+                              handleVitalSignsModalOpen({
+                                ...i,
+                                appointmentId: id,
+                              }),
+                          },
+                        ])}
+
                       {status === REQUEST_STATUS.approved &&
                         !multiDoctorMode &&
+                        vitalSignsChecked &&
                         getActionButtons([
                           {
                             action: ACTION_BUTTONS.DIAGNOSE,
@@ -343,6 +485,15 @@ const MyApprovedAppointmentsPage = () => {
           data={consultModal.data}
           onClose={handleConsultModalClose}
           onSave={fetchAppointments}
+        />
+      )}
+
+      {vitalSignsModal.open && (
+        <VitalsignsModal
+          open={vitalSignsModal.open}
+          data={vitalSignsModal.data}
+          onClose={handleitalSignsModalClose}
+          onSave={handleVitalSigns}
         />
       )}
 

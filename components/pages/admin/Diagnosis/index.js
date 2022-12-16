@@ -21,10 +21,10 @@ import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import { useFilter, usePagination, useRequest } from "../../../../hooks";
 import {
-  addServiceReq,
-  deleteServiceReq,
-  getServicesReq,
-  updateServiceReq,
+  addDiagnosisReq,
+  deleteDiagnosisReq,
+  getDiagnosisReq,
+  updateDiagnosisReq,
 } from "../../../../modules/firebase";
 import { localUpdateDocs, pluralize } from "../../../../modules/helper";
 import {
@@ -34,7 +34,7 @@ import {
   confirmMessage,
   successMessage,
 } from "../../../common";
-import ManageServiceModal from "./ManageServiceModal";
+import ManageModal from "./ManageServiceModal";
 import TableCells from "./TableCells";
 
 const defaultModal = {
@@ -42,144 +42,135 @@ const defaultModal = {
   data: {},
 };
 
-const ServicesManagementPage = () => {
+const AffiliatesManagementPage = () => {
   const router = useRouter();
   const { setBackdropLoader } = useBackdropLoader();
   const { openResponseDialog, openErrorDialog } = useResponseDialog();
 
   // Requests
-  const [getServices] = useRequest(getServicesReq, setBackdropLoader);
-  const [addService] = useRequest(addServiceReq, setBackdropLoader);
-  const [updateService] = useRequest(updateServiceReq, setBackdropLoader);
-  const [deleteService] = useRequest(deleteServiceReq, setBackdropLoader);
+  const [getDiagnosis] = useRequest(getDiagnosisReq, setBackdropLoader);
+  const [addDiagnosis] = useRequest(addDiagnosisReq, setBackdropLoader);
+  const [updateDiagnosis] = useRequest(updateDiagnosisReq, setBackdropLoader);
+  const [deleteDiagnosis] = useRequest(deleteDiagnosisReq, setBackdropLoader);
 
   // Local States
-  const [services, setServices] = useState([]);
-  const [serviceModal, setServiceModal] = useState(false);
+  const [diagnosis, setDiagnosis] = useState([]);
+  const [manageModal, setManageModal] = useState(false);
   const filtering = useFilter({});
   const pagination = usePagination(filtering.filtered);
 
   useEffect(() => {
     const fetch = async () => {
-      // Get Services
-      const { data: serviceList, error: getServicesError } =
-        await getServices();
-      if (getServicesError) return openErrorDialog(getServicesError);
+      const { data, error } = await getDiagnosis();
+      if (error) return openErrorDialog(error);
 
-      setServices(serviceList);
+      setDiagnosis(data);
     };
     fetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    filtering.setData(services);
+    filtering.setData(diagnosis);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [services]);
+  }, [diagnosis]);
 
   useEffect(() => {
     pagination.setTotalItems(filtering.filtered.length);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtering.filtered.length]);
 
-  const handleAddService = async (docs) => {
-    // Add
-    const { data: newDocs, error: addError } = await addService({
-      docs,
-    });
+  const handleAdd = async (docs) => {
+    const p = { docs };
+    const { data: newDocs, error: addError } = await addDiagnosis(p);
     if (addError) return openErrorDialog(addError);
 
     // Successful
-    setServices((prev) => [...prev, ...newDocs]);
+    setDiagnosis((prev) => [...prev, ...newDocs]);
     openResponseDialog({
       autoClose: true,
       content: successMessage({
-        noun: pluralize("Service", newDocs.length),
+        noun: pluralize("Diagnosis", newDocs.length),
         verb: "added",
       }),
       type: "SUCCESS",
       closeCb() {
-        setServiceModal(defaultModal);
+        setManageModal(defaultModal);
       },
     });
   };
 
-  const handleEditService = async (updatedDocs) => {
-    const updatedService = updatedDocs[0];
-    const serviceCopy = [...services];
+  const handleEdit = async (updatedDocs) => {
+    const updatedDiagnosis = updatedDocs[0];
+    const copy = [...diagnosis];
     const { latestDocs, updates } = localUpdateDocs({
-      updatedDoc: updatedService,
-      oldDocs: serviceCopy,
+      updatedDoc: updatedDiagnosis,
+      oldDocs: copy,
     });
 
     // Update
-    const { error: updateError } = await updateService({
-      service: updates,
-    });
-    if (updateError) return openErrorDialog(updateError);
+    const p = { document: updates };
+    const { error } = await updateDiagnosis(p);
+    if (error) return openErrorDialog(error);
 
     // Success
-    setServices(latestDocs);
+    setDiagnosis(latestDocs);
     openResponseDialog({
       autoClose: true,
-      content: successMessage({ noun: "Service", verb: "updated" }),
+      content: successMessage({ noun: "Diagnosis", verb: "updated" }),
       type: "SUCCESS",
       closeCb() {
-        setServiceModal(defaultModal);
+        setManageModal(defaultModal);
       },
     });
   };
 
-  const handleDeleteConfirm = (service) => {
+  const handleDeleteConfirm = (item) => {
     openResponseDialog({
-      content: confirmMessage({ verb: "Delete", item: service.name }),
+      content: confirmMessage({ verb: "Delete", item: item.name }),
       type: "CONFIRM",
       actions: (
-        <Button
-          color="error"
-          onClick={() => handleDelete(service)}
-          size="small"
-        >
+        <Button color="error" onClick={() => handleDelete(item)} size="small">
           delete
         </Button>
       ),
     });
   };
 
-  const handleDelete = async (service) => {
+  const handleDelete = async (document) => {
     // Delete
-    const { error: deleteError } = await deleteService({ service });
+    const { error: deleteError } = await deleteDiagnosis({ document });
     if (deleteError) return openErrorDialog(deleteError);
 
     // Success
-    setServices((prev) => prev.filter((i) => i.id !== service.id));
+    setDiagnosis((prev) => prev.filter((i) => i.id !== document.id));
     openResponseDialog({
       autoClose: true,
-      content: successMessage({ noun: "Service", verb: "deleted" }),
+      content: successMessage({ noun: "Diagnosis", verb: "deleted" }),
       type: "SUCCESS",
     });
   };
 
-  const handleServiceModalOpen = () => {
-    setServiceModal({
+  const handleManageModalOpen = () => {
+    setManageModal({
       open: true,
       data: null,
     });
   };
 
-  const handleServiceModalClose = () => {
-    setServiceModal(defaultModal);
+  const handleManageModalClose = () => {
+    setManageModal(defaultModal);
   };
 
-  const handleEditServiceModalOpen = (service) => {
-    setServiceModal({
+  const handleEditModalOpen = (data) => {
+    setManageModal({
       open: true,
-      data: service,
+      data,
     });
   };
 
   const handleRestoreRedirect = () => {
-    router.push(PATHS.ADMIN.SERVICES_RESTORE);
+    // router.push(PATHS.ADMIN.SERVICES_RESTORE);
   };
 
   const handleSearchChange = useCallback(
@@ -209,19 +200,19 @@ const ServicesManagementPage = () => {
         <Button
           variant="contained"
           size="small"
-          onClick={handleServiceModalOpen}
+          onClick={handleManageModalOpen}
           startIcon={<AddCircleIcon />}
         >
-          add service
+          add diagnosis
         </Button>
-        <Button
+        {/* <Button
           size="small"
           onClick={handleRestoreRedirect}
           startIcon={<RestoreIcon />}
           sx={{ ml: 2 }}
         >
           restore service
-        </Button>
+        </Button> */}
       </Box>
 
       <TableContainer>
@@ -229,9 +220,8 @@ const ServicesManagementPage = () => {
           <TableHead>
             <TableRow>
               {[
-                { text: "Service", sx: { width: 200 } },
+                { text: "Diagnosis", sx: { width: 300 } },
                 { text: "Description" },
-                { text: "Service Cost" },
                 { text: "Actions", align: "center", sx: { width: 110 } },
               ].map(({ text, align, sx }) => (
                 <TableCell
@@ -256,7 +246,7 @@ const ServicesManagementPage = () => {
                       <IconButton
                         color="primary"
                         size="small"
-                        onClick={() => handleEditServiceModalOpen(i)}
+                        onClick={() => handleEditModalOpen(i)}
                       >
                         <EditIcon />
                       </IconButton>
@@ -276,16 +266,16 @@ const ServicesManagementPage = () => {
       </TableContainer>
       <Pagination pagination={pagination} onChange={handlePageChange} />
 
-      {serviceModal.open && (
-        <ManageServiceModal
-          open={serviceModal.open}
-          data={serviceModal.data}
-          onClose={handleServiceModalClose}
-          onSave={!serviceModal.data ? handleAddService : handleEditService}
+      {manageModal.open && (
+        <ManageModal
+          open={manageModal.open}
+          data={manageModal.data}
+          onClose={handleManageModalClose}
+          onSave={!manageModal.data ? handleAdd : handleEdit}
         />
       )}
     </Box>
   );
 };
 
-export default ServicesManagementPage;
+export default AffiliatesManagementPage;

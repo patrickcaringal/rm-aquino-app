@@ -1,39 +1,51 @@
 import React, { useEffect } from "react";
 
 import { Button } from "@mui/material";
+import faker from "faker";
 import { FormikProvider, useFormik } from "formik";
 
-import { ServicesSchema } from "../../../../modules/validation";
+import { isMockDataEnabled } from "../../../../modules/env";
+import { AffiliatesSchema } from "../../../../modules/validation";
 import { Modal } from "../../../common";
 import Form from "./Form";
 
 const defaultValues = {
-  services: [
-    {
-      name: "",
-      description: "",
-      price: 0,
-    },
+  diagnosis: [
+    isMockDataEnabled
+      ? {
+          name: faker.lorem.words(1).toUpperCase(),
+          description: faker.lorem.paragraph().toUpperCase(),
+        }
+      : {
+          name: "",
+          description: "",
+        },
   ],
 };
 
-export default function ManageServiceModal({
+export default function ManageAffiliateModal({
   open = false,
   data,
   onClose,
   onSave,
 }) {
   const isCreate = !data;
-  const initialValues = isCreate ? defaultValues : { services: [data] };
+  const initialValues = isCreate ? defaultValues : { diagnosis: [data] };
 
   const formik = useFormik({
     initialValues: initialValues,
-    validationSchema: ServicesSchema,
+    // validationSchema: AffiliatesSchema,
     validateOnChange: false,
     enableReinitialize: true,
     onSubmit: async (values) => {
-      const { services } = values;
-      onSave(services);
+      let { diagnosis } = values;
+      diagnosis = diagnosis.map((i) => ({
+        ...i,
+        name: i.name.toUpperCase(),
+        description: i.description.toUpperCase(),
+      }));
+
+      onSave(diagnosis);
     },
   });
 
@@ -52,7 +64,7 @@ export default function ManageServiceModal({
     <Modal
       open={open}
       onClose={handleClose}
-      title={`${isCreate ? "Add" : "Edit"} Service`}
+      title={`${isCreate ? "Add" : "Edit"} Diagnosis`}
       dialogActions={
         <>
           <Button color="inherit" onClick={handleClose}>

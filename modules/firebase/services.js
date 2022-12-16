@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   query,
   updateDoc,
@@ -30,6 +31,25 @@ export const getServicesReq = async () => {
     const map = data.reduce((acc, i) => ({ ...acc, [i.id]: i.name }), {});
 
     return { data, map, success: true };
+  } catch (error) {
+    console.log(error);
+    return { error: error.message };
+  }
+};
+
+export const getServiceReq = async ({ id }) => {
+  try {
+    // Get Patient
+    const q = doc(db, "services", id);
+    const querySnapshot = await getDoc(q);
+
+    if (!querySnapshot.exists()) {
+      throw new Error("Unable to get Services doc");
+    }
+
+    const data = querySnapshot.data();
+
+    return { data, success: true };
   } catch (error) {
     console.log(error);
     return { error: error.message };
