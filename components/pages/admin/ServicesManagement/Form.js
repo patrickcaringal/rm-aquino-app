@@ -111,6 +111,18 @@ const Form = ({
                           error={getError("description")}
                         />
                       </Grid>
+                      <Grid item xs={12} sm={12}>
+                        <Input
+                          type="number"
+                          required
+                          label="Price"
+                          name={getFieldName("price")}
+                          value={valueArr.price}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={getError("price")}
+                        />
+                      </Grid>
                     </Grid>
                     {values.services.length !== index + 1 && (
                       <Divider sx={{ mt: 3, mb: 4 }} />

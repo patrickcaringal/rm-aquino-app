@@ -152,7 +152,7 @@ export const localUpdateDocs = ({
   const { diff } = compareObj({
     latest: updatedDoc,
     old: oldDoc,
-    fields: Object.keys(oldDoc),
+    fields: Object.keys(oldDoc), // .concat(["price"])
     retainFields: ["id"],
   });
 

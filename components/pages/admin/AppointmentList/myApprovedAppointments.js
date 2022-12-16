@@ -27,6 +27,8 @@ import {
   approveAppointmentReq,
   getAppointmentByDateStatusReq,
   getDoctorAppointmentByDateReq,
+  getServiceReq,
+  payAppointmentReq,
   rejectAppointmentReq,
   updateAppointmentReq,
   updatePatientReq,
@@ -81,6 +83,8 @@ const MyApprovedAppointmentsPage = () => {
     rejectAppointmentReq,
     setBackdropLoader
   );
+  const [getService] = useRequest(getServiceReq, setBackdropLoader);
+  const [payAppointment] = useRequest(payAppointmentReq, setBackdropLoader);
 
   // Local States
   const [appointments, setAppointments] = useState([]);
@@ -286,6 +290,62 @@ const MyApprovedAppointmentsPage = () => {
     );
   };
 
+  const handlePaymentConfirm = async (i) => {
+    const payload = { id: i.serviceId };
+    const { data, error } = await getService(payload);
+    if (error) return openErrorDialog(error);
+
+    openResponseDialog({
+      title: "Payment",
+      content: (
+        <>
+          <Typography variant="body1" gutterBottom>
+            Record payment?
+          </Typography>
+          <Typography variant="body2">
+            {formatTimeStamp(i.date, "MMM dd, yyyy (EEEE)")}
+          </Typography>
+          <Typography variant="body2">{`${i.patientName}`}</Typography>
+          <Typography variant="body2">{i.doctor}</Typography>
+          <Typography variant="body2">{i.service}</Typography>
+          <Typography variant="body2" sx={{ mt: 1, fontWeight: 500 }}>
+            ₱ {data.price}
+          </Typography>
+        </>
+      ),
+      type: "CONFIRM",
+      actions: (
+        <Button
+          variant="contained"
+          onClick={async () => {
+            const p = {
+              id: i.id,
+              cost: data.price,
+            };
+            const { error } = await payAppointment(p);
+            if (error) return openErrorDialog(error);
+
+            closeDialog();
+            setTimeout(() => {
+              fetchAppointments();
+              openResponseDialog({
+                autoClose: true,
+                content: successMessage({
+                  noun: "Payment",
+                  verb: "saved",
+                }),
+                type: "SUCCESS",
+              });
+            }, 500);
+          }}
+          size="small"
+        >
+          Save payment
+        </Button>
+      ),
+    });
+  };
+
   return (
     <Box sx={{ pt: 2 }}>
       <Filters
@@ -334,6 +394,7 @@ const MyApprovedAppointmentsPage = () => {
                   patientName,
                   status,
                   vitalSignsChecked = false,
+                  paid = false,
                 } = i;
 
                 return (
@@ -359,8 +420,19 @@ const MyApprovedAppointmentsPage = () => {
                       <RequestStatus status={status} />
                     </TableCell>
                     <TableCell align="center">
+                      {status === REQUEST_STATUS.done &&
+                        !paid &&
+                        user?.role === "staff" &&
+                        getActionButtons([
+                          {
+                            action: ACTION_BUTTONS.PAID,
+                            color: "success",
+                            onClick: () => handlePaymentConfirm(i),
+                          },
+                        ])}
+
                       {status === REQUEST_STATUS.approved &&
-                        // !vitalSignsChecked &&
+                        user?.role === "staff" &&
                         getActionButtons([
                           {
                             action: ACTION_BUTTONS.VITALSIGN,

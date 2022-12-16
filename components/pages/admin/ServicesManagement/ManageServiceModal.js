@@ -12,6 +12,7 @@ const defaultValues = {
     {
       name: "",
       description: "",
+      price: 0,
     },
   ],
 };

@@ -156,6 +156,22 @@ export const getNavbarItems = (id, role, router) => {
             }),
           id: [PATHS.ADMIN.MY_APPOINTMENT_CALENDAR],
         },
+        {
+          text: "Referral",
+          icon: null,
+          // menuItems: [
+          //   {
+          //     text: "Affiliates",
+          //     onClick: () => router.push(PATHS.ADMIN.AFFILIATES_MANAGEMENT),
+          //   },
+          //   {
+          //     text: "Referral list",
+          //     onClick: () => router.push(PATHS.ADMIN.REFERRAL_LIST),
+          //   },
+          // ],
+          id: [PATHS.ADMIN.AFFILIATES_MANAGEMENT, PATHS.ADMIN.REFERRAL_LIST],
+          onClick: () => router.push(PATHS.ADMIN.REFERRAL_LIST),
+        },
         // {
         //   text: "Appointments",
         //   icon: null,

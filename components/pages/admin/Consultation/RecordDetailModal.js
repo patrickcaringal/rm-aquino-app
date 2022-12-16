@@ -374,7 +374,7 @@ const exportMedCert = (data) => {
   movingY += 20;
   doc.setFontSize(12);
   const tab = `            `;
-  const x = `${tab}This is to certify that ${patientName} visited Sigua Medical Clinic, JP Rizal St, Poblacion Uno, Cabuyao, 4026 Laguna and undergo ${service} with ${doctor} on ${date}. With the diagnosis of ${diagnosis}.`;
+  const x = `${tab}This is to certify that ${patientName} visited RM Aquino Medical Clinic, JP Rizal St, Poblacion Uno, Cabuyao, 4026 Laguna and undergo ${service} with ${doctor} on ${date}. With the diagnosis of ${diagnosis}.`;
 
   doc.splitTextToSize(x, endX - 26).forEach((i) => {
     doc.text(i, baseX + 10, movingY);

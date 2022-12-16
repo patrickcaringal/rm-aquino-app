@@ -5,7 +5,7 @@ import { TableCell } from "@mui/material";
 import { LongTypography } from "../../../../components/common";
 
 const TableCells = ({ data }) => {
-  const { id, name, description } = data;
+  const { id, name, description, price } = data;
 
   return (
     <>
@@ -13,6 +13,7 @@ const TableCells = ({ data }) => {
       <TableCell>
         <LongTypography text={description} displayedLines={2} />
       </TableCell>
+      <TableCell sx={{ width: 250 }}>{price}</TableCell>
     </>
   );
 };

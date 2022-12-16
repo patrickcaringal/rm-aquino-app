@@ -29,6 +29,7 @@ import {
   getDoctorAppointmentByDateReq,
   getDoctorAppointmentByMonthReq,
   getPatientAppointmentReq,
+  payAppointmentReq,
   rejectAppointmentReq,
   updateAppointmentReq,
 } from "./appointment";
@@ -77,6 +78,7 @@ import {
   addServiceReq,
   deleteServiceReq,
   getDeletedServicesReq,
+  getServiceReq,
   getServicesReq,
   restoreServiceReq,
   updateServiceReq,
@@ -104,6 +106,7 @@ export {
   getServicesReq,
   restoreServiceReq,
   updateServiceReq,
+  getServiceReq,
   // patient
   approvePatientReq,
   createPatientAccountReq,
@@ -147,6 +150,7 @@ export {
   getPatientAppointmentReq,
   rejectAppointmentReq,
   updateAppointmentReq,
+  payAppointmentReq,
   // medical record
   getPatientRecordReq,
   getMedicalRecordsReq,

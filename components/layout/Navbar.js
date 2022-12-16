@@ -168,10 +168,16 @@ const ResponsiveAppBar = () => {
                       WebkitLineClamp: "2",
                       overflow: "hidden",
                       mr: 3,
+                      textTransform: "uppercase",
                     }}
                   >
                     {/* {formatTimeStamp(new Date(), "MMM dd, yyyy")} */}
-                    {user?.email}
+                    {/* {user?.email} */}
+                    {user?.role === "superadmin"
+                      ? "Doctor"
+                      : !user?.role
+                      ? "Patient"
+                      : user?.role}
                   </Typography>
                 </Box>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -262,7 +268,7 @@ const ResponsiveAppBar = () => {
                     <ListItemButton
                       sx={{
                         // color: "common.white",
-                        maxWidth: 150,
+                        maxWidth: text !== "Schedule Appointment" ? 160 : 200,
                         justifyContent: "center",
                         bgcolor: selected ? "primary.light" : "primary",
                       }}

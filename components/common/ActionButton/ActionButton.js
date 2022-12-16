@@ -9,6 +9,7 @@ import EventBusyIcon from "@mui/icons-material/EventBusy";
 import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import InfoIcon from "@mui/icons-material/Info";
 import MonitorHeartIcon from "@mui/icons-material/MonitorHeart";
+import PaidIcon from "@mui/icons-material/Paid";
 import PrintIcon from "@mui/icons-material/Print";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
 import RestoreIcon from "@mui/icons-material/Restore";
@@ -32,6 +33,7 @@ export const ACTION_BUTTONS = {
   VITALSIGN: "VITALSIGN",
   PRINT: "PRINT",
   EMAIL: "EMAIL",
+  PAID: "PAID",
 };
 
 export const ACTION_ICONS = {
@@ -49,6 +51,7 @@ export const ACTION_ICONS = {
   VITALSIGN: <MonitorHeartIcon />,
   PRINT: <PrintIcon />,
   EMAIL: <EmailIcon />,
+  PAID: <PaidIcon />,
 };
 
 const getButton = ({

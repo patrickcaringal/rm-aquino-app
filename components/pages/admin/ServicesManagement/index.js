@@ -231,6 +231,7 @@ const ServicesManagementPage = () => {
               {[
                 { text: "Service", sx: { width: 200 } },
                 { text: "Description" },
+                { text: "Service Cost" },
                 { text: "Actions", align: "center", sx: { width: 110 } },
               ].map(({ text, align, sx }) => (
                 <TableCell
