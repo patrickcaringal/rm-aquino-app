@@ -49,7 +49,7 @@ const defaultValues = isMockDataEnabled
           name: "",
           dosage: "",
           frequency: "",
-          quantity: "02",
+          quantity: "0",
           remarks: "",
         },
       ],

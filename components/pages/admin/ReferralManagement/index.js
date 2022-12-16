@@ -341,12 +341,15 @@ const exportReferral = (data) => {
       );
       movingY += 6;
 
-      doc.text(
-        `Diagnosis: ${i.diagnosis}${i.remarks ? `, ${i.remarks}` : ""}`,
-        baseX + 10,
-        movingY
-      );
-      movingY += 6;
+      doc
+        .splitTextToSize(
+          `Diagnosis: ${i.diagnosis}${i.remarks ? `, ${i.remarks}` : ""}`,
+          endX - 26
+        )
+        .forEach((j) => {
+          doc.text(j, baseX + 10, movingY);
+          movingY += 6;
+        });
 
       if (i?.medications?.length > 0) {
         doc.text(`Medications:`, baseX + 10, movingY);
@@ -372,7 +375,10 @@ const exportReferral = (data) => {
 
   if (remarks) {
     movingY += 10;
-    doc.text(remarks, baseX + 10, movingY);
+    doc.splitTextToSize(remarks, endX - 26).forEach((j) => {
+      doc.text(j, baseX + 10, movingY);
+      movingY += 8;
+    });
   }
 
   movingY += 16;

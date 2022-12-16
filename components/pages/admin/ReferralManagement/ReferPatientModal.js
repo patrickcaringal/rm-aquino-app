@@ -260,6 +260,7 @@ const ReferPatientModal = ({ referrer, open, onClose, onSave }) => {
         rows={3}
         value={values.remarks}
         label="Other remarks"
+        placeholder="anything related to the referral that is informative."
         name="remarks"
         onChange={handleChange}
         onBlur={handleBlur}
