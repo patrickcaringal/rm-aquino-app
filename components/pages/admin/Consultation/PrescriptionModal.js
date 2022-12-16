@@ -43,7 +43,7 @@ const PrescriptionModal = ({ open = false, data, onClose, onSave }) => {
             Close
           </Button>
           <Button variant="contained" size="small" onClick={submitForm}>
-            print prescription
+            print
           </Button>
         </>
       }

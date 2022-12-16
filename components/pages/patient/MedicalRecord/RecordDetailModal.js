@@ -7,14 +7,9 @@ import { jsPDF } from "jspdf";
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
 import { useResponseDialog } from "../../../../contexts/ResponseDialogContext";
 import { useRequest } from "../../../../hooks";
-import {
-  getDoctorReq,
-  updateMedicalRecordReq,
-} from "../../../../modules/firebase";
+import { getDoctorReq } from "../../../../modules/firebase";
 import { formatTimeStamp } from "../../../../modules/helper";
 import { Datalist, Modal } from "../../../common";
-import MedicalCertificateModal from "./MedicalCertificateModal";
-import PrescriptionModal from "./PrescriptionModal";
 
 const defaultModal = {
   open: false,
@@ -27,10 +22,6 @@ const RecordDetailModal = ({ open = false, data, onClose }) => {
 
   // Requests
   const [getDoctor] = useRequest(getDoctorReq, setBackdropLoader);
-  const [updateMedicalRecord] = useRequest(
-    updateMedicalRecordReq,
-    setBackdropLoader
-  );
 
   // Local States
   const [prescriptionModal, setPrescriptionModal] = useState(defaultModal);
@@ -118,80 +109,11 @@ const RecordDetailModal = ({ open = false, data, onClose }) => {
     onClose();
   };
 
-  const handlePrescriptionModalOpen = (data) => {
-    setPrescriptionModal({
-      open: true,
-      data,
-    });
-  };
-
-  const handlePrescriptionModalClose = () => {
-    setPrescriptionModal(defaultModal);
-  };
-
-  const handleMedicalCertModalOpen = (data) => {
-    setMedicalCertModal({
-      open: true,
-      data,
-    });
-  };
-
-  const handleMedicalCertModalClose = () => {
-    setMedicalCertModal(defaultModal);
-  };
-
-  const savePrescription = async (p) => {
-    const payload = {
-      document: {
-        id: p.id,
-        presciption: p,
-      },
-    };
-
-    const { data, error } = await updateMedicalRecord(payload);
-    if (error) return openErrorDialog(error);
-  };
-
-  const saveMedicalCertificate = async (p) => {
-    const payload = {
-      document: {
-        id: p.id,
-        medicalCertificate: p,
-      },
-    };
-
-    const { data, error } = await updateMedicalRecord(payload);
-    if (error) return openErrorDialog(error);
-  };
-
   const handlePrintPrescription = async (i) => {
-    const payload = { id: data.doctorId };
-    const { data: d, error } = await getDoctor(payload);
-    if (error) return openErrorDialog(error);
-
-    const j = {
-      date: data.date,
-      patient: data.patientName,
-      doctor: data.doctor,
-      specialty: d.specialty,
-      email: d.email,
-      contactNo: d.contactNo,
-    };
-
-    await savePrescription({
-      id: data.id,
-      ...i,
-      ...j,
-    });
-
-    exportPrescription({
-      ...i,
-      ...j,
-    });
+    exportPrescription(i);
   };
 
   const handlePrintMedicalCert = async (i) => {
-    await saveMedicalCertificate({ ...i, id: data.id });
     exportMedCert(i);
   };
 
@@ -208,20 +130,24 @@ const RecordDetailModal = ({ open = false, data, onClose }) => {
           <Button color="inherit" size="small" onClick={handleClose}>
             Close
           </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => handlePrescriptionModalOpen(data)}
-          >
-            prescription
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => handleMedicalCertModalOpen(data)}
-          >
-            medical certificate
-          </Button>
+          {!!data.presciption && (
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => handlePrintPrescription(data.presciption)}
+            >
+              prescription
+            </Button>
+          )}
+          {!!data.medicalCertificate && (
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => handlePrintMedicalCert(data.medicalCertificate)}
+            >
+              medical certificate
+            </Button>
+          )}
         </>
       }
     >
@@ -271,24 +197,6 @@ const RecordDetailModal = ({ open = false, data, onClose }) => {
           )}
         </Box>
       </Box>
-
-      {prescriptionModal.open && (
-        <PrescriptionModal
-          open={prescriptionModal.open}
-          data={prescriptionModal.data}
-          onClose={handlePrescriptionModalClose}
-          onSave={handlePrintPrescription}
-        />
-      )}
-
-      {medicalCertModal.open && (
-        <MedicalCertificateModal
-          open={medicalCertModal.open}
-          data={medicalCertModal.data}
-          onClose={handleMedicalCertModalClose}
-          onSave={handlePrintMedicalCert}
-        />
-      )}
     </Modal>
   );
 };

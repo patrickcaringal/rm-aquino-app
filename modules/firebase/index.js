@@ -49,7 +49,11 @@ import {
   getDiagnosisReq,
   updateDiagnosisReq,
 } from "./diagnosis";
-import { getMedicalRecordsReq, getPatientRecordReq } from "./medicalRecords";
+import {
+  getMedicalRecordsReq,
+  getPatientRecordReq,
+  updateMedicalRecordReq,
+} from "./medicalRecords";
 import {
   approvePatientReq,
   createPatientAccountReq,
@@ -154,6 +158,7 @@ export {
   // medical record
   getPatientRecordReq,
   getMedicalRecordsReq,
+  updateMedicalRecordReq,
   // affiliate
   addAffiliateReq,
   deleteAffiliateReq,
