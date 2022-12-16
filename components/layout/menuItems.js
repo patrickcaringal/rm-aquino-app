@@ -103,10 +103,10 @@ export const getNavbarItems = (id, role, router) => {
               text: "Affiliates",
               onClick: () => router.push(PATHS.ADMIN.AFFILIATES_MANAGEMENT),
             },
-            {
-              text: "Referr Patient",
-              onClick: () => router.push(PATHS.ADMIN.REFERRAL),
-            },
+            // {
+            //   text: "Referr Patient",
+            //   onClick: () => router.push(PATHS.ADMIN.REFERRAL),
+            // },
             {
               text: "Referral list",
               onClick: () => router.push(PATHS.ADMIN.REFERRAL_LIST),

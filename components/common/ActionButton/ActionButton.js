@@ -4,16 +4,19 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import EmailIcon from "@mui/icons-material/Email";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import InfoIcon from "@mui/icons-material/Info";
 import MonitorHeartIcon from "@mui/icons-material/MonitorHeart";
+import PrintIcon from "@mui/icons-material/Print";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
 import RestoreIcon from "@mui/icons-material/Restore";
 import SourceIcon from "@mui/icons-material/Source";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import { IconButton, Tooltip } from "@mui/material";
+
 export const ACTION_BUTTONS = {
   DETAILS: "DETAILS",
   DETAILS2: "DETAILS2",
@@ -27,6 +30,8 @@ export const ACTION_BUTTONS = {
   REJECT: "REJECT",
   CANCEL: "CANCEL",
   VITALSIGN: "VITALSIGN",
+  PRINT: "PRINT",
+  EMAIL: "EMAIL",
 };
 
 export const ACTION_ICONS = {
@@ -42,6 +47,8 @@ export const ACTION_ICONS = {
   REJECT: <ThumbDownIcon />,
   CANCEL: <EventBusyIcon />,
   VITALSIGN: <MonitorHeartIcon />,
+  PRINT: <PrintIcon />,
+  EMAIL: <EmailIcon />,
 };
 
 const getButton = ({

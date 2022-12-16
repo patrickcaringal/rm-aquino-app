@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { Autocomplete, Box, Button } from "@mui/material";
 import { useFormik } from "formik";
+import _ from "lodash";
 import { useRouter } from "next/router";
 
 import { useBackdropLoader } from "../../../../contexts/BackdropLoaderContext";
@@ -10,6 +11,7 @@ import { useRequest } from "../../../../hooks";
 import {
   addReferralReq,
   getAffiliatesReq,
+  getPatientRecordReq,
   getPatientsReq,
   getServicesReq,
 } from "../../../../modules/firebase";
@@ -32,6 +34,7 @@ const ReferPatientModal = ({ referrer, open, onClose, onSave }) => {
   const [getAffiliates] = useRequest(getAffiliatesReq, setBackdropLoader);
   const [getServices] = useRequest(getServicesReq, setBackdropLoader);
   const [addReferral] = useRequest(addReferralReq, setBackdropLoader);
+  const [getPatientRecord] = useRequest(getPatientRecordReq, setBackdropLoader);
 
   // Local States
   const [patients, setPatients] = useState([]);
@@ -70,6 +73,24 @@ const ReferPatientModal = ({ referrer, open, onClose, onSave }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const fetchPatientMedicalRecord = async (id) => {
+    const { data, error } = await getPatientRecordReq({ id });
+    if (error) return openErrorDialog(error);
+
+    return data
+      .slice(0, 3)
+      .map((i) =>
+        _.pick(i, [
+          "date",
+          "doctor",
+          "service",
+          "diagnosis",
+          "remarks",
+          "medications",
+        ])
+      );
+  };
+
   const formik = useFormik({
     initialValues: {
       // affiliate
@@ -91,6 +112,8 @@ const ReferPatientModal = ({ referrer, open, onClose, onSave }) => {
     validateOnChange: false,
     enableReinitialize: true,
     onSubmit: async (values, { resetForm }) => {
+      const records = await fetchPatientMedicalRecord(values.patientId);
+
       const p = {
         ...values,
         serviceName:
@@ -99,6 +122,7 @@ const ReferPatientModal = ({ referrer, open, onClose, onSave }) => {
             : values.serviceName,
         referrerName: referrer?.name,
         referrerId: referrer?.id,
+        records,
       };
       delete p.otherServiceName;
 
